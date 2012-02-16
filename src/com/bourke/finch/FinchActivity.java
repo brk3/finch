@@ -6,19 +6,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
+import android.support.v4.app.ActionBar;
+import android.support.v4.view.Menu;
+import android.support.v4.view.MenuItem;
+import android.support.v4.app.FragmentActivity;
 
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.TestAdapter;
 
-public class FinchActivity extends SherlockActivity
+public class FinchActivity extends FragmentActivity
         implements ActionBar.OnNavigationListener {
 
-    public static int THEME_DARK = R.style.Theme_Sherlock;
-    public static int THEME_LIGHT = R.style.Theme_Sherlock_Light;
+    public static int THEME_DARK = R.style.Theme_Finch;
+    public static int THEME_LIGHT = R.style.Theme_Finch_Light;
 
     private String[] mLocations;
 
@@ -35,9 +35,9 @@ public class FinchActivity extends SherlockActivity
         setContentView(R.layout.main);
 
         /* Set up actionbar navigation spinner */
-        mLocations = getResources().getStringArray(R.array.locations);
-        ArrayAdapter<CharSequence> list = ArrayAdapter.createFromResource(this,
-                R.array.locations, R.layout.sherlock_spinner_item);
+        ArrayAdapter<CharSequence> list =
+            ArrayAdapter.createFromResource(this, R.array.locations,
+                R.layout.spinner_title);
         list.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         getSupportActionBar().setNavigationMode(
@@ -51,6 +51,8 @@ public class FinchActivity extends SherlockActivity
         mMainList.setAdapter(adapter);
         //adapter = new LazyAdapter(this, mStrings);
         //mMainList.setAdapter(adapter);
+
+        getSupportActionBar().setSubtitle("@brk3");
     }
 
     @Override

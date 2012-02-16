@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Finch" parent="Theme.Sherlock">
+        <item name="abTitleTextStyle">@style/CustomTitle</item>
+        <item name="abSubtitleTextStyle">@style/CustomSubTitle</item>
+        <item name="actionBarSize">55dp</item>
+    </style>
+
+    <style name="Theme.Finch_Light" parent="Theme.Sherlock.Light">
+        <item name="abTitleTextStyle">@style/CustomTitle</item>
+        <item name="abSubtitleTextStyle">@style/CustomSubTitle</item>
+        <item name="actionBarSize">55dp</item>
+    </style>
+
+    <style name="CustomTitle">
+        <item name="android:textSize">25sp</item>
+    </style>
+
+    <style name="CustomSubTitle">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/text_faded</item>
+    </style>
+
+</resources>
