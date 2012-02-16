@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/backrepeat">
+
+    <TextView
+        android:id="@+id/text_tweet"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="left|center_vertical"
+        android:textSize="18dip"
+        android:layout_marginLeft="10dip" />
+
+    <ImageView
+        android:id="@+id/image_profile"
+        android:layout_width="100dip"
+        android:layout_height="100dip"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/ic_contact_picture"
+        android:scaleType="centerCrop" />
+
+</RelativeLayout>
