@@ -2,20 +2,28 @@ package com.bourke.finch;
 
 import android.os.Bundle;
 
+import android.support.v4.app.ActionBar;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.Menu;
+import android.support.v4.view.MenuItem;
+
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import android.support.v4.app.ActionBar;
-import android.support.v4.view.Menu;
-import android.support.v4.view.MenuItem;
-import android.support.v4.app.FragmentActivity;
-
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.TestAdapter;
 
+import twitter4j.auth.AccessToken;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+
 public class FinchActivity extends FragmentActivity
         implements ActionBar.OnNavigationListener {
+
+    private static final String CONSUMER_KEY = "7QIjyQd3cA8c8jn80tRtqw";
+    private static final String CONSUMER_SECRET =
+        "yREZDaGBZfIGnlNGce9m80jRUKbnkYhZGT7XZkFZqg";
 
     public static int THEME_DARK = R.style.Theme_Finch;
     public static int THEME_LIGHT = R.style.Theme_Finch_Light;
@@ -52,6 +60,13 @@ public class FinchActivity extends FragmentActivity
         //adapter = new LazyAdapter(this, mStrings);
         //mMainList.setAdapter(adapter);
 
+        /* Check for saved log in details */
+        //checkForSavedLogin();
+
+        /* Set consumer and provider on teh Application service */
+        //getConsumerProvider();
+
+        /* Set actionbar subtitle to user's username */
         getSupportActionBar().setSubtitle("@brk3");
     }
 
