@@ -11,6 +11,7 @@
         <item name="abTitleTextStyle">@style/CustomTitle</item>
         <item name="abSubtitleTextStyle">@style/CustomSubTitle</item>
         <item name="actionBarSize">55dp</item>
+        <item name="abBackground">#ffdedede</item>
     </style>
 
     <style name="CustomTitle">
