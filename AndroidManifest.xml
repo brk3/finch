@@ -13,15 +13,18 @@
 
     <application android:label="@string/app_name"
                  android:icon="@drawable/ic_launcher">
-        <activity android:name="FinchActivity"
-                  android:label="@string/app_name"
-                  android:uiOptions="splitActionBarWhenNarrow"
-                  android:launchMode="singleInstance">
 
+        <activity android:name="HomeActivity"
+                  android:label="@string/app_name"
+                  android:uiOptions="splitActionBarWhenNarrow">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name="LoginActivity"
+                  android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -29,5 +32,6 @@
                 <data android:scheme="finch-callback" />
             </intent-filter>
         </activity>
+
     </application>
 </manifest>

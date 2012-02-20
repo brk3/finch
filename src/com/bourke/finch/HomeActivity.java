@@ -37,10 +37,10 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import android.os.AsyncTask;
 
-public class FinchActivity extends FragmentActivity
+public class HomeActivity extends FragmentActivity
         implements ActionBar.OnNavigationListener {
 
-    private static final String TAG = "Finch/FinchActivity";
+    private static final String TAG = "Finch/HomeAcivity";
 
     protected static final String CONSUMER_KEY = "7QIjyQd3cA8c8jn80tRtqw";
     protected static final String CONSUMER_SECRET =
