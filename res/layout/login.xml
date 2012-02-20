@@ -12,10 +12,20 @@
         android:textSize="25dip"
         android:textColor="@color/text_faded"
         android:text="Welcome\nto\nFinch" />
+    <ImageButton
+        android:id="@+id/btnSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/textview"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_send_holo_light" />
     <EditText
-        android:id="@+id/usernameInput"
+        android:id="@+id/txtUsername"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textview" />
+        android:layout_below="@id/textview"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@id/btnSend" />
 
 </RelativeLayout>
