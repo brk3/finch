@@ -61,8 +61,6 @@ public class LoginActivity extends FragmentActivity
 		mTwitter = new TwitterFactory().getInstance();
 		mTwitter.setOAuthConsumer(Constants.CONSUMER_KEY,
                 Constants.CONSUMER_SECRET);
-
-        new RequestAuthTask().execute();
     }
 
 	@Override
@@ -76,7 +74,7 @@ public class LoginActivity extends FragmentActivity
 	}
 
     public void loginUser(View view) {
-
+        new RequestAuthTask().execute();
     }
 
     @Override
