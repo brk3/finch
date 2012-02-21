@@ -3,28 +3,34 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:paddingLeft="20dip"
     android:background="@drawable/backrepeat">
 
     <TextView
         android:id="@+id/textview"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="25dip"
+        android:textSize="26dip"
         android:textColor="@color/text_faded"
-        android:text="Welcome\nto\nFinch" />
+        android:text="Welcome\nto\nFinch."
+        android:paddingTop="100dip" />
     <ImageButton
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@id/textview"
-        android:background="@android:color/transparent"
+        android:background="@drawable/login_button"
+        android:padding="10dip"
+        android:onClick="loginUser"
         android:src="@drawable/ic_send_holo_light" />
     <EditText
         android:id="@+id/txtUsername"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/textview"
+        android:singleLine="true"
+        android:text="\@"
         android:layout_alignParentLeft="true"
         android:layout_toLeftOf="@id/btnSend" />
 
