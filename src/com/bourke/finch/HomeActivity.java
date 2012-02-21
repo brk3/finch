@@ -41,6 +41,8 @@ public class HomeActivity extends FragmentActivity
 
     private Twitter mTwitter;
 
+    private AccessToken mAccessToken;
+
     private SharedPreferences mPrefs;
     private Context mContext;
 
@@ -87,9 +89,6 @@ public class HomeActivity extends FragmentActivity
 			Log.d(TAG, "New User");
             startActivity(new Intent(this, LoginActivity.class));
 		}
-
-        /* Set actionbar subtitle to user's username */
-        getSupportActionBar().setSubtitle("@brk3");
     }
 
     /*
@@ -100,8 +99,14 @@ public class HomeActivity extends FragmentActivity
 		String secret = mPrefs.getString(Constants.PREF_ACCESS_TOKEN_SECRET,
                 null);
 
-		AccessToken at = new AccessToken(token, secret);
-		mTwitter.setOAuthAccessToken(at);
+		mAccessToken = new AccessToken(token, secret);
+		mTwitter.setOAuthAccessToken(mAccessToken);
+
+        /* Set actionbar subtitle to user's username */
+        TwitterTask.Payload showUserParams = new TwitterTask.Payload(
+                TwitterTask.SHOWUSER, new Object[] {HomeActivity.this,
+                    mAccessToken.getUserId()});
+        new TwitterTask().execute(showUserParams);
 
 		Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
 	}
