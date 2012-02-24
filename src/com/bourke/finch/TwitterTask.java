@@ -2,49 +2,98 @@ package com.bourke.finch;
 
 import android.os.AsyncTask;
 
+import android.util.Log;
+
+import android.view.Window;
+
+import android.widget.Toast;
+
+import java.util.List;
+
+import twitter4j.ResponseList;
+
+import twitter4j.Status;
+
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
 
-import twitter4j.TwitterFactory;
-
 import twitter4j.User;
 
-/* AsyncTask<executeParams, publishProgressParams, resultType> */
+/*
+ * Generic AsyncTask used to make API calls in a background thread.
+ *
+ * Pattern adapted from
+ * http://jyro.blogspot.com/2009/11/android-asynctask-template.html
+ *
+ * AsyncTask<executeParams, publishProgressParams, resultType>
+ */
 
 public class TwitterTask extends
         AsyncTask<TwitterTask.Payload, Object, TwitterTask.Payload> {
 
     public static final String TAG = "Finch/TwitterTask";
 
-    public static final int SHOWUSER = 0;
+    public static final int SHOW_USER = 0;
+    public static final int GET_HOME_TIMELINE = 1;
+
+    private Twitter mTwitter;
+
+    private TwitterTask.Payload mParams;
+
+    public TwitterTask(TwitterTask.Payload params, Twitter twitter) {
+        mParams = params;
+        mTwitter = twitter;
+    }
 
     @Override
     protected void onPreExecute() {
+
+        TwitterTask.Payload payload = mParams;
+        int taskType = mParams.taskType;
+
+        switch(taskType) {
+
+            case SHOW_USER: case GET_HOME_TIMELINE:
+                HomeActivity app = (HomeActivity)payload.data[0];
+                app.setProgressBarIndeterminateVisibility(Boolean.TRUE);
+                break;
+        }
     }
 
     public TwitterTask.Payload doInBackground(TwitterTask.Payload... params) {
 
-        TwitterTask.Payload payload = params[0];
-        int taskType = payload.taskType;
+        TwitterTask.Payload payload = mParams;
+        int taskType = mParams.taskType;
 
         switch(taskType) {
 
-            case SHOWUSER:
+            case SHOW_USER:
                 /* Extract the parameters of the task from payload */
                 long userId = (Long)payload.data[1];
 
                 /* Perform the task */
-                Twitter twitter = new TwitterFactory().getInstance();
                 User user = null;
                 try {
-                    user = twitter.showUser(userId);
+                    user = mTwitter.showUser(userId);
                 } catch (TwitterException e) {
-
+                    e.printStackTrace();
+                    return null;
                 }
 
                 /* Return result of the task */
                 payload.result = user;
+                break;
+
+            case GET_HOME_TIMELINE:
+                List<twitter4j.Status> homeTimeline = null;
+                try {
+                    homeTimeline = mTwitter.getHomeTimeline();
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+                payload.result = homeTimeline;
                 break;
         }
 
@@ -54,19 +103,29 @@ public class TwitterTask extends
     @Override
     public void onPostExecute(TwitterTask.Payload payload) {
 
+        if (payload == null) {
+            return;
+        }
+
+        HomeActivity app = (HomeActivity)payload.data[0];
+
         switch(payload.taskType) {
 
-            case SHOWUSER:
-                HomeActivity app = (HomeActivity)payload.data[0];
+            case SHOW_USER:
                 String screenName = ((User)payload.result).getScreenName();
+                app.setProgressBarIndeterminateVisibility(false);
                 app.getSupportActionBar().setSubtitle(screenName);
                 break;
+
+            case GET_HOME_TIMELINE:
+                app.setProgressBarIndeterminateVisibility(false);
+                List<twitter4j.Status> homeTimeline =
+                    (ResponseList<twitter4j.Status>)payload.result;
+                for (twitter4j.Status s : homeTimeline) {
+                    Log.d(TAG, "XXX: " + s.getText());
+                }
+                break;
         }
-    }
-
-    @Override
-    public void onProgressUpdate(Object... value) {
-
     }
 
     public static class Payload {

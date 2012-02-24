@@ -12,6 +12,7 @@ import android.support.v4.app.ActionBar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.Menu;
 import android.support.v4.view.MenuItem;
+import android.support.v4.view.Window;
 
 import android.util.Log;
 
@@ -59,6 +60,7 @@ public class HomeActivity extends FragmentActivity
                 Constants.CONSUMER_SECRET);
 
         /* Set layout and theme */
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setTheme(Constants.THEME_LIGHT);
         setContentView(R.layout.main);
 
@@ -95,6 +97,7 @@ public class HomeActivity extends FragmentActivity
      * The user had previously given our app permission to use Twitter.
 	 */
 	private void loginAuthorisedUser() {
+
 		String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
 		String secret = mPrefs.getString(Constants.PREF_ACCESS_TOKEN_SECRET,
                 null);
@@ -102,14 +105,25 @@ public class HomeActivity extends FragmentActivity
 		mAccessToken = new AccessToken(token, secret);
 		mTwitter.setOAuthAccessToken(mAccessToken);
 
+        onLogin();
+	}
+
+    private void onLogin() {
+
         /* Set actionbar subtitle to user's username */
         TwitterTask.Payload showUserParams = new TwitterTask.Payload(
-                TwitterTask.SHOWUSER, new Object[] {HomeActivity.this,
-                    mAccessToken.getUserId()});
-        new TwitterTask().execute(showUserParams);
+                TwitterTask.SHOW_USER,
+                new Object[] {HomeActivity.this, mAccessToken.getUserId()});
+        new TwitterTask(showUserParams, mTwitter).execute();
 
 		Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
-	}
+
+        /* Fetch user's timeline to populate ListView */
+        TwitterTask.Payload getTimelineParams = new TwitterTask.Payload(
+                TwitterTask.GET_HOME_TIMELINE,
+                new Object[] {HomeActivity.this});
+        new TwitterTask(getTimelineParams, mTwitter).execute();
+    }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
