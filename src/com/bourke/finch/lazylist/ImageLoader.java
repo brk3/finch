@@ -73,75 +73,40 @@ public class ImageLoader {
     private Bitmap getBitmap(String screenName) {
         File f = fileCache.getFile(screenName);
 
-        /* From sd cache */
-        //Bitmap b = decodeFile(f);
-        Bitmap b = BitmapFactory.decodeFile(f.toString());
-        if (b != null)
-            return b;
+        /* From sd cache. Original lazylist code uses a custom decodeFile
+         * method here, but our should come prescaled courtesy of twitter4j. */
+        Bitmap bitmap = BitmapFactory.decodeFile(f.toString());
 
-        /* From web */
-        String profileImageUrl = "";
-        try {
-            Twitter twitter = ((FinchApplication)mActivity.getApplication())
-                .getTwitter();
-            ProfileImage p = twitter.getProfileImage(
-                    screenName, ProfileImage.BIGGER);
-            profileImageUrl = p.getURL();
-        } catch (TwitterException e) {
-            e.printStackTrace();
-            return null;
-        }
-        try {
-            Bitmap bitmap = null;
-            URL imageUrl = new URL(profileImageUrl);
-            HttpURLConnection conn =
-                (HttpURLConnection)imageUrl.openConnection();
-            conn.setConnectTimeout(30000);
-            conn.setReadTimeout(30000);
-            conn.setInstanceFollowRedirects(true);
-            InputStream is = conn.getInputStream();
-            OutputStream os = new FileOutputStream(f);
-            Utils.CopyStream(is, os);
-            os.close();
-            bitmap = decodeFile(f);
-            return bitmap;
-        } catch (Exception ex){
-           ex.printStackTrace();
-           return null;
-        }
-    }
+        if (bitmap == null) {
+            /* From web */
+            try {
+                Twitter twitter =
+                    ((FinchApplication)mActivity.getApplication())
+                    .getTwitter();
+                ProfileImage p = twitter.getProfileImage(
+                        screenName, ProfileImage.BIGGER);
+                String profileImageUrl = p.getURL();
 
-    /* Decodes image and scales it to reduce memory consumption */
-    private Bitmap decodeFile(File f) {
-        try {
-            /* Decode image size */
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(new FileInputStream(f),null,o);
+                URL imageUrl = new URL(profileImageUrl);
+                HttpURLConnection conn =
+                    (HttpURLConnection)imageUrl.openConnection();
+                conn.setConnectTimeout(30000);
+                conn.setReadTimeout(30000);
+                conn.setInstanceFollowRedirects(true);
+                InputStream is = conn.getInputStream();
+                OutputStream os = new FileOutputStream(f);
+                Utils.CopyStream(is, os);
+                os.close();
 
-            /* Find the correct scale value. It should be the power of 2. */
-            final int REQUIRED_SIZE = 70;
-            int width_tmp = o.outWidth, height_tmp=o.outHeight;
-            int scale = 1;
-
-            while (true) {
-                if (width_tmp/2<REQUIRED_SIZE || height_tmp/2<REQUIRED_SIZE) {
-                    break;
-                }
-                width_tmp /= 2;
-                height_tmp /= 2;
-                scale *= 2;
+                bitmap = BitmapFactory.decodeFile(f.toString());
+            } catch (TwitterException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            /* Decode with inSampleSize */
-            BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize = scale;
-            return BitmapFactory.decodeStream(
-                    new FileInputStream(f), null, o2);
-        } catch (FileNotFoundException e) {
         }
 
-        return null;
+        return bitmap;
     }
 
     private boolean imageViewReused(PhotoToLoad photoToLoad) {
