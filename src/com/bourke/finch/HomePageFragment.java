@@ -23,6 +23,9 @@ import android.widget.Toast;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.TestAdapter;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
