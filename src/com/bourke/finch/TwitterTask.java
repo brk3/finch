@@ -1,5 +1,4 @@
 package com.bourke.finch;
-
 import android.os.AsyncTask;
 
 import android.util.Log;
@@ -7,9 +6,11 @@ import android.util.Log;
 import android.view.Window;
 
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.bourke.finch.lazylist.ImageLoader;
+import com.bourke.finch.lazylist.LazyAdapter;
 
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class TwitterTask extends
         switch(taskType) {
 
             case SHOW_USER: case GET_HOME_TIMELINE:
-                HomeActivity app = (HomeActivity)payload.data[0];
+                FinchActivity app = (FinchActivity)payload.data[0];
                 app.setProgressBarIndeterminateVisibility(Boolean.TRUE);
                 break;
         }
@@ -112,23 +113,24 @@ public class TwitterTask extends
             return;
         }
 
-        HomeActivity app = null;
+        FinchActivity app = null;
 
         switch(payload.taskType) {
 
             case SHOW_USER:
                 String screenName = ((User)payload.result).getScreenName();
-                app = (HomeActivity)payload.data[0];
+                app = (FinchActivity)payload.data[0];
                 app.setProgressBarIndeterminateVisibility(false);
                 app.getSupportActionBar().setSubtitle(screenName);
                 break;
 
             case GET_HOME_TIMELINE:
-                app = (HomeActivity)payload.data[0];
+                app = (FinchActivity)payload.data[0];
                 app.setProgressBarIndeterminateVisibility(false);
-                app.getMainList().setStatuses(
+                LazyAdapter mainListAdapter = (LazyAdapter)payload.data[1];
+                mainListAdapter.setStatuses(
                         (ResponseList<twitter4j.Status>)payload.result);
-                app.getMainList().notifyDataSetChanged();
+                mainListAdapter.notifyDataSetChanged();
                 break;
         }
     }

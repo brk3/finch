@@ -164,7 +164,7 @@ public class LoginActivity extends FragmentActivity
 
             Toast.makeText(mContext, "Logged In", Toast.LENGTH_SHORT).show();
 
-            startActivity(new Intent(mContext, HomeActivity.class));
+            startActivity(new Intent(mContext, FinchActivity.class));
         }
     }
 }
