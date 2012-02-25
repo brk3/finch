@@ -34,7 +34,7 @@ public class LazyAdapter extends BaseAdapter {
         activity = a;
         inflater = (LayoutInflater)activity.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
-        imageLoader = new ImageLoader(activity.getApplicationContext());
+        imageLoader = new ImageLoader(activity);
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -48,14 +48,16 @@ public class LazyAdapter extends BaseAdapter {
             TextView text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
             text_tweet.setText(mStatuses.get(position).getText());
 
+            String screenName = mStatuses.get(position).getUser().
+                getScreenName();
+
             TextView text_screenname =
                 (TextView)vi.findViewById(R.id.text_screenname);
-            text_screenname.setText("@"+mStatuses.get(position).getUser().
-                    getScreenName());
+            text_screenname.setText("@"+screenName);
 
             ImageView image_profile = (ImageView)vi.findViewById(
                     R.id.image_profile);
-            //imageLoader.DisplayImage(mStatuses[position], image);
+            imageLoader.displayImage(screenName, image_profile);
         }
 
         return vi;

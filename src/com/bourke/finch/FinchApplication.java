@@ -1,9 +1,15 @@
 package com.bourke.finch;
 
-public class Constants {
+import android.app.Application;
 
-    public static int THEME_DARK = R.style.Theme_Finch;
-    public static int THEME_LIGHT = R.style.Theme_Finch_Light;
+import twitter4j.Twitter;
+
+public class FinchApplication extends Application {
+
+    private Twitter mTwitter;
+
+    public static final int THEME_DARK = R.style.Theme_Finch;
+    public static final int THEME_LIGHT = R.style.Theme_Finch_Light;
 
     protected static final String CALLBACK_URL = "finch-callback:///";
 
@@ -15,6 +21,12 @@ public class Constants {
 	protected static final String PREF_ACCESS_TOKEN_SECRET =
         "accessTokenSecret";
 
-    private Constants() {
+    public Twitter getTwitter() {
+        return mTwitter;
     }
+
+    public void setTwitter(Twitter twitter) {
+        mTwitter = twitter;
+    }
+
 }

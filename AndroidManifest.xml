@@ -11,8 +11,13 @@
     <!-- used by twitter integration -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <application android:label="@string/app_name"
-                 android:icon="@drawable/ic_launcher">
+    <!-- used by lazylist cache -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <application
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:name="FinchApplication">
 
         <activity android:name="HomeActivity"
                   android:label="@string/app_name"

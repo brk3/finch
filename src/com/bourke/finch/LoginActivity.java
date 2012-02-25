@@ -53,14 +53,14 @@ public class LoginActivity extends FragmentActivity
         mPrefs = getSharedPreferences("twitterPrefs", MODE_PRIVATE);
 
         /* Set layout and theme */
-        setTheme(Constants.THEME_LIGHT);
+        setTheme(FinchApplication.THEME_LIGHT);
         setContentView(R.layout.login);
         getActionBar().hide();
 
 		/* Load the twitter4j helper */
 		mTwitter = new TwitterFactory().getInstance();
-		mTwitter.setOAuthConsumer(Constants.CONSUMER_KEY,
-                Constants.CONSUMER_SECRET);
+		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
+                FinchApplication.CONSUMER_SECRET);
     }
 
 	@Override
@@ -68,7 +68,8 @@ public class LoginActivity extends FragmentActivity
 		super.onNewIntent(intent);
 
 		Uri uri = intent.getData();
-        if (uri != null && uri.toString().startsWith(Constants.CALLBACK_URL)) {
+        if (uri != null &&
+                uri.toString().startsWith(FinchApplication.CALLBACK_URL)) {
             new HandleAuthTask(uri).execute();
         }
 	}
@@ -95,7 +96,7 @@ public class LoginActivity extends FragmentActivity
             try {
                 Log.i(TAG, "Request App Authentication");
                 mReqToken = mTwitter.getOAuthRequestToken(
-                        Constants.CALLBACK_URL);
+                        FinchApplication.CALLBACK_URL);
                 authUrl = mReqToken.getAuthenticationURL();
 
             } catch (TwitterException e) {
@@ -156,8 +157,9 @@ public class LoginActivity extends FragmentActivity
             String token = mAccessToken.getToken();
             String secret = mAccessToken.getTokenSecret();
             SharedPreferences.Editor editor = mPrefs.edit();
-            editor.putString(Constants.PREF_ACCESS_TOKEN, token);
-            editor.putString(Constants.PREF_ACCESS_TOKEN_SECRET, secret);
+            editor.putString(FinchApplication.PREF_ACCESS_TOKEN, token);
+            editor.putString(FinchApplication.PREF_ACCESS_TOKEN_SECRET,
+                    secret);
             editor.commit();
 
             Toast.makeText(mContext, "Logged In", Toast.LENGTH_SHORT).show();

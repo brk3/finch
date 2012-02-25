@@ -67,12 +67,12 @@ public class HomeActivity extends FragmentActivity
 
 		/* Load the twitter4j helper */
 		mTwitter = new TwitterFactory().getInstance();
-		mTwitter.setOAuthConsumer(Constants.CONSUMER_KEY,
-                Constants.CONSUMER_SECRET);
+		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
+                FinchApplication.CONSUMER_SECRET);
 
         /* Set layout and theme */
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setTheme(Constants.THEME_LIGHT);
+        setTheme(FinchApplication.THEME_LIGHT);
         setContentView(R.layout.main);
 
         /* Set up actionbar navigation spinner */
@@ -95,7 +95,7 @@ public class HomeActivity extends FragmentActivity
 
         /* Setup prefs and check if credentials present */
         mPrefs = getSharedPreferences("twitterPrefs", MODE_PRIVATE);
-		if (mPrefs.contains(Constants.PREF_ACCESS_TOKEN)) {
+		if (mPrefs.contains(FinchApplication.PREF_ACCESS_TOKEN)) {
 			Log.d(TAG, "Repeat User");
 			loginAuthorisedUser();
 		} else {
@@ -109,12 +109,14 @@ public class HomeActivity extends FragmentActivity
 	 */
 	private void loginAuthorisedUser() {
 
-		String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
-		String secret = mPrefs.getString(Constants.PREF_ACCESS_TOKEN_SECRET,
-                null);
+		String token = mPrefs.getString(
+                FinchApplication.PREF_ACCESS_TOKEN, null);
+		String secret = mPrefs.getString(
+                FinchApplication.PREF_ACCESS_TOKEN_SECRET, null);
 
 		mAccessToken = new AccessToken(token, secret);
 		mTwitter.setOAuthAccessToken(mAccessToken);
+        ((FinchApplication)getApplication()).setTwitter(mTwitter);
 
         onLogin();
 	}
