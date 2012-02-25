@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import twitter4j.Twitter;
+import twitter4j.ProfileImage;
+import twitter4j.TwitterException;
 
 public class ImageLoader {
 
@@ -37,8 +39,6 @@ public class ImageLoader {
     private FileCache fileCache;
 
     private Map<ImageView, String> imageViews =
-        Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
-    private Map<ImageView, String> screenNames =
         Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
 
     private ExecutorService executorService;
@@ -54,45 +54,46 @@ public class ImageLoader {
     }
 
     public void displayImage(String screenName, ImageView imageView) {
-        screenNames.put(imageView, screenName);
-        TwitterTask.Payload getProfileImageParams = new TwitterTask.Payload(
-                TwitterTask.GET_PROFILE_IMAGE, new Object[] {
-                    this, screenName, imageView});
-        Twitter twitter = ((FinchApplication)mActivity.getApplication())
-            .getTwitter();
-        new TwitterTask(getProfileImageParams, twitter).execute();
-    }
-
-    public void _displayImage(String url, ImageView imageView) {
-        imageViews.put(imageView, url);
-        Bitmap bitmap = memoryCache.get(url);
+        imageViews.put(imageView, screenName);
+        Bitmap bitmap = memoryCache.get(screenName);
 
         if (bitmap != null)
             imageView.setImageBitmap(bitmap);
         else {
-            queuePhoto(url, imageView);
+            queuePhoto(screenName, imageView);
             imageView.setImageResource(stub_id);
         }
     }
 
-    private void queuePhoto(String url, ImageView imageView) {
-        PhotoToLoad p = new PhotoToLoad(url, imageView);
+    private void queuePhoto(String screenName, ImageView imageView) {
+        PhotoToLoad p = new PhotoToLoad(screenName, imageView);
         executorService.submit(new PhotosLoader(p));
     }
 
-    private Bitmap getBitmap(String url) {
-        File f = fileCache.getFile(url);
+    private Bitmap getBitmap(String screenName) {
+        File f = fileCache.getFile(screenName);
 
         /* From sd cache */
         //Bitmap b = decodeFile(f);
-        Bitmap b = BitmapFactory.decodeFile(f);
+        Bitmap b = BitmapFactory.decodeFile(f.toString());
         if (b != null)
             return b;
 
         /* From web */
+        String profileImageUrl = "";
+        try {
+            Twitter twitter = ((FinchApplication)mActivity.getApplication())
+                .getTwitter();
+            ProfileImage p = twitter.getProfileImage(
+                    screenName, ProfileImage.BIGGER);
+            profileImageUrl = p.getURL();
+        } catch (TwitterException e) {
+            e.printStackTrace();
+            return null;
+        }
         try {
             Bitmap bitmap = null;
-            URL imageUrl = new URL(url);
+            URL imageUrl = new URL(profileImageUrl);
             HttpURLConnection conn =
                 (HttpURLConnection)imageUrl.openConnection();
             conn.setConnectTimeout(30000);
@@ -145,7 +146,7 @@ public class ImageLoader {
 
     private boolean imageViewReused(PhotoToLoad photoToLoad) {
         String tag = imageViews.get(photoToLoad.imageView);
-        if (tag==null || !tag.equals(photoToLoad.url)) {
+        if (tag == null || !tag.equals(photoToLoad.screenName)) {
             return true;
         }
         return false;
@@ -158,11 +159,11 @@ public class ImageLoader {
 
     /* Task for the queue */
     private class PhotoToLoad {
-        public String url;
+        public String screenName;
         public ImageView imageView;
 
         public PhotoToLoad(String u, ImageView i){
-            url = u;
+            screenName = u;
             imageView = i;
         }
     }
@@ -179,8 +180,8 @@ public class ImageLoader {
             if(imageViewReused(photoToLoad)) {
                 return;
             }
-            Bitmap bmp = getBitmap(photoToLoad.url);
-            memoryCache.put(photoToLoad.url, bmp);
+            Bitmap bmp = getBitmap(photoToLoad.screenName);
+            memoryCache.put(photoToLoad.screenName, bmp);
             if(imageViewReused(photoToLoad)) {
                 return;
             }

@@ -6,9 +6,14 @@ import android.util.Log;
 
 import android.view.Window;
 
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bourke.finch.lazylist.ImageLoader;
+
 import java.util.List;
+
+import twitter4j.ProfileImage;
 
 import twitter4j.ResponseList;
 
@@ -19,10 +24,6 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import twitter4j.User;
-import twitter4j.ProfileImage;
-
-import com.bourke.finch.lazylist.ImageLoader;
-import android.widget.ImageView;
 
 /*
  * Generic AsyncTask used to make API calls in a background thread.
@@ -40,7 +41,6 @@ public class TwitterTask extends
 
     public static final int SHOW_USER = 0;
     public static final int GET_HOME_TIMELINE = 1;
-    public static final int GET_PROFILE_IMAGE = 2;
 
     private Twitter mTwitter;
 
@@ -62,9 +62,6 @@ public class TwitterTask extends
             case SHOW_USER: case GET_HOME_TIMELINE:
                 HomeActivity app = (HomeActivity)payload.data[0];
                 app.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                break;
-
-            case GET_PROFILE_IMAGE:
                 break;
         }
     }
@@ -103,19 +100,6 @@ public class TwitterTask extends
                 }
                 payload.result = homeTimeline;
                 break;
-
-            case GET_PROFILE_IMAGE:
-                String screenName = (String)payload.data[1];
-                String profileImageUrl = "";
-                try {
-                    ProfileImage p = mTwitter.getProfileImage(
-                            screenName, ProfileImage.BIGGER);
-                    profileImageUrl = p.getURL();
-                } catch (TwitterException e) {
-                    e.printStackTrace();
-                }
-                payload.result = profileImageUrl;
-                break;
         }
 
         return payload;
@@ -145,12 +129,6 @@ public class TwitterTask extends
                 app.getMainList().setStatuses(
                         (ResponseList<twitter4j.Status>)payload.result);
                 app.getMainList().notifyDataSetChanged();
-                break;
-
-            case GET_PROFILE_IMAGE:
-                ImageLoader imageLoader = (ImageLoader)payload.data[0];
-                imageLoader._displayImage((String)payload.result,
-                        (ImageView)payload.data[2]);
                 break;
         }
     }

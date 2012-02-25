@@ -14,7 +14,7 @@ public class MemoryCache {
         Collections.synchronizedMap(
                 new HashMap<String, SoftReference<Bitmap>>());
 
-    public Bitmap get(String id){
+    public Bitmap get(String id) {
         if(!cache.containsKey(id))
             return null;
         SoftReference<Bitmap> ref=cache.get(id);
