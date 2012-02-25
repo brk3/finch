@@ -10,8 +10,9 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_gravity="left|center_vertical"
-        android:textSize="18dip"
-        android:layout_marginLeft="10dip" />
+        android:layout_toLeftOf="@+id/image_profile"
+        android:textSize="15dip"
+        android:padding="5dip" />
 
     <ImageView
         android:id="@+id/image_profile"
@@ -20,5 +21,19 @@
         android:layout_alignParentRight="true"
         android:src="@drawable/ic_contact_picture"
         android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/text_screenname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dip"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_alignLeft="@id/image_profile"
+        android:background="@color/transparent_black"
+        android:text="\@test_name"
+        android:textColor="@color/white"
+        android:layout_alignRight="@id/image_profile"
+        android:layout_alignBottom="@id/image_profile" />
 
 </RelativeLayout>

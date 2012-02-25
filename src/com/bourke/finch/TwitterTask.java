@@ -119,11 +119,9 @@ public class TwitterTask extends
 
             case GET_HOME_TIMELINE:
                 app.setProgressBarIndeterminateVisibility(false);
-                List<twitter4j.Status> homeTimeline =
-                    (ResponseList<twitter4j.Status>)payload.result;
-                for (twitter4j.Status s : homeTimeline) {
-                    Log.d(TAG, "XXX: " + s.getText());
-                }
+                app.getMainList().setStatuses(
+                        (ResponseList<twitter4j.Status>)payload.result);
+                app.getMainList().notifyDataSetChanged();
                 break;
         }
     }

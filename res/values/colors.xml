@@ -1,7 +1,9 @@
 <resources>
 
-    <color name="button_text">#ffffffff</color>
     <color name="text_faded">#ff7c7c7c</color>
     <color name="text_primary">#fff1f1f1</color>
+
+    <color name="white">#ffffffff</color>
+    <color name="transparent_black">#96000000</color>
 
 </resources>

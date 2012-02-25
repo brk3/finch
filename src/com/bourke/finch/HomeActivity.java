@@ -24,11 +24,22 @@ import android.widget.Toast;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.TestAdapter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Collection;
+import java.util.List;
+
 import twitter4j.auth.AccessToken;
+
+import twitter4j.ResponseList;
+
+import twitter4j.Status;
 
 import twitter4j.Twitter;
 
 import twitter4j.TwitterFactory;
+
+import twitter4j.User;
 
 public class HomeActivity extends FragmentActivity
         implements ActionBar.OnNavigationListener {
@@ -76,11 +87,11 @@ public class HomeActivity extends FragmentActivity
 
         /* Setup main ListView */
         mMainList = (ListView)findViewById(R.id.list);
-        String[] testTweets = {"Loren Ipsum", "Loren Ipsum", "Loren Ipsum"};
-        TestAdapter adapter = new TestAdapter(this, testTweets);
-        mMainList.setAdapter(adapter);
-        //adapter = new LazyAdapter(this, mStrings);
+        //String[] testTweets = {"Loren Ipsum", "Loren Ipsum", "Loren Ipsum"};
+        //TestAdapter adapter = new TestAdapter(this, testTweets);
         //mMainList.setAdapter(adapter);
+        mMainListAdapter = new LazyAdapter(this);
+        mMainList.setAdapter(mMainListAdapter);
 
         /* Setup prefs and check if credentials present */
         mPrefs = getSharedPreferences("twitterPrefs", MODE_PRIVATE);
@@ -148,6 +159,10 @@ public class HomeActivity extends FragmentActivity
                     MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 
         return true;
+    }
+
+    public LazyAdapter getMainList() {
+        return mMainListAdapter;
     }
 
 }
