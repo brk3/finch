@@ -3,6 +3,7 @@ package com.bourke.finch;
 import android.app.Application;
 
 import twitter4j.Twitter;
+import android.net.Uri;
 
 public class FinchApplication extends Application {
 
@@ -21,6 +22,10 @@ public class FinchApplication extends Application {
 	protected static final String PREF_ACCESS_TOKEN_SECRET =
         "accessTokenSecret";
 	protected static final String PREF_SCREEN_NAME = "screenName";
+
+    public static final Uri SCREEN_NAME_URI = Uri.parse(
+            "content://com.finch.bourke/screenname");
+
 
     public Twitter getTwitter() {
         return mTwitter;

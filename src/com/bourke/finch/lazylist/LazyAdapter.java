@@ -4,6 +4,8 @@ import android.app.Activity;
 
 import android.content.Context;
 
+import android.text.util.Linkify;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,12 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bourke.finch.FinchApplication;
 import com.bourke.finch.R;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import twitter4j.ResponseList;
 
@@ -20,15 +27,19 @@ import twitter4j.Status;
 
 import twitter4j.User;
 
-import java.util.List;
-import java.util.Collection;
-
 public class LazyAdapter extends BaseAdapter {
 
     private Activity activity;
+
     private ResponseList<Status> mStatuses;
+
     private static LayoutInflater inflater = null;
+
     public ImageLoader imageLoader;
+
+    private Pattern screenNameMatcher = Pattern.compile("@\\w+");
+    private String screenNameViewURL =
+        "content://com.bourke.finch/screenname/";
 
     public LazyAdapter(Activity a) {
         activity = a;
@@ -47,6 +58,9 @@ public class LazyAdapter extends BaseAdapter {
         if (mStatuses != null) {
             TextView text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
             text_tweet.setText(mStatuses.get(position).getText());
+            Linkify.addLinks(text_tweet, Linkify.ALL);
+            Linkify.addLinks(text_tweet, screenNameMatcher,
+                     FinchApplication.SCREEN_NAME_URI.toString() + "/");
 
             String screenName = mStatuses.get(position).getUser().
                 getScreenName();

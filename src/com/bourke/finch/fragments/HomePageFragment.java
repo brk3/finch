@@ -141,6 +141,13 @@ public class HomePageFragment extends Fragment {
 		Toast.makeText(getActivity(), "Welcome back!",
                 Toast.LENGTH_SHORT).show();
 
+        /* Fetch user's timeline to populate ListView */
+        TwitterTask.Payload getTimelineParams = new TwitterTask.Payload(
+                TwitterTask.GET_HOME_TIMELINE,
+                new Object[] {
+                    getActivity(), mMainListAdapter, mRefreshableMainList});
+        new TwitterTask(getTimelineParams, mTwitter).execute();
+
         /* Set actionbar subtitle to user's username, and home icon to user's
          * profile image */
         /*
@@ -157,12 +164,5 @@ public class HomePageFragment extends Fragment {
                         getActivity(), mAccessToken.getUserId()});
             new TwitterTask(showUserParams, mTwitter).execute();
         //}
-
-        /* Fetch user's timeline to populate ListView */
-        TwitterTask.Payload getTimelineParams = new TwitterTask.Payload(
-                TwitterTask.GET_HOME_TIMELINE,
-                new Object[] {
-                    getActivity(), mMainListAdapter, mRefreshableMainList});
-        new TwitterTask(getTimelineParams, mTwitter).execute();
     }
 }

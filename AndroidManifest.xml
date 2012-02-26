@@ -20,6 +20,10 @@
         android:name="FinchApplication"
         android:uiOptions="splitActionBarWhenNarrow">
 
+        <provider
+           android:name="com.bourke.finch.provider.FinchProvider"
+           android:authorities="com.bourke.finch.provider" />
+
         <activity android:name="FinchActivity"
                   android:label="@string/app_name">
             <intent-filter>
