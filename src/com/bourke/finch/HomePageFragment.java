@@ -54,6 +54,7 @@ public class HomePageFragment extends Fragment {
     private static final String TAG = "Finch/HomePageFragment";
 
     private ListView mMainList;
+    private PullToRefreshListView mRefreshableMainList;
     private LazyAdapter mMainListAdapter;
 
     private Twitter mTwitter;
@@ -81,9 +82,24 @@ public class HomePageFragment extends Fragment {
             .inflate(R.layout.home_page, container, false);
 
         /* Setup main ListView */
-        mMainList = (ListView)layout.findViewById(R.id.list);
+        mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
+                R.id.list);
+        mMainList = mRefreshableMainList.getRefreshableView();
         mMainListAdapter = new LazyAdapter(getActivity());
         mMainList.setAdapter(mMainListAdapter);
+
+		mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                /* Fetch user's timeline to populate ListView */
+                TwitterTask.Payload getTimelineParams =
+                     new TwitterTask.Payload(TwitterTask.GET_HOME_TIMELINE,
+                         new Object[] {
+                             getActivity(), mMainListAdapter,
+                             mRefreshableMainList});
+                new TwitterTask(getTimelineParams, mTwitter).execute();
+            }
+        });
 
         /* Setup prefs and check if credentials present */
         mPrefs = getActivity().getSharedPreferences(
@@ -134,8 +150,8 @@ public class HomePageFragment extends Fragment {
         /* Fetch user's timeline to populate ListView */
         TwitterTask.Payload getTimelineParams = new TwitterTask.Payload(
                 TwitterTask.GET_HOME_TIMELINE,
-                new Object[] {getActivity(), mMainListAdapter});
+                new Object[] {
+                    getActivity(), mMainListAdapter, mRefreshableMainList});
         new TwitterTask(getTimelineParams, mTwitter).execute();
     }
-
 }

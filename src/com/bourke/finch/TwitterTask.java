@@ -1,4 +1,5 @@
 package com.bourke.finch;
+
 import android.os.AsyncTask;
 
 import android.util.Log;
@@ -11,6 +12,8 @@ import android.widget.Toast;
 
 import com.bourke.finch.lazylist.ImageLoader;
 import com.bourke.finch.lazylist.LazyAdapter;
+
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.List;
 
@@ -125,12 +128,20 @@ public class TwitterTask extends
                 break;
 
             case GET_HOME_TIMELINE:
+                /* Stop spinner */
                 app = (FinchActivity)payload.data[0];
                 app.setProgressBarIndeterminateVisibility(false);
+
+                /* Update list adapter */
                 LazyAdapter mainListAdapter = (LazyAdapter)payload.data[1];
                 mainListAdapter.setStatuses(
                         (ResponseList<twitter4j.Status>)payload.result);
                 mainListAdapter.notifyDataSetChanged();
+
+                /* Notify main list that it has been refreshed */
+                PullToRefreshListView mainList =
+                    (PullToRefreshListView)payload.data[2];
+                mainList.onRefreshComplete();
                 break;
         }
     }
