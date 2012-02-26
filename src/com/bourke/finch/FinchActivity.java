@@ -12,13 +12,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.Menu;
+import android.support.v4.view.MenuItem;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.view.Window;
 
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
 import android.widget.ArrayAdapter;
@@ -83,7 +83,6 @@ public class FinchActivity extends FragmentActivity
         return true;
     }
 
-    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add("Write")
@@ -103,7 +102,6 @@ public class FinchActivity extends FragmentActivity
 
         return true;
     }
-    */
 
     public static class FinchPagerAdapter extends FragmentPagerAdapter {
 

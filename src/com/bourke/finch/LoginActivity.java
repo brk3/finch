@@ -55,7 +55,7 @@ public class LoginActivity extends FragmentActivity
         /* Set layout and theme */
         setTheme(FinchApplication.THEME_LIGHT);
         setContentView(R.layout.login);
-        getActionBar().hide();
+        getSupportActionBar().hide();
 
 		/* Load the twitter4j helper */
 		mTwitter = new TwitterFactory().getInstance();

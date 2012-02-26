@@ -17,7 +17,8 @@
     <application
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher"
-        android:name="FinchApplication">
+        android:name="FinchApplication"
+        android:uiOptions="splitActionBarWhenNarrow">
 
         <activity android:name="FinchActivity"
                   android:label="@string/app_name">
