@@ -1,7 +1,8 @@
 package com.bourke.finch.lazylist;
 
-import java.io.File;
 import android.content.Context;
+
+import java.io.File;
 
 public class FileCache {
     

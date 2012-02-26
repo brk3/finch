@@ -20,6 +20,7 @@ public class FinchApplication extends Application {
 	protected static final String PREF_ACCESS_TOKEN = "accessToken";
 	protected static final String PREF_ACCESS_TOKEN_SECRET =
         "accessTokenSecret";
+	protected static final String PREF_SCREEN_NAME = "screenName";
 
     public Twitter getTwitter() {
         return mTwitter;

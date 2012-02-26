@@ -68,6 +68,9 @@ public class HomePageFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
+        mPrefs = getActivity().getSharedPreferences(
+                "twitterPrefs", Context.MODE_PRIVATE);
+
 		/* Load the twitter4j helper */
 		mTwitter = new TwitterFactory().getInstance();
 		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
@@ -102,8 +105,6 @@ public class HomePageFragment extends Fragment {
         });
 
         /* Setup prefs and check if credentials present */
-        mPrefs = getActivity().getSharedPreferences(
-                "twitterPrefs", Context.MODE_PRIVATE);
 		if (mPrefs.contains(FinchApplication.PREF_ACCESS_TOKEN)) {
 			Log.d(TAG, "Repeat User");
 			loginAuthorisedUser();
@@ -137,15 +138,25 @@ public class HomePageFragment extends Fragment {
 
     private void onLogin() {
 
-        /* Set actionbar subtitle to user's username */
-        TwitterTask.Payload showUserParams = new TwitterTask.Payload(
-                TwitterTask.SHOW_USER,
-                new Object[] {
-                    getActivity(), mAccessToken.getUserId()});
-        new TwitterTask(showUserParams, mTwitter).execute();
-
 		Toast.makeText(getActivity(), "Welcome back!",
                 Toast.LENGTH_SHORT).show();
+
+        /* Set actionbar subtitle to user's username, and home icon to user's
+         * profile image */
+        /*
+        String screenName = mPrefs.getString(FinchApplication.PREF_SCREEN_NAME,
+                "");
+        if (!screenName.isEmpty()) {
+            ((FinchActivity)getActivity()).getSupportActionBar().
+                setSubtitle(screenName);
+        } else {
+        */
+            TwitterTask.Payload showUserParams = new TwitterTask.Payload(
+                    TwitterTask.SHOW_USER,
+                    new Object[] {
+                        getActivity(), mAccessToken.getUserId()});
+            new TwitterTask(showUserParams, mTwitter).execute();
+        //}
 
         /* Fetch user's timeline to populate ListView */
         TwitterTask.Payload getTimelineParams = new TwitterTask.Payload(

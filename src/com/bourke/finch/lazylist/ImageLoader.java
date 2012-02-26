@@ -85,9 +85,8 @@ public class ImageLoader {
                     .getTwitter();
                 ProfileImage p = twitter.getProfileImage(
                         screenName, ProfileImage.BIGGER);
-                String profileImageUrl = p.getURL();
 
-                URL imageUrl = new URL(profileImageUrl);
+                URL imageUrl = new URL(p.getURL());
                 HttpURLConnection conn =
                     (HttpURLConnection)imageUrl.openConnection();
                 conn.setConnectTimeout(30000);

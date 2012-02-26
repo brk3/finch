@@ -60,7 +60,6 @@ public class FinchActivity extends FragmentActivity
         FinchPagerAdapter adapter = new FinchPagerAdapter(
                 getSupportFragmentManager());
         viewPager.setAdapter(adapter);
-
         viewPager.setOnPageChangeListener(new OnPageChangeListener() {
 
         @Override
@@ -124,6 +123,5 @@ public class FinchActivity extends FragmentActivity
             }
             return null;
         }
-
     }
 }
