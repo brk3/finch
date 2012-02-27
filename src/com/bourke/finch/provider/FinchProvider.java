@@ -1,14 +1,16 @@
 package com.bourke.finch.provider;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.UriMatcher;
 
-import android.net.Uri;
-import android.database.sqlite.SQLiteDatabase;
-import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import android.net.Uri;
+
 import android.util.Log;
-import android.content.ContentResolver;
 
 public class FinchProvider extends ContentProvider {
 
@@ -17,21 +19,17 @@ public class FinchProvider extends ContentProvider {
     /* The root authority for this provider */
     public static final String AUTHORITY = "com.bourke.finch.provider";
 
-    private static final String BASE_PATH = "screennames";
+    private static final String BASE_PATH = "screenname";
 
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH);
-
-    public static final String CONTENT_TYPE =
-        ContentResolver.CURSOR_DIR_BASE_TYPE + "/screennames";
-    public static final String CONTENT_ITEM_TYPE =
-        ContentResolver.CURSOR_ITEM_BASE_TYPE + "/screenname";
 
     public static final int SCREEN_NAMES = 0;
     public static final int SCREEN_NAME = 1;
 
     private static final UriMatcher mUriMatcher = new UriMatcher(
             UriMatcher.NO_MATCH);
+
     static {
         mUriMatcher.addURI(AUTHORITY, BASE_PATH, SCREEN_NAMES);
         mUriMatcher.addURI(AUTHORITY, BASE_PATH+"/*", SCREEN_NAME);
@@ -40,31 +38,40 @@ public class FinchProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         Log.d(TAG, "XXX: onCreate()");
+
+        /* The provider was successfully loaded */
         return true;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String where,
             String[] whereArgs) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int delete(Uri uri, String where, String[] whereArgs) {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues initialValues) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getType(Uri uri) {
+        Log.d(TAG, "XXX: getType()");
+
         switch (mUriMatcher.match(uri)) {
+            case SCREEN_NAMES:
+                Log.d(TAG, "XXX1: SCREEN_NAMES");
+                return "vnd.android.cursor.dir/vnd.finch.screenname";
 
             case SCREEN_NAME:
-                return "vnd.android.cursor.item/vnd.finch.sceenname";
+                Log.d(TAG, "XXX2: SCREEN_NAME");
+                return "vnd.android.cursor.item/vnd.finch.screenname";
+
             default:
                 // any other kind of URL is illegal
                 throw new IllegalArgumentException("Unknown URL " + uri);
@@ -74,7 +81,7 @@ public class FinchProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
             String[] selectionArgs, String sort) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
 

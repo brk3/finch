@@ -24,7 +24,7 @@ public class FinchApplication extends Application {
 	protected static final String PREF_SCREEN_NAME = "screenName";
 
     public static final Uri SCREEN_NAME_URI = Uri.parse(
-            "content://com.finch.bourke/screenname");
+            "content://com.bourke.finch.provider/screenname");
 
 
     public Twitter getTwitter() {

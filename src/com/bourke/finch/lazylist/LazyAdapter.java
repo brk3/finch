@@ -37,9 +37,8 @@ public class LazyAdapter extends BaseAdapter {
 
     public ImageLoader imageLoader;
 
+    //private Pattern screenNameMatcher = Pattern.compile("@\\w+");
     private Pattern screenNameMatcher = Pattern.compile("@\\w+");
-    private String screenNameViewURL =
-        "content://com.bourke.finch/screenname/";
 
     public LazyAdapter(Activity a) {
         activity = a;
