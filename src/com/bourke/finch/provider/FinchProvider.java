@@ -37,8 +37,6 @@ public class FinchProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Log.d(TAG, "XXX: onCreate()");
-
         /* The provider was successfully loaded */
         return true;
     }
@@ -61,15 +59,12 @@ public class FinchProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        Log.d(TAG, "XXX: getType()");
 
         switch (mUriMatcher.match(uri)) {
             case SCREEN_NAMES:
-                Log.d(TAG, "XXX1: SCREEN_NAMES");
                 return "vnd.android.cursor.dir/vnd.finch.screenname";
 
             case SCREEN_NAME:
-                Log.d(TAG, "XXX2: SCREEN_NAME");
                 return "vnd.android.cursor.item/vnd.finch.screenname";
 
             default:
@@ -83,6 +78,5 @@ public class FinchProvider extends ContentProvider {
             String[] selectionArgs, String sort) {
         throw new UnsupportedOperationException();
     }
-
 
 }
