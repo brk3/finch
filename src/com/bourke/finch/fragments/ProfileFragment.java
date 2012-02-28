@@ -13,11 +13,15 @@ import android.support.v4.app.Fragment;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 
-public class MessagesFragment extends Fragment {
+public class ProfileFragment extends Fragment {
 
-    private static final String TAG = "Finch/MessagesFragment";
+    private static final String TAG = "Finch/ProfileFragment";
 
     private Twitter mTwitter;
+
+    public ProfileFragment() {
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,7 +37,7 @@ public class MessagesFragment extends Fragment {
             Bundle savedInstanceState) {
 
         RelativeLayout layout = (RelativeLayout)inflater
-            .inflate(R.layout.messages_fragment, container, false);
+            .inflate(R.layout.standard_list_fragment, container, false);
 
         //
 

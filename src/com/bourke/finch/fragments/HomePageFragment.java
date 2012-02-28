@@ -82,7 +82,7 @@ public class HomePageFragment extends Fragment {
             Bundle savedInstanceState) {
 
         RelativeLayout layout = (RelativeLayout)inflater
-            .inflate(R.layout.home_page, container, false);
+            .inflate(R.layout.pull_refresh_list, container, false);
 
         /* Setup main ListView */
         mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
