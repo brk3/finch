@@ -35,8 +35,8 @@ public class ProfileActivity extends FragmentActivity
     private static final int NUM_ITEMS = 3;
 
     public static final int TWEETS_PAGE = 0;
-    public static final int FOLLOWING_PAGE = 2;
-    public static final int FOLLOWERS_PAGE = 3;
+    public static final int FOLLOWING_PAGE = 1;
+    public static final int FOLLOWERS_PAGE = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +44,7 @@ public class ProfileActivity extends FragmentActivity
 
         /* Set layout and theme */
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setTheme(FinchApplication.THEME_LIGHT);
         setContentView(R.layout.profile);
 
@@ -86,18 +87,15 @@ public class ProfileActivity extends FragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add("Write")
             .setIcon(R.drawable.ic_action_edit)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
-                    MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         menu.add("Refresh")
             .setIcon(R.drawable.ic_action_refresh)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
-                    MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         menu.add("Search")
             .setIcon(R.drawable.ic_action_search)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
-                    MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         return true;
     }
@@ -117,14 +115,11 @@ public class ProfileActivity extends FragmentActivity
         public Fragment getItem(int position) {
             switch (position) {
                 case TWEETS_PAGE:
-                    //return new ProfileTweetsFragment();
-                    return null;
+                    return new ProfileFragment(ProfileFragment.TYPE_TWEETS);
                 case FOLLOWING_PAGE:
-                    //return new ProfileFollowingFragment();
-                    return null;
+                    return new ProfileFragment(ProfileFragment.TYPE_FOLLOWING);
                 case FOLLOWERS_PAGE:
-                    //return new ProfileFollowersFragment();
-                    return null;
+                    return new ProfileFragment(ProfileFragment.TYPE_FOLLOWERS);
             }
             return null;
         }

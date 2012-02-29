@@ -17,9 +17,13 @@ public class ProfileFragment extends Fragment {
 
     private static final String TAG = "Finch/ProfileFragment";
 
+    public static final int TYPE_TWEETS = 0;
+    public static final int TYPE_FOLLOWING = 1;
+    public static final int TYPE_FOLLOWERS = 2;
+
     private Twitter mTwitter;
 
-    public ProfileFragment() {
+    public ProfileFragment(int type) {
 
     }
 
