@@ -2,9 +2,7 @@
 <resources>
 
     <style name="Theme.Finch" parent="Theme.Sherlock">
-        <item name="abTitleTextStyle">@style/CustomTitle</item>
-        <item name="abSubtitleTextStyle">@style/CustomSubTitle</item>
-        <item name="actionBarSize">55dp</item>
+        <!-- TODO -->
     </style>
 
     <style name="Theme.Finch_Light" parent="Theme.Sherlock.Light">

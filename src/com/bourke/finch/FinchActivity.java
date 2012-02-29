@@ -43,6 +43,7 @@ public class FinchActivity extends FragmentActivity
 
         /* Set layout and theme */
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setTheme(FinchApplication.THEME_LIGHT);
         setContentView(R.layout.main);
 
@@ -86,18 +87,15 @@ public class FinchActivity extends FragmentActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add("Write")
             .setIcon(R.drawable.ic_action_edit)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
-                    MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         menu.add("Refresh")
             .setIcon(R.drawable.ic_action_refresh)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
-                    MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         menu.add("Search")
             .setIcon(R.drawable.ic_action_search)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS |
-                    MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         return true;
     }

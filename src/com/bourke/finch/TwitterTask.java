@@ -222,10 +222,17 @@ public class TwitterTask extends
                 ImageView homeIcon = (ImageView)app.findViewById(
                         android.R.id.home);
                 int abHeight = app.getSupportActionBar().getHeight();
-                homeIcon.setLayoutParams(new FrameLayout.LayoutParams(
-                            abHeight, abHeight));
-                homeIcon.setPadding(0, 10, 10, 10);
-                homeIcon.setImageDrawable(profileImage);
+                try {
+                    homeIcon.setLayoutParams(new FrameLayout.LayoutParams(
+                                abHeight, abHeight));
+                    homeIcon.setPadding(0, 10, 10, 10);
+                    homeIcon.setImageDrawable(profileImage);
+                } catch (NullPointerException e) {
+                    /* Problem on <3.0, need to test further. Hopefully ABS 4.0
+                     * might fix this. */
+                    Log.e(TAG, "Could not get reference to home icon");
+                    e.printStackTrace();
+                }
                 break;
         }
     }
