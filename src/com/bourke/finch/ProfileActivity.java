@@ -27,12 +27,17 @@ import android.widget.ListView;
 
 import com.bourke.finch.lazylist.LazyAdapter;
 
+import com.viewpagerindicator.TabPageIndicator;
+import com.viewpagerindicator.TitleProvider;
+
 import java.util.ArrayList;
 
-public class ProfileActivity extends FragmentActivity
+public class ProfileActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
 
-    private static final int NUM_ITEMS = 3;
+    //TODO: add to R.strings
+    public static final String[] CONTENT = new String[] {
+        "Tweets", "Following", "Followers" };
 
     public static final int TWEETS_PAGE = 0;
     public static final int FOLLOWING_PAGE = 1;
@@ -43,39 +48,17 @@ public class ProfileActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
 
         /* Set layout and theme */
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setTheme(FinchApplication.THEME_LIGHT);
         setContentView(R.layout.profile);
 
-        /* Set up actionbar navigation spinner */
-        ArrayAdapter<CharSequence> list =
-            ArrayAdapter.createFromResource(this, R.array.locations,
-                R.layout.spinner_title);
-        list.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        getSupportActionBar().setNavigationMode(
-                ActionBar.NAVIGATION_MODE_LIST);
-        getSupportActionBar().setListNavigationCallbacks(list, this);
-
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         FinchPagerAdapter adapter = new FinchPagerAdapter(
                 getSupportFragmentManager());
-        viewPager.setAdapter(adapter);
-        viewPager.setOnPageChangeListener(new OnPageChangeListener() {
-        @Override
-        public void onPageSelected(int page) {
-            //TODO: update nav spinner
-        }
 
-        @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-        }
+        ViewPager pager = (ViewPager)findViewById(R.id.pager);
+        pager.setAdapter(adapter);
 
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
-        });
+        TabPageIndicator indicator =
+            (TabPageIndicator)findViewById(R.id.indicator);
+        indicator.setViewPager(pager);
     }
 
     @Override
@@ -83,24 +66,8 @@ public class ProfileActivity extends FragmentActivity
         return true;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add("Write")
-            .setIcon(R.drawable.ic_action_edit)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-        menu.add("Refresh")
-            .setIcon(R.drawable.ic_action_refresh)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-        menu.add("Search")
-            .setIcon(R.drawable.ic_action_search)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-        return true;
-    }
-
-    public static class FinchPagerAdapter extends FragmentPagerAdapter {
+    public static class FinchPagerAdapter extends FragmentPagerAdapter
+            implements TitleProvider {
 
         public FinchPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -108,7 +75,13 @@ public class ProfileActivity extends FragmentActivity
 
         @Override
         public int getCount() {
-            return NUM_ITEMS;
+            return ProfileActivity.CONTENT.length;
+        }
+
+        @Override
+        public String getTitle(int position) {
+            return ProfileActivity.CONTENT[
+                position % ProfileActivity.CONTENT.length].toUpperCase();
         }
 
         @Override
