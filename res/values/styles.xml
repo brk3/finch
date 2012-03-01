@@ -10,6 +10,10 @@
         <item name="abSubtitleTextStyle">@style/CustomSubTitle</item>
         <item name="actionBarSize">55dp</item>
         <item name="abBackground">#ffdedede</item>
+
+        <!-- Lines taken from ViewPagerIndicator to work around Issue#66 -->
+        <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator</item>
+        <item name="vpiTabTextStyle">@style/Widget.TabPageIndicator.Text</item>
     </style>
 
     <style name="CustomTitle">
@@ -19,6 +23,25 @@
     <style name="CustomSubTitle">
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/text_faded</item>
+    </style>
+
+    <!-- Lines taken from ViewPagerIndicator to work around Issue#66 -->
+    <style name="Widget" />
+    <style name="TextAppearance.TabPageIndicator" parent="Widget" />
+    <style name="Widget.TabPageIndicator" parent="Widget">
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:background">@drawable/vpi__tab_indicator</item>
+        <item name="android:paddingLeft">22dip</item>
+        <item name="android:paddingRight">22dip</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+    <style name="Widget.TabPageIndicator.Text" parent="Widget">
+        <item name="android:textAppearance">@style/TextAppearance.TabPageIndicator</item>
+        <item name="android:textColor">@color/vpi__light_theme</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:maxLines">1</item>
     </style>
 
 </resources>
