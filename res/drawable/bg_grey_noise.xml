@@ -1,5 +1,5 @@
 <bitmap
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/list_texture_tile"
+    android:src="@drawable/light_grey_noise"
     android:tileMode="repeat"
     android:dither="true" />

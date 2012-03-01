@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:paddingLeft="20dip"
-    android:background="@drawable/backrepeat">
+    android:background="@drawable/bg_grey_noise">
 
     <TextView
         android:id="@+id/textWelcome"
