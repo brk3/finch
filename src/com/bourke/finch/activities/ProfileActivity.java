@@ -4,6 +4,8 @@ import android.app.Activity;
 
 import android.content.Context;
 
+import android.net.Uri;
+
 import android.os.Bundle;
 import android.os.Parcelable;
 
@@ -32,8 +34,15 @@ import com.viewpagerindicator.TitleProvider;
 
 import java.util.ArrayList;
 
+import twitter4j.Twitter;
+
+import twitter4j.TwitterFactory;
+import android.util.Log;
+
 public class ProfileActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
+
+    private static final String TAG = "finch/ProfileActivity";
 
     //TODO: add to R.strings
     public static final String[] CONTENT = new String[] {
@@ -43,22 +52,50 @@ public class ProfileActivity extends BaseFinchActivity
     public static final int FOLLOWING_PAGE = 1;
     public static final int FOLLOWERS_PAGE = 2;
 
+    private Twitter mTwitter;
+
+    private Uri mURI;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /* Set layout and theme */
         setContentView(R.layout.profile);
 
+        /* Get the URL we are being asked to view */
+        Uri uri = getIntent().getData();
+        if ((uri == null) && (savedInstanceState != null)) {
+            uri = Uri.parse(savedInstanceState.getString(
+                        FinchApplication.KEY_URL));
+        }
+
+        /* Check uri appears to be in correct format */
+        if ((uri == null) || (uri.getPathSegments().size() < 2)) {
+            // TODO: recover
+        }
+        mURI = uri;
+
+		/* Load the twitter4j helper */
+		mTwitter = new TwitterFactory().getInstance();
+		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
+                FinchApplication.CONSUMER_SECRET);
+        /* Set up TabPageIndicator and bind viewpager to it */
         FinchPagerAdapter adapter = new FinchPagerAdapter(
                 getSupportFragmentManager());
-
         ViewPager pager = (ViewPager)findViewById(R.id.pager);
         pager.setAdapter(adapter);
-
         TabPageIndicator indicator =
             (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(pager);
+
+        /* Get details for screenname and display */
+        /*
+        String screenName = uri.getPathSegments().get(1).replaceFirst("@", "");
+        TwitterTaskPayload showUserParams = new TwitterTaskPayload(
+                TwitterTask.SHOW_USER,
+                new Object[] {getActivity(), mAccessToken.getUserId()});
+        new TwitterTask(showUserParams, mTwitter).execute();
+        */
     }
 
     @Override

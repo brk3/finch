@@ -1,5 +1,6 @@
 package com.bourke.finch;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
@@ -15,8 +16,14 @@ import android.support.v4.view.MenuItem;
 
 import android.util.Log;
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,15 +46,11 @@ import twitter4j.Status;
 
 import twitter4j.Twitter;
 
+import twitter4j.TwitterException;
+
 import twitter4j.TwitterFactory;
 
 import twitter4j.User;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.view.View;
-import android.content.Context;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 public class HomePageFragment extends Fragment {
 
@@ -95,12 +98,31 @@ public class HomePageFragment extends Fragment {
             @Override
             public void onRefresh() {
                 /* Fetch user's timeline to populate ListView */
-                TwitterTask.Payload getTimelineParams =
-                     new TwitterTask.Payload(TwitterTask.GET_HOME_TIMELINE,
+                TwitterTaskCallback<TwitterTaskParams, TwitterException> tbc =
+                        new TwitterTaskCallback<TwitterTaskParams,
+                                                TwitterException>() {
+                    public void onSuccess(TwitterTaskParams payload) {
+                        /* Stop spinner */
+                        //setProgressBarIndeterminateVisibility(false);
+
+                        /* Update list adapter */
+                        mMainListAdapter.setStatuses(
+                                (ResponseList<twitter4j.Status>)
+                                payload.result);
+                        mMainListAdapter.notifyDataSetChanged();
+
+                        /* Notify main list that it has been refreshed */
+                        mRefreshableMainList.onRefreshComplete();
+                    }
+                    public void onFailure(TwitterException exception) {
+                    }
+                };
+                TwitterTaskParams getTimelineParams =
+                     new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
                          new Object[] {
                              getActivity(), mMainListAdapter,
                              mRefreshableMainList});
-                new TwitterTask(getTimelineParams, mTwitter).execute();
+                new TwitterTask(getTimelineParams, tbc, mTwitter).execute();
             }
         });
 
@@ -142,27 +164,38 @@ public class HomePageFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
 
         /* Fetch user's timeline to populate ListView */
-        TwitterTask.Payload getTimelineParams = new TwitterTask.Payload(
+        TwitterTaskParams getTimelineParams = new TwitterTaskParams(
                 TwitterTask.GET_HOME_TIMELINE,
                 new Object[] {
                     getActivity(), mMainListAdapter, mRefreshableMainList});
-        new TwitterTask(getTimelineParams, mTwitter).execute();
+        new TwitterTask(getTimelineParams, null,  mTwitter).execute();
+
+        TwitterTaskCallback<TwitterTaskParams, TwitterException> tbc =
+                new TwitterTaskCallback<TwitterTaskParams,
+                                        TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                /* Stop spinner */
+                //setProgressBarIndeterminateVisibility(false);
+
+                /* Update list adapter */
+                mMainListAdapter.setStatuses(
+                        (ResponseList<twitter4j.Status>)
+                        payload.result);
+                mMainListAdapter.notifyDataSetChanged();
+
+                /* Notify main list that it has been refreshed */
+                mRefreshableMainList.onRefreshComplete();
+            }
+            public void onFailure(TwitterException exception) {
+            }
+        };
 
         /* Set actionbar subtitle to user's username, and home icon to user's
          * profile image */
-        /*
-        String screenName = mPrefs.getString(FinchApplication.PREF_SCREEN_NAME,
-                "");
-        if (!screenName.isEmpty()) {
-            ((FinchActivity)getActivity()).getSupportActionBar().
-                setSubtitle(screenName);
-        } else {
-        */
-            TwitterTask.Payload showUserParams = new TwitterTask.Payload(
-                    TwitterTask.SHOW_USER,
-                    new Object[] {
-                        getActivity(), mAccessToken.getUserId()});
-            new TwitterTask(showUserParams, mTwitter).execute();
-        //}
+        TwitterTaskParams showUserParams = new TwitterTaskParams(
+                TwitterTask.SHOW_USER,
+                new Object[] {
+                    getActivity(), mAccessToken.getUserId()});
+        new TwitterTask(showUserParams, tbc, mTwitter).execute();
     }
 }

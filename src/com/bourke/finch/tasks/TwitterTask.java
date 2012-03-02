@@ -60,27 +60,32 @@ import android.widget.FrameLayout;
  */
 
 public class TwitterTask extends
-        AsyncTask<TwitterTask.Payload, Object, TwitterTask.Payload> {
+        AsyncTask<TwitterTaskParams, Object, TwitterTaskParams> {
 
     public static final String TAG = "Finch/TwitterTask";
 
     public static final int SHOW_USER = 0;
     public static final int GET_HOME_TIMELINE = 1;
     public static final int GET_PROFILE_IMAGE = 2;
+    public static final int SHOW_PROFILE = 3;
+
+    private TwitterTaskParams mParams;
 
     private Twitter mTwitter;
 
-    private TwitterTask.Payload mParams;
+    private TwitterTaskCallback mCallback;
 
-    public TwitterTask(TwitterTask.Payload params, Twitter twitter) {
+    public TwitterTask(TwitterTaskParams params, TwitterTaskCallback callback,
+            Twitter twitter) {
         mParams = params;
         mTwitter = twitter;
+        mCallback = callback;
     }
 
     @Override
     protected void onPreExecute() {
 
-        TwitterTask.Payload payload = mParams;
+        TwitterTaskParams payload = mParams;
         int taskType = mParams.taskType;
 
         switch(taskType) {
@@ -92,12 +97,15 @@ public class TwitterTask extends
 
             case GET_PROFILE_IMAGE:
                 break;
+
+            case SHOW_PROFILE:
+                break;
         }
     }
 
-    public TwitterTask.Payload doInBackground(TwitterTask.Payload... params) {
+    public TwitterTaskParams doInBackground(TwitterTaskParams... params) {
 
-        TwitterTask.Payload payload = mParams;
+        TwitterTaskParams payload = mParams;
         int taskType = mParams.taskType;
 
         switch(taskType) {
@@ -160,8 +168,11 @@ public class TwitterTask extends
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
                 payload.result = bitmap;
+                break;
+
+            case SHOW_PROFILE:
+
                 break;
         }
 
@@ -169,7 +180,7 @@ public class TwitterTask extends
     }
 
     @Override
-    public void onPostExecute(TwitterTask.Payload payload) {
+    public void onPostExecute(TwitterTaskParams payload) {
 
         if (payload == null) {
             return;
@@ -193,10 +204,10 @@ public class TwitterTask extends
 
                 /* Now we have screenName, start another thread to get the
                  * profile image */
-                TwitterTask.Payload showProfileImageParams =
-                    new TwitterTask.Payload(TwitterTask.GET_PROFILE_IMAGE,
+                TwitterTaskParams showProfileImageParams =
+                    new TwitterTaskParams(TwitterTask.GET_PROFILE_IMAGE,
                         new Object[] {app, screenName});
-                new TwitterTask(showProfileImageParams, mTwitter).execute();
+                new TwitterTask(showProfileImageParams, null, mTwitter).execute();
                 break;
 
             case GET_HOME_TIMELINE:
@@ -234,18 +245,6 @@ public class TwitterTask extends
                     e.printStackTrace();
                 }
                 break;
-        }
-    }
-
-    public static class Payload {
-        public int taskType;
-        public Object[] data;
-        public Object result;
-        public Object exception;
-
-        public Payload(int taskType, Object[] data) {
-            this.taskType = taskType;
-            this.data = data;
         }
     }
 }

@@ -22,10 +22,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import twitter4j.ResponseList;
-
 import twitter4j.Status;
-
-import twitter4j.User;
 
 public class LazyAdapter extends BaseAdapter {
 
