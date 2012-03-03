@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import android.graphics.drawable.Drawable;
+
 import android.os.Bundle;
 
 import android.preference.PreferenceManager;
@@ -21,6 +23,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -66,6 +70,9 @@ public class HomePageFragment extends Fragment {
 
     private SharedPreferences mPrefs;
 
+    private TwitterTaskCallback
+        <TwitterTaskParams, TwitterException> mHomeListCallback;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -78,6 +85,27 @@ public class HomePageFragment extends Fragment {
 		mTwitter = new TwitterFactory().getInstance();
 		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
                 FinchApplication.CONSUMER_SECRET);
+
+        mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,
+                                                    TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                /* Stop spinner */
+                HomePageFragment.this.getActivity().
+                    setProgressBarIndeterminateVisibility(false);
+
+                /* Update list adapter */
+                mMainListAdapter.setStatuses(
+                        (ResponseList<twitter4j.Status>)
+                        payload.result);
+                mMainListAdapter.notifyDataSetChanged();
+
+                /* Notify main list that it has been refreshed */
+                mRefreshableMainList.onRefreshComplete();
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
     }
 
     @Override
@@ -94,35 +122,16 @@ public class HomePageFragment extends Fragment {
         mMainListAdapter = new LazyAdapter(getActivity());
         mMainList.setAdapter(mMainListAdapter);
 
+        /* Set up refreshableMainList callback */
 		mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh() {
-                /* Fetch user's timeline to populate ListView */
-                TwitterTaskCallback<TwitterTaskParams, TwitterException> tbc =
-                        new TwitterTaskCallback<TwitterTaskParams,
-                                                TwitterException>() {
-                    public void onSuccess(TwitterTaskParams payload) {
-                        /* Stop spinner */
-                        //setProgressBarIndeterminateVisibility(false);
-
-                        /* Update list adapter */
-                        mMainListAdapter.setStatuses(
-                                (ResponseList<twitter4j.Status>)
-                                payload.result);
-                        mMainListAdapter.notifyDataSetChanged();
-
-                        /* Notify main list that it has been refreshed */
-                        mRefreshableMainList.onRefreshComplete();
-                    }
-                    public void onFailure(TwitterException exception) {
-                    }
-                };
                 TwitterTaskParams getTimelineParams =
                      new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
-                         new Object[] {
-                             getActivity(), mMainListAdapter,
+                         new Object[] {getActivity(), mMainListAdapter,
                              mRefreshableMainList});
-                new TwitterTask(getTimelineParams, tbc, mTwitter).execute();
+                new TwitterTask(getTimelineParams, mHomeListCallback,
+                    mTwitter).execute();
             }
         });
 
@@ -168,25 +177,63 @@ public class HomePageFragment extends Fragment {
                 TwitterTask.GET_HOME_TIMELINE,
                 new Object[] {
                     getActivity(), mMainListAdapter, mRefreshableMainList});
-        new TwitterTask(getTimelineParams, null,  mTwitter).execute();
+        new TwitterTask(getTimelineParams, mHomeListCallback,
+                mTwitter).execute();
 
-        TwitterTaskCallback<TwitterTaskParams, TwitterException> tbc =
-                new TwitterTaskCallback<TwitterTaskParams,
-                                        TwitterException>() {
+        final TwitterTaskCallback<TwitterTaskParams, TwitterException>
+            profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,
+                                                    TwitterException>() {
+
             public void onSuccess(TwitterTaskParams payload) {
-                /* Stop spinner */
-                //setProgressBarIndeterminateVisibility(false);
-
-                /* Update list adapter */
-                mMainListAdapter.setStatuses(
-                        (ResponseList<twitter4j.Status>)
-                        payload.result);
-                mMainListAdapter.notifyDataSetChanged();
-
-                /* Notify main list that it has been refreshed */
-                mRefreshableMainList.onRefreshComplete();
+                Drawable profileImage = (Drawable)payload.result;
+                ImageView homeIcon = (ImageView)HomePageFragment.this
+                    .getActivity().findViewById(android.R.id.home);
+                int abHeight = ((FinchActivity)HomePageFragment.this.
+                        getActivity()).getSupportActionBar().getHeight();
+                try {
+                    homeIcon.setLayoutParams(new FrameLayout.LayoutParams(
+                                abHeight, abHeight));
+                    homeIcon.setPadding(0, 10, 10, 10);
+                    homeIcon.setImageDrawable(profileImage);
+                } catch (NullPointerException e) {
+                    /* Problem on <3.0, need to test further. Hopefully ABS 4.0
+                     * might fix this. */
+                    Log.e(TAG, "Could not get reference to home icon");
+                    e.printStackTrace();
+                }
             }
-            public void onFailure(TwitterException exception) {
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+
+        TwitterTaskCallback<TwitterTaskParams, TwitterException>
+            showUserCallback =  new TwitterTaskCallback<TwitterTaskParams,
+                                                    TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                String screenName = ((User)payload.result).getScreenName();
+                HomePageFragment.this.getActivity()
+                    .setProgressBarIndeterminateVisibility(false);
+                ((FinchActivity)HomePageFragment.this.getActivity()).
+                    getSupportActionBar().setSubtitle(screenName);
+                SharedPreferences prefs = HomePageFragment.this.getActivity()
+                    .getSharedPreferences("twitterPrefs",
+                        Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(FinchApplication.PREF_SCREEN_NAME,
+                        screenName);
+                editor.commit();
+
+                /* Now we have screenName, start another thread to get the
+                 * profile image */
+                TwitterTaskParams showProfileImageParams =
+                    new TwitterTaskParams(TwitterTask.GET_PROFILE_IMAGE,
+                        new Object[] {getActivity(), screenName});
+                new TwitterTask(showProfileImageParams, profileImageCallback,
+                        mTwitter).execute();
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
             }
         };
 
@@ -194,8 +241,8 @@ public class HomePageFragment extends Fragment {
          * profile image */
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.SHOW_USER,
-                new Object[] {
-                    getActivity(), mAccessToken.getUserId()});
-        new TwitterTask(showUserParams, tbc, mTwitter).execute();
+                new Object[] {getActivity(), mAccessToken.getUserId()});
+        new TwitterTask(showUserParams, showUserCallback,
+                mTwitter).execute();
     }
 }

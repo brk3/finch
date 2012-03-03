@@ -77,9 +77,10 @@ public class TwitterTask extends
 
     public TwitterTask(TwitterTaskParams params, TwitterTaskCallback callback,
             Twitter twitter) {
+
         mParams = params;
-        mTwitter = twitter;
         mCallback = callback;
+        mTwitter = twitter;
     }
 
     @Override
@@ -186,66 +187,8 @@ public class TwitterTask extends
             return;
         }
 
-        FinchActivity app = null;
-
-        switch(payload.taskType) {
-
-            case SHOW_USER:
-                String screenName = ((User)payload.result).getScreenName();
-                app = (FinchActivity)payload.data[0];
-                app.setProgressBarIndeterminateVisibility(false);
-                app.getSupportActionBar().setSubtitle(screenName);
-                SharedPreferences prefs = app.getSharedPreferences(
-                        "twitterPrefs", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(FinchApplication.PREF_SCREEN_NAME,
-                        screenName);
-                editor.commit();
-
-                /* Now we have screenName, start another thread to get the
-                 * profile image */
-                TwitterTaskParams showProfileImageParams =
-                    new TwitterTaskParams(TwitterTask.GET_PROFILE_IMAGE,
-                        new Object[] {app, screenName});
-                new TwitterTask(showProfileImageParams, null, mTwitter).execute();
-                break;
-
-            case GET_HOME_TIMELINE:
-                /* Stop spinner */
-                app = (FinchActivity)payload.data[0];
-                app.setProgressBarIndeterminateVisibility(false);
-
-                /* Update list adapter */
-                LazyAdapter mainListAdapter = (LazyAdapter)payload.data[1];
-                mainListAdapter.setStatuses(
-                        (ResponseList<twitter4j.Status>)payload.result);
-                mainListAdapter.notifyDataSetChanged();
-
-                /* Notify main list that it has been refreshed */
-                PullToRefreshListView mainList =
-                    (PullToRefreshListView)payload.data[2];
-                mainList.onRefreshComplete();
-                break;
-
-            case GET_PROFILE_IMAGE:
-                app = (FinchActivity)payload.data[0];
-                Drawable profileImage = (Drawable)payload.result;
-                ImageView homeIcon = (ImageView)app.findViewById(
-                        android.R.id.home);
-                int abHeight = app.getSupportActionBar().getHeight();
-                try {
-                    homeIcon.setLayoutParams(new FrameLayout.LayoutParams(
-                                abHeight, abHeight));
-                    homeIcon.setPadding(0, 10, 10, 10);
-                    homeIcon.setImageDrawable(profileImage);
-                } catch (NullPointerException e) {
-                    /* Problem on <3.0, need to test further. Hopefully ABS 4.0
-                     * might fix this. */
-                    Log.e(TAG, "Could not get reference to home icon");
-                    e.printStackTrace();
-                }
-                break;
-        }
+        mCallback.onSuccess(payload);
     }
+
 }
 
