@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ import android.widget.Toast;
 
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.TestAdapter;
+import com.bourke.finch.provider.FinchProvider;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -55,6 +57,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 
 import twitter4j.User;
+import android.net.Uri;
 
 public class HomePageFragment extends Fragment {
 
@@ -73,6 +76,8 @@ public class HomePageFragment extends Fragment {
     private TwitterTaskCallback
         <TwitterTaskParams, TwitterException> mHomeListCallback;
 
+    private ResponseList<Status> mHomeTimeline;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -86,6 +91,7 @@ public class HomePageFragment extends Fragment {
 		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
                 FinchApplication.CONSUMER_SECRET);
 
+        /* Fetch user's hometimeline */
         mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
@@ -93,10 +99,10 @@ public class HomePageFragment extends Fragment {
                 HomePageFragment.this.getActivity().
                     setProgressBarIndeterminateVisibility(false);
 
+                mHomeTimeline = (ResponseList<Status>)payload.result;
+
                 /* Update list adapter */
-                mMainListAdapter.setStatuses(
-                        (ResponseList<twitter4j.Status>)
-                        payload.result);
+                mMainListAdapter.setStatuses(mHomeTimeline);
                 mMainListAdapter.notifyDataSetChanged();
 
                 /* Notify main list that it has been refreshed */
@@ -121,6 +127,22 @@ public class HomePageFragment extends Fragment {
         mMainList = mRefreshableMainList.getRefreshableView();
         mMainListAdapter = new LazyAdapter(getActivity());
         mMainList.setAdapter(mMainListAdapter);
+        mMainList.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v,
+                    int position, long id) {
+                Intent profileActivity = new Intent(
+                    HomePageFragment.this.getActivity(),
+                    ProfileActivity.class);
+                // Minus one as list is not zero indexed
+                String screenName = mHomeTimeline.get(position-1).getUser()
+                    .getScreenName();
+                profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
+                        "/" + screenName));
+                HomePageFragment.this.startActivity(profileActivity);
+            }
+        });
 
         /* Set up refreshableMainList callback */
 		mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {

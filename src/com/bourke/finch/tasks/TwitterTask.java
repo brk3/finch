@@ -49,6 +49,7 @@ import twitter4j.User;
 import android.content.Context;
 import android.widget.RelativeLayout;
 import android.widget.FrameLayout;
+import android.app.Activity;
 
 /*
  * Generic AsyncTask used to make API calls in a background thread.
@@ -67,7 +68,6 @@ public class TwitterTask extends
     public static final int SHOW_USER = 0;
     public static final int GET_HOME_TIMELINE = 1;
     public static final int GET_PROFILE_IMAGE = 2;
-    public static final int SHOW_PROFILE = 3;
 
     private TwitterTaskParams mParams;
 
@@ -92,14 +92,11 @@ public class TwitterTask extends
         switch(taskType) {
 
             case SHOW_USER: case GET_HOME_TIMELINE:
-                FinchActivity app = (FinchActivity)payload.data[0];
+                Activity app = (Activity)payload.data[0];
                 app.setProgressBarIndeterminateVisibility(Boolean.TRUE);
                 break;
 
             case GET_PROFILE_IMAGE:
-                break;
-
-            case SHOW_PROFILE:
                 break;
         }
     }
@@ -112,19 +109,21 @@ public class TwitterTask extends
         switch(taskType) {
 
             case SHOW_USER:
-                /* Extract the parameters of the task from payload */
-                long userId = (Long)payload.data[1];
-
-                /* Perform the task(s) */
                 User user = null;
                 try {
-                    user = mTwitter.showUser(userId);
+                    Object userId = payload.data[1];
+                    if (userId instanceof Long) {
+                        user = mTwitter.showUser((Long)userId);
+                    } else if (userId instanceof String) {
+                        user = mTwitter.showUser((String)userId);
+                    } else {
+                        Log.e(TAG, "Error: TwitterTask.SHOW_USER called with "+
+                                userId.getClass().getName());
+                    }
                 } catch (TwitterException e) {
                     e.printStackTrace();
                     return null;
                 }
-
-                /* Return result of the task */
                 payload.result = user;
                 break;
 
@@ -143,7 +142,7 @@ public class TwitterTask extends
                 //TODO: add caching
                 Drawable bitmap = null;
                 try {
-                    FinchActivity app = (FinchActivity)payload.data[0];
+                    Activity app = (Activity)payload.data[0];
                     String screenName = (String)payload.data[1];
 
                     ProfileImage p = mTwitter.getProfileImage(
@@ -170,10 +169,6 @@ public class TwitterTask extends
                     e.printStackTrace();
                 }
                 payload.result = bitmap;
-                break;
-
-            case SHOW_PROFILE:
-
                 break;
         }
 

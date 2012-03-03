@@ -4,6 +4,9 @@ import android.app.Activity;
 
 import android.content.Context;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+
 import android.net.Uri;
 
 import android.os.Bundle;
@@ -21,11 +24,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.view.Window;
 
+import android.util.Log;
+
 import android.view.View;
 
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.bourke.finch.lazylist.LazyAdapter;
 
@@ -36,8 +43,11 @@ import java.util.ArrayList;
 
 import twitter4j.Twitter;
 
+import twitter4j.TwitterException;
+
 import twitter4j.TwitterFactory;
-import android.util.Log;
+
+import twitter4j.User;
 
 public class ProfileActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
@@ -55,6 +65,8 @@ public class ProfileActivity extends BaseFinchActivity
     private Twitter mTwitter;
 
     private Uri mURI;
+
+    private ImageView mProfileImage;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,9 +88,8 @@ public class ProfileActivity extends BaseFinchActivity
         mURI = uri;
 
 		/* Load the twitter4j helper */
-		mTwitter = new TwitterFactory().getInstance();
-		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
-                FinchApplication.CONSUMER_SECRET);
+        mTwitter = ((FinchApplication)getApplication()).getTwitter();
+
         /* Set up TabPageIndicator and bind viewpager to it */
         FinchPagerAdapter adapter = new FinchPagerAdapter(
                 getSupportFragmentManager());
@@ -88,14 +99,54 @@ public class ProfileActivity extends BaseFinchActivity
             (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(pager);
 
-        /* Get details for screenname and display */
-        /*
+        /* Get profile image for screenname and add to imageview */
+        mProfileImage = (ImageView)findViewById(R.id.image_profile);
+        TwitterTaskCallback<TwitterTaskParams, TwitterException>
+            profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,
+                                                    TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                mProfileImage.setImageDrawable((BitmapDrawable)payload.result);
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
         String screenName = uri.getPathSegments().get(1).replaceFirst("@", "");
-        TwitterTaskPayload showUserParams = new TwitterTaskPayload(
+        TwitterTaskParams showUserParams = new TwitterTaskParams(
+                TwitterTask.GET_PROFILE_IMAGE,
+                new Object[] {this, screenName});
+        new TwitterTask(showUserParams, profileImageCallback,
+                mTwitter).execute();
+
+        /* Get user object */
+        TwitterTaskCallback<TwitterTaskParams, TwitterException>
+            userObjectCallback = new TwitterTaskCallback<TwitterTaskParams,
+                                                         TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                ProfileActivity.this.populateProfileView((User)payload.result);
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+        TwitterTaskParams userObjectParams = new TwitterTaskParams(
                 TwitterTask.SHOW_USER,
-                new Object[] {getActivity(), mAccessToken.getUserId()});
-        new TwitterTask(showUserParams, mTwitter).execute();
-        */
+                new Object[] {this, screenName});
+        new TwitterTask(userObjectParams, userObjectCallback,
+                mTwitter).execute();
+    }
+
+    //TODO: move all this to a fragment
+    private void populateProfileView(User user) {
+        /* Set textview for screenname */
+        TextView textViewScreenName = (TextView)findViewById(
+                R.id.text_screenname);
+        textViewScreenName.setText("@"+user.getScreenName());
+
+        /* Set textview for description */
+        TextView textViewDescription = (TextView)findViewById(
+                R.id.text_description);
+        textViewDescription.setText(user.getDescription());
     }
 
     @Override

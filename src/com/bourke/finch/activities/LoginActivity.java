@@ -101,7 +101,6 @@ public class LoginActivity extends FragmentActivity
 
             } catch (TwitterException e) {
                 e.printStackTrace();
-                return null;
             }
             return authUrl;
         }

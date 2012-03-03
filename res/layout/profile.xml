@@ -30,9 +30,8 @@
             android:layout_toRightOf="@id/image_profile"
             android:paddingTop="20dip"
             android:paddingLeft="15dip"
-            android:paddingBottom="15dip"
-            android:textSize="25sp"
-            android:text="loren ipsum" />
+            android:paddingBottom="5dip"
+            android:textSize="25sp" />
 
         <TextView
             android:id="@+id/text_description"
@@ -41,8 +40,7 @@
             android:layout_toRightOf="@id/image_profile"
             android:paddingLeft="15dip"
             android:layout_below="@id/text_screenname"
-            android:textColor="@color/white"
-            android:text="loren ipsum" />
+            android:textColor="@color/white" />
 
     </RelativeLayout>
 
