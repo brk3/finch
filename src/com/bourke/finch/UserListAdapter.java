@@ -1,4 +1,4 @@
-package com.bourke.finch.lazylist;
+package com.bourke.finch;
 
 import android.app.Activity;
 
@@ -14,29 +14,26 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bourke.finch.FinchApplication;
-import com.bourke.finch.R;
+import com.bourke.finch.lazylist.ImageLoader;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import twitter4j.ResponseList;
-import twitter4j.Status;
 
-public class LazyAdapter extends BaseAdapter {
+import twitter4j.User;
+
+public class UserListAdapter extends BaseAdapter {
 
     private Activity activity;
 
-    private ResponseList<Status> mStatuses;
+    private ResponseList<User> mUsers;
 
     private static LayoutInflater inflater = null;
 
     public ImageLoader imageLoader;
 
-    private Pattern screenNameMatcher = Pattern.compile("@\\w+");
 
-    public LazyAdapter(Activity a) {
+    public UserListAdapter(Activity a) {
         activity = a;
         inflater = (LayoutInflater)activity.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
@@ -50,19 +47,12 @@ public class LazyAdapter extends BaseAdapter {
             vi = inflater.inflate(R.layout.main_row, null);
         }
 
-        if (mStatuses != null) {
-            TextView text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
-            text_tweet.setText(mStatuses.get(position).getText());
-            Linkify.addLinks(text_tweet, Linkify.ALL);
-            Linkify.addLinks(text_tweet, screenNameMatcher,
-                     FinchApplication.SCREEN_NAME_URI.toString() + "/");
+        if (mUsers != null) {
+            String screenName = mUsers.get(position).getScreenName();
 
-            String screenName = mStatuses.get(position).getUser().
-                getScreenName();
-
-            TextView text_screenname =
-                (TextView)vi.findViewById(R.id.text_screenname);
-            text_screenname.setText("@"+screenName);
+            TextView text_screenname = (TextView)vi.findViewById(
+                    R.id.text_screenname);
+            text_screenname.setText(screenName);
 
             ImageView image_profile = (ImageView)vi.findViewById(
                     R.id.image_profile);
@@ -74,8 +64,8 @@ public class LazyAdapter extends BaseAdapter {
 
     public int getCount() {
         int count = 0;
-        if (mStatuses != null) {
-            count = mStatuses.size();
+        if (mUsers != null) {
+            count = mUsers.size();
         }
         return count;
     }
@@ -88,8 +78,8 @@ public class LazyAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setStatuses(ResponseList<Status> data) {
-        mStatuses = data;
+    public void setUsers(ResponseList<User> users) {
+        mUsers = users;
     }
 
 }

@@ -20,6 +20,9 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import twitter4j.IDs;
 
 import twitter4j.ResponseList;
 
@@ -28,8 +31,10 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
+
 import twitter4j.TwitterFactory;
-import java.util.List;
+
+import twitter4j.User;
 
 public class ProfileFragment extends Fragment {
 
@@ -45,7 +50,7 @@ public class ProfileFragment extends Fragment {
     private ListView mMainList;
     private PullToRefreshListView mRefreshableMainList;
 
-    private UserTimeLineAdapter mMainListAdapter;
+    private BaseAdapter mMainListAdapter;
 
     private ResponseList<Status> mTimeline;
 
@@ -55,7 +60,8 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
 		/* Load the twitter4j helper */
-		mTwitter = new TwitterFactory().getInstance();
+        mTwitter = ((FinchApplication)
+                getActivity().getApplication()).getTwitter();
     }
 
     @Override
@@ -69,6 +75,8 @@ public class ProfileFragment extends Fragment {
         mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
                 R.id.list);
         mMainList = mRefreshableMainList.getRefreshableView();
+
+        /* Set up adapter depending on TYPE */
         switch (mType) {
             case TYPE_TWEETS:
                 mMainListAdapter = new UserTimeLineAdapter(getActivity());
@@ -83,8 +91,19 @@ public class ProfileFragment extends Fragment {
                 });
                 getUserTweets();
                 break;
-            case TYPE_FOLLOWING:
 
+            case TYPE_FOLLOWING:
+                mMainListAdapter = new UserListAdapter(getActivity());
+                mMainList.setAdapter(mMainListAdapter);
+                mMainList.setOnItemClickListener(
+                        new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View v,
+                            int position, long id) {
+                        // TODO: implement onitemclick
+                    }
+                });
+                getFollowingIds();
                 break;
 
             case TYPE_FOLLOWERS:
@@ -114,7 +133,7 @@ public class ProfileFragment extends Fragment {
                                  TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 mTimeline = (ResponseList<Status>)payload.result;
-                mMainListAdapter.setStatuses(mTimeline);
+                ((UserTimeLineAdapter)mMainListAdapter).setStatuses(mTimeline);
                 mMainListAdapter.notifyDataSetChanged();
             }
             public void onFailure(TwitterException e) {
@@ -128,6 +147,50 @@ public class ProfileFragment extends Fragment {
                 new Object[] {getActivity(), screenName});
 
         new TwitterTask(userTimelineParams, userTimelineCallback,
+                mTwitter).execute();
+    }
+
+    private void getFollowingIds() {
+        TwitterTaskCallback<TwitterTaskParams, TwitterException>
+            followingIdsCallback =  new TwitterTaskCallback<TwitterTaskParams,
+                                 TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                long[] ids = ((IDs)payload.result).getIDs();
+                /* Now we have ids, get user objects */
+                getFollowingUsers(ids);
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+        String screenName = ((ProfileActivity)
+                ProfileFragment.this.getActivity()).getScreenName();
+        TwitterTaskParams followIdsParams = new TwitterTaskParams(
+                TwitterTask.GET_FOLLOWING_IDS,
+                new Object[] {getActivity(), screenName});
+
+        new TwitterTask(followIdsParams, followingIdsCallback,
+                mTwitter).execute();
+    }
+
+    public void getFollowingUsers(long[] ids) {
+        TwitterTaskCallback<TwitterTaskParams, TwitterException>
+            followingUsersCallback = new TwitterTaskCallback<TwitterTaskParams,
+                                 TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                ResponseList<User> users = (ResponseList<User>)payload.result;
+                ((UserListAdapter)mMainListAdapter).setUsers(users);
+                mMainListAdapter.notifyDataSetChanged();
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+        TwitterTaskParams followUsersParams = new TwitterTaskParams(
+                TwitterTask.LOOKUP_USERS,
+                new Object[] {getActivity(), ids});
+
+        new TwitterTask(followUsersParams, followingUsersCallback,
                 mTwitter).execute();
     }
 

@@ -1,5 +1,8 @@
 package com.bourke.finch;
 
+import android.app.Activity;
+
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import android.graphics.Bitmap;
@@ -15,8 +18,10 @@ import android.util.Log;
 
 import android.view.Window;
 
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bourke.finch.lazylist.ImageLoader;
@@ -35,6 +40,8 @@ import java.net.URL;
 
 import java.util.List;
 
+import twitter4j.IDs;
+
 import twitter4j.ProfileImage;
 
 import twitter4j.ResponseList;
@@ -46,10 +53,6 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import twitter4j.User;
-import android.content.Context;
-import android.widget.RelativeLayout;
-import android.widget.FrameLayout;
-import android.app.Activity;
 
 /*
  * Generic AsyncTask used to make API calls in a background thread.
@@ -69,6 +72,8 @@ public class TwitterTask extends
     public static final int GET_HOME_TIMELINE = 1;
     public static final int GET_PROFILE_IMAGE = 2;
     public static final int GET_USER_TIMELINE = 3;
+    public static final int GET_FOLLOWING_IDS = 4;
+    public static final int LOOKUP_USERS = 5;
 
     private TwitterTaskParams mParams;
 
@@ -78,7 +83,6 @@ public class TwitterTask extends
 
     public TwitterTask(TwitterTaskParams params, TwitterTaskCallback callback,
             Twitter twitter) {
-
         mParams = params;
         mCallback = callback;
         mTwitter = twitter;
@@ -112,7 +116,6 @@ public class TwitterTask extends
                     }
                 } catch (TwitterException e) {
                     e.printStackTrace();
-                    return null;
                 }
                 payload.result = user;
                 break;
@@ -123,7 +126,6 @@ public class TwitterTask extends
                     homeTimeline = mTwitter.getHomeTimeline();
                 } catch (TwitterException e) {
                     e.printStackTrace();
-                    return null;
                 }
                 payload.result = homeTimeline;
                 break;
@@ -133,10 +135,10 @@ public class TwitterTask extends
                 Drawable bitmap = null;
                 try {
                     Activity app = (Activity)payload.data[0];
-                    String screenName = (String)payload.data[1];
+                    String p_screenName = (String)payload.data[1];
 
                     ProfileImage p = mTwitter.getProfileImage(
-                            screenName, ProfileImage.BIGGER);
+                            p_screenName, ProfileImage.BIGGER);
                     String profileImageUrl = p.getURL();
 
                     File tempFile = new File(
@@ -163,14 +165,36 @@ public class TwitterTask extends
 
             case GET_USER_TIMELINE:
                 List<twitter4j.Status> userTimeLine = null;
-                String screenName = (String)payload.data[1];
+                String u_screenName = (String)payload.data[1];
                 try {
-                    userTimeLine = mTwitter.getUserTimeline(screenName);
+                    userTimeLine = mTwitter.getUserTimeline(u_screenName);
                 } catch (TwitterException e) {
                     e.printStackTrace();
-                    return null;
                 }
                 payload.result = userTimeLine;
+                break;
+
+            case GET_FOLLOWING_IDS:
+                IDs ids = null;
+                String f_screenName = (String)payload.data[1];
+                try {
+                    long cursor = -1; // begin paging
+                    ids = mTwitter.getFollowersIDs(f_screenName, -1);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                }
+                payload.result = ids;
+                break;
+
+            case LOOKUP_USERS:
+                ResponseList<User> users = null;
+                long[] l_ids = (long[])payload.data[1];
+                try {
+                    users = mTwitter.lookupUsers(l_ids);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                }
+                payload.result = users;
                 break;
         }
 

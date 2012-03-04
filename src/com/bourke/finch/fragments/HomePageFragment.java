@@ -33,7 +33,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bourke.finch.lazylist.LazyAdapter;
-import com.bourke.finch.lazylist.TestAdapter;
 import com.bourke.finch.provider.FinchProvider;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
