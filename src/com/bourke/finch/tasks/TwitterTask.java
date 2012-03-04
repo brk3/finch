@@ -68,6 +68,7 @@ public class TwitterTask extends
     public static final int SHOW_USER = 0;
     public static final int GET_HOME_TIMELINE = 1;
     public static final int GET_PROFILE_IMAGE = 2;
+    public static final int GET_USER_TIMELINE = 3;
 
     private TwitterTaskParams mParams;
 
@@ -85,22 +86,11 @@ public class TwitterTask extends
 
     @Override
     protected void onPreExecute() {
-
-        TwitterTaskParams payload = mParams;
-        int taskType = mParams.taskType;
-
-        switch(taskType) {
-
-            case SHOW_USER: case GET_HOME_TIMELINE:
-                Activity app = (Activity)payload.data[0];
-                app.setProgressBarIndeterminateVisibility(Boolean.TRUE);
-                break;
-
-            case GET_PROFILE_IMAGE:
-                break;
-        }
+        Activity app = (Activity)mParams.data[0];
+        app.setProgressBarIndeterminateVisibility(Boolean.TRUE);
     }
 
+    @Override
     public TwitterTaskParams doInBackground(TwitterTaskParams... params) {
 
         TwitterTaskParams payload = mParams;
@@ -170,6 +160,18 @@ public class TwitterTask extends
                 }
                 payload.result = bitmap;
                 break;
+
+            case GET_USER_TIMELINE:
+                List<twitter4j.Status> userTimeLine = null;
+                String screenName = (String)payload.data[1];
+                try {
+                    userTimeLine = mTwitter.getUserTimeline(screenName);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+                payload.result = userTimeLine;
+                break;
         }
 
         return payload;
@@ -177,10 +179,12 @@ public class TwitterTask extends
 
     @Override
     public void onPostExecute(TwitterTaskParams payload) {
-
         if (payload == null) {
             return;
         }
+
+        Activity app = (Activity)mParams.data[0];
+        app.setProgressBarIndeterminateVisibility(Boolean.FALSE);
 
         mCallback.onSuccess(payload);
     }

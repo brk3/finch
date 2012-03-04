@@ -64,9 +64,9 @@ public class ProfileActivity extends BaseFinchActivity
 
     private Twitter mTwitter;
 
-    private Uri mURI;
-
     private ImageView mProfileImage;
+
+    private String mScreenName = new String();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -85,7 +85,7 @@ public class ProfileActivity extends BaseFinchActivity
         if ((uri == null) || (uri.getPathSegments().size() < 2)) {
             // TODO: recover
         }
-        mURI = uri;
+        mScreenName = uri.getPathSegments().get(1).replaceFirst("@", "");
 
 		/* Load the twitter4j helper */
         mTwitter = ((FinchApplication)getApplication()).getTwitter();
@@ -111,10 +111,9 @@ public class ProfileActivity extends BaseFinchActivity
                 e.printStackTrace();
             }
         };
-        String screenName = uri.getPathSegments().get(1).replaceFirst("@", "");
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.GET_PROFILE_IMAGE,
-                new Object[] {this, screenName});
+                new Object[] {this, mScreenName});
         new TwitterTask(showUserParams, profileImageCallback,
                 mTwitter).execute();
 
@@ -131,7 +130,7 @@ public class ProfileActivity extends BaseFinchActivity
         };
         TwitterTaskParams userObjectParams = new TwitterTaskParams(
                 TwitterTask.SHOW_USER,
-                new Object[] {this, screenName});
+                new Object[] {this, mScreenName});
         new TwitterTask(userObjectParams, userObjectCallback,
                 mTwitter).execute();
     }
@@ -152,6 +151,10 @@ public class ProfileActivity extends BaseFinchActivity
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         return true;
+    }
+
+    public String getScreenName() {
+        return mScreenName;
     }
 
     public static class FinchPagerAdapter extends FragmentPagerAdapter

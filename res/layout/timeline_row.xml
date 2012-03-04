@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/bg_grey_noise">
+
+    <TextView
+        android:id="@+id/text_tweet"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:textSize="15dip"
+        android:padding="5dip" />
+
+</RelativeLayout>

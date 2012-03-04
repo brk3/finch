@@ -8,8 +8,6 @@ public class TwitterTaskParams {
 
     public Object result;
 
-    public Object exception;
-
     public TwitterTaskParams(int taskType, Object[] data) {
         this.taskType = taskType;
         this.data = data;
