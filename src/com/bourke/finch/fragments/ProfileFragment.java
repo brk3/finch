@@ -16,10 +16,13 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.bourke.finch.lazylist.LazyAdapter;
+
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import twitter4j.IDs;
@@ -33,6 +36,8 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import twitter4j.TwitterFactory;
+
+import twitter4j.TwitterResponse;
 
 import twitter4j.User;
 
@@ -93,7 +98,7 @@ public class ProfileFragment extends Fragment {
                 break;
 
             case TYPE_FOLLOWING:
-                mMainListAdapter = new UserListAdapter(getActivity());
+                mMainListAdapter = new LazyAdapter(getActivity());
                 mMainList.setAdapter(mMainListAdapter);
                 mMainList.setOnItemClickListener(
                         new AdapterView.OnItemClickListener() {
@@ -156,8 +161,16 @@ public class ProfileFragment extends Fragment {
                                  TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 long[] ids = ((IDs)payload.result).getIDs();
-                /* Now we have ids, get user objects */
-                getFollowingUsers(ids);
+                /* Now we have ids, get first 100 user objects, which the max
+                 * Twitter will allow in a request. */
+                long[] idsSegment;
+                if (ids.length > 100) {
+                    idsSegment = Arrays.copyOfRange(ids, 0, 100);
+                } else {
+                    idsSegment = ids;
+                }
+
+                getFollowingUsers(idsSegment);
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();
@@ -178,8 +191,9 @@ public class ProfileFragment extends Fragment {
             followingUsersCallback = new TwitterTaskCallback<TwitterTaskParams,
                                  TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                ResponseList<User> users = (ResponseList<User>)payload.result;
-                ((UserListAdapter)mMainListAdapter).setUsers(users);
+                ResponseList<TwitterResponse> users =
+                    (ResponseList<TwitterResponse>)payload.result;
+                ((LazyAdapter)mMainListAdapter).setResponses(users);
                 mMainListAdapter.notifyDataSetChanged();
             }
             public void onFailure(TwitterException e) {

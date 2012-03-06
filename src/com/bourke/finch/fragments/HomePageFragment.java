@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 
 import twitter4j.auth.AccessToken;
+import twitter4j.TwitterResponse;
 
 import twitter4j.ResponseList;
 
@@ -75,7 +76,7 @@ public class HomePageFragment extends Fragment {
     private TwitterTaskCallback
         <TwitterTaskParams, TwitterException> mHomeListCallback;
 
-    private ResponseList<Status> mHomeTimeline;
+    private ResponseList<TwitterResponse> mHomeTimeline;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,10 +99,10 @@ public class HomePageFragment extends Fragment {
                 HomePageFragment.this.getActivity().
                     setProgressBarIndeterminateVisibility(false);
 
-                mHomeTimeline = (ResponseList<Status>)payload.result;
+                mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
 
                 /* Update list adapter */
-                mMainListAdapter.setStatuses(mHomeTimeline);
+                mMainListAdapter.setResponses(mHomeTimeline);
                 mMainListAdapter.notifyDataSetChanged();
 
                 /* Notify main list that it has been refreshed */
@@ -135,7 +136,8 @@ public class HomePageFragment extends Fragment {
                     HomePageFragment.this.getActivity(),
                     ProfileActivity.class);
                 // Minus one as list is not zero indexed
-                String screenName = mHomeTimeline.get(position-1).getUser()
+                String screenName = (
+                    (Status)mHomeTimeline.get(position-1)).getUser()
                     .getScreenName();
                 profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
                         "/" + screenName));

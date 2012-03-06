@@ -6,6 +6,8 @@ import android.content.Context;
 
 import android.text.util.Linkify;
 
+import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +24,20 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import twitter4j.ResponseList;
+
 import twitter4j.Status;
+
+import twitter4j.TwitterResponse;
+
+import twitter4j.User;
 
 public class LazyAdapter extends BaseAdapter {
 
+    private static final String TAG = "finch/LazyAdapter";
+
     private Activity activity;
 
-    private ResponseList<Status> mStatuses;
+    private ResponseList<TwitterResponse> mResponses;
 
     private static LayoutInflater inflater = null;
 
@@ -50,20 +59,46 @@ public class LazyAdapter extends BaseAdapter {
             vi = inflater.inflate(R.layout.main_row, null);
         }
 
-        if (mStatuses != null) {
+        if (mResponses != null) {
+            TwitterResponse currentEntity = mResponses.get(position);
+
+            /* Set the tweet TextView. If the user is protected, this may be
+             * null, so account for that. */
             TextView text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
-            text_tweet.setText(mStatuses.get(position).getText());
+            String text = "";
+            if (currentEntity instanceof User) {
+                if (((User)currentEntity).getStatus() == null) {
+                    // TODO: add to strings.xml
+                    text = "You need to follow this user to see their status.";
+                } else {
+                    text = ((User)currentEntity).getStatus().getText();
+                }
+            } else if (currentEntity instanceof Status) {
+                text = ((Status)currentEntity).getText();
+            } else {
+                Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
+                        + currentEntity.getClass().getName());
+            }
+            text_tweet.setText(text);
             Linkify.addLinks(text_tweet, Linkify.ALL);
             Linkify.addLinks(text_tweet, screenNameMatcher,
                      FinchApplication.SCREEN_NAME_URI.toString() + "/");
 
-            String screenName = mStatuses.get(position).getUser().
-                getScreenName();
-
+            /* Set the screen name TextView */
+            String screenName = "";
+            if (currentEntity instanceof User) {
+                screenName = ((User)currentEntity).getScreenName();
+            } else if (currentEntity instanceof Status) {
+                screenName = ((Status)currentEntity).getUser().getScreenName();
+            } else {
+                Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
+                        + currentEntity.getClass().getName());
+            }
             TextView text_screenname =
                 (TextView)vi.findViewById(R.id.text_screenname);
             text_screenname.setText("@"+screenName);
 
+            /* Set the profile image ImageView */
             ImageView image_profile = (ImageView)vi.findViewById(
                     R.id.image_profile);
             imageLoader.displayImage(screenName, image_profile);
@@ -74,8 +109,8 @@ public class LazyAdapter extends BaseAdapter {
 
     public int getCount() {
         int count = 0;
-        if (mStatuses != null) {
-            count = mStatuses.size();
+        if (mResponses != null) {
+            count = mResponses.size();
         }
         return count;
     }
@@ -88,8 +123,8 @@ public class LazyAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setStatuses(ResponseList<Status> data) {
-        mStatuses = data;
+    public void setResponses(ResponseList<TwitterResponse> data) {
+        mResponses = data;
     }
 
 }
