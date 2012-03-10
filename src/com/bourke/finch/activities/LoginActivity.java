@@ -25,6 +25,9 @@ import android.widget.Toast;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
+
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
@@ -58,9 +61,14 @@ public class LoginActivity extends FragmentActivity
         getSupportActionBar().hide();
 
 		/* Load the twitter4j helper */
-		mTwitter = new TwitterFactory().getInstance();
-		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
+		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+		configurationBuilder.setOAuthConsumerKey(
+                FinchApplication.CONSUMER_KEY);
+		configurationBuilder.setOAuthConsumerSecret(
                 FinchApplication.CONSUMER_SECRET);
+		configurationBuilder.setUseSSL(true);
+		Configuration configuration = configurationBuilder.build();
+		mTwitter = new TwitterFactory(configuration).getInstance();
     }
 
 	@Override

@@ -1,36 +1,20 @@
 package com.bourke.finch;
 
-import android.app.Activity;
-
-import android.content.Context;
-
 import android.os.Bundle;
-import android.os.Parcelable;
 
 import android.support.v4.app.ActionBar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.Menu;
-import android.support.v4.view.MenuItem;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v4.view.Window;
 
-import android.view.View;
-
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-
-import com.bourke.finch.lazylist.LazyAdapter;
-
-import java.util.ArrayList;
+import android.widget.Toast;
 
 public class FinchActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
+
+    private static final String TAG = "finch/FinchActivity";
 
     private static final int NUM_ITEMS = 2;
 
@@ -39,6 +23,7 @@ public class FinchActivity extends BaseFinchActivity
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);
@@ -49,19 +34,21 @@ public class FinchActivity extends BaseFinchActivity
         viewPager.setAdapter(adapter);
         viewPager.setOnPageChangeListener(new OnPageChangeListener() {
 
-        @Override
-        public void onPageSelected(int page) {
-            //TODO: update nav spinner
-        }
+            @Override
+            public void onPageSelected(int page) {
+                //TODO: update nav spinner
+            }
 
-        @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-        }
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+            }
 
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
+            @Override
+            public void onPageScrollStateChanged(int arg0) {
+            }
         });
+
+		Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
     }
 
     @Override

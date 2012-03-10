@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 
 import android.graphics.drawable.Drawable;
 
+import android.net.Uri;
+
 import android.os.Bundle;
 
 import android.preference.PreferenceManager;
@@ -44,7 +46,9 @@ import java.util.Collections;
 import java.util.List;
 
 import twitter4j.auth.AccessToken;
-import twitter4j.TwitterResponse;
+
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 
 import twitter4j.ResponseList;
 
@@ -56,8 +60,9 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterFactory;
 
+import twitter4j.TwitterResponse;
+
 import twitter4j.User;
-import android.net.Uri;
 
 public class HomePageFragment extends Fragment {
 
@@ -87,9 +92,14 @@ public class HomePageFragment extends Fragment {
                 "twitterPrefs", Context.MODE_PRIVATE);
 
 		/* Load the twitter4j helper */
-		mTwitter = new TwitterFactory().getInstance();
-		mTwitter.setOAuthConsumer(FinchApplication.CONSUMER_KEY,
+		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+		configurationBuilder.setOAuthConsumerKey(
+                FinchApplication.CONSUMER_KEY);
+		configurationBuilder.setOAuthConsumerSecret(
                 FinchApplication.CONSUMER_SECRET);
+		configurationBuilder.setUseSSL(true);
+		Configuration configuration = configurationBuilder.build();
+		mTwitter = new TwitterFactory(configuration).getInstance();
 
         /* Fetch user's hometimeline */
         mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,

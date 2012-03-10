@@ -1,51 +1,26 @@
 package com.bourke.finch;
 
-import android.app.Activity;
-
-import android.content.Context;
-
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 
 import android.net.Uri;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 
 import android.support.v4.app.ActionBar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.Menu;
-import android.support.v4.view.MenuItem;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.support.v4.view.Window;
 
-import android.util.Log;
-
-import android.view.View;
-
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-
-import com.bourke.finch.lazylist.LazyAdapter;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
 
-import java.util.ArrayList;
-
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
-
-import twitter4j.TwitterFactory;
 
 import twitter4j.User;
 

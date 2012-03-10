@@ -18,7 +18,7 @@ public abstract class BaseFinchActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
 
         /* Set layout and theme */
-        //requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setTheme(FinchApplication.THEME_LIGHT);
 
