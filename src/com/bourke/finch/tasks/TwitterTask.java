@@ -11,8 +11,8 @@ import android.graphics.drawable.Drawable;
 
 import android.os.AsyncTask;
 
-import android.support.v4.app.ActionBar;
-import android.support.v4.view.MenuItem;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
 
 import android.util.Log;
 
@@ -27,8 +27,6 @@ import android.widget.Toast;
 import com.bourke.finch.lazylist.ImageLoader;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.Utils;
-
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.io.File;
 import java.io.FileOutputStream;

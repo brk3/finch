@@ -6,10 +6,14 @@
     </style>
 
     <style name="Theme.Finch_Light" parent="Theme.Sherlock.Light">
-        <item name="abTitleTextStyle">@style/CustomTitle</item>
-        <item name="abSubtitleTextStyle">@style/CustomSubTitle</item>
+        <item name="titleTextStyle">@style/CustomTitle</item>
+        <item name="android:titleTextStyle">@style/CustomTitle</item>
+        <item name="subtitleTextStyle">@style/CustomSubTitle</item>
+        <item name="android:subtitleTextStyle">@style/CustomSubTitle</item>
         <item name="actionBarSize">55dp</item>
-        <item name="abBackground">#ffdedede</item>
+        <item name="android:actionBarSize">55dp</item>
+        <item name="background">#ffdedede</item>
+        <item name="android:background">#ffdedede</item>
 
         <!-- Lines taken from ViewPagerIndicator to work around Issue#66 -->
         <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator</item>

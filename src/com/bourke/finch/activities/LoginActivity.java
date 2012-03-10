@@ -9,9 +9,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import android.support.v4.app.ActionBar;
-import android.support.v4.app.FragmentActivity;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 
@@ -21,6 +18,9 @@ import android.view.View;
 
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
@@ -34,7 +34,7 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterFactory;
 
-public class LoginActivity extends FragmentActivity
+public class LoginActivity extends SherlockFragmentActivity
         implements ActionBar.OnNavigationListener {
 
     private static final String TAG = "Finch/LoginActivity";

@@ -2,15 +2,17 @@ package com.bourke.finch;
 
 import android.os.Bundle;
 
-import android.support.v4.app.ActionBar;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.Menu;
-import android.support.v4.view.MenuItem;
-import android.support.v4.view.Window;
 
 import android.widget.ArrayAdapter;
 
-public abstract class BaseFinchActivity extends FragmentActivity
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.actionbarsherlock.view.Window;
+
+public abstract class BaseFinchActivity extends SherlockFragmentActivity
         implements ActionBar.OnNavigationListener {
 
     @Override

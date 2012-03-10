@@ -2,8 +2,6 @@ package com.bourke.finch;
 
 import android.os.Bundle;
 
-import android.support.v4.app.Fragment;
-
 import android.util.Log;
 
 import android.view.LayoutInflater;
@@ -16,10 +14,12 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
+import com.actionbarsherlock.app.SherlockFragment;
+
 import com.bourke.finch.lazylist.LazyAdapter;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
+//import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+//import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +41,7 @@ import twitter4j.TwitterResponse;
 
 import twitter4j.User;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends SherlockFragment {
 
     private static final String TAG = "Finch/ProfileFragment";
 
@@ -53,7 +53,7 @@ public class ProfileFragment extends Fragment {
     private Twitter mTwitter;
 
     private ListView mMainList;
-    private PullToRefreshListView mRefreshableMainList;
+    //private PullToRefreshListView mRefreshableMainList;
 
     private BaseAdapter mMainListAdapter;
 
@@ -66,7 +66,7 @@ public class ProfileFragment extends Fragment {
 
 		/* Load the twitter4j helper */
         mTwitter = ((FinchApplication)
-                getActivity().getApplication()).getTwitter();
+                getSherlockActivity().getApplication()).getTwitter();
     }
 
     @Override
@@ -74,17 +74,18 @@ public class ProfileFragment extends Fragment {
             Bundle savedInstanceState) {
 
         RelativeLayout layout = (RelativeLayout)inflater
-            .inflate(R.layout.pull_refresh_list, container, false);
+            .inflate(R.layout.standard_list_fragment, container, false);
 
         /* Setup ListView */
-        mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
-                R.id.list);
-        mMainList = mRefreshableMainList.getRefreshableView();
+        //mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
+        //        R.id.list);
+        //mMainList = mRefreshableMainList.getRefreshableView();
+        mMainList = (ListView)layout.findViewById(R.id.list);
 
         /* Set up adapter depending on TYPE */
         switch (mType) {
             case TYPE_TWEETS:
-                mMainListAdapter = new UserTimeLineAdapter(getActivity());
+                mMainListAdapter = new UserTimeLineAdapter(getSherlockActivity());
                 mMainList.setAdapter(mMainListAdapter);
                 mMainList.setOnItemClickListener(
                         new AdapterView.OnItemClickListener() {
@@ -98,7 +99,7 @@ public class ProfileFragment extends Fragment {
                 break;
 
             case TYPE_FOLLOWING:
-                mMainListAdapter = new LazyAdapter(getActivity());
+                mMainListAdapter = new LazyAdapter(getSherlockActivity());
                 mMainList.setAdapter(mMainListAdapter);
                 mMainList.setOnItemClickListener(
                         new AdapterView.OnItemClickListener() {
@@ -121,12 +122,14 @@ public class ProfileFragment extends Fragment {
         }
 
         /* Set up refreshableMainList callback */
+        /*
 		mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh() {
 
             }
         });
+        */
 
         return layout;
     }
@@ -146,10 +149,10 @@ public class ProfileFragment extends Fragment {
             }
         };
         String screenName = ((ProfileActivity)
-                ProfileFragment.this.getActivity()).getScreenName();
+                ProfileFragment.this.getSherlockActivity()).getScreenName();
         TwitterTaskParams userTimelineParams = new TwitterTaskParams(
                 TwitterTask.GET_USER_TIMELINE,
-                new Object[] {getActivity(), screenName});
+                new Object[] {getSherlockActivity(), screenName});
 
         new TwitterTask(userTimelineParams, userTimelineCallback,
                 mTwitter).execute();
@@ -177,10 +180,10 @@ public class ProfileFragment extends Fragment {
             }
         };
         String screenName = ((ProfileActivity)
-                ProfileFragment.this.getActivity()).getScreenName();
+                ProfileFragment.this.getSherlockActivity()).getScreenName();
         TwitterTaskParams followIdsParams = new TwitterTaskParams(
                 TwitterTask.GET_FOLLOWING_IDS,
-                new Object[] {getActivity(), screenName});
+                new Object[] {getSherlockActivity(), screenName});
 
         new TwitterTask(followIdsParams, followingIdsCallback,
                 mTwitter).execute();
@@ -202,7 +205,7 @@ public class ProfileFragment extends Fragment {
         };
         TwitterTaskParams followUsersParams = new TwitterTaskParams(
                 TwitterTask.LOOKUP_USERS,
-                new Object[] {getActivity(), ids});
+                new Object[] {getSherlockActivity(), ids});
 
         new TwitterTask(followUsersParams, followingUsersCallback,
                 mTwitter).execute();

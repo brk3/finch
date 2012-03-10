@@ -12,12 +12,6 @@ import android.os.Bundle;
 
 import android.preference.PreferenceManager;
 
-import android.support.v4.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.Menu;
-import android.support.v4.view.MenuItem;
-
 import android.util.Log;
 
 import android.view.LayoutInflater;
@@ -34,11 +28,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockFragment;
+
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.provider.FinchProvider;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
+//import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+//import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,12 +60,12 @@ import twitter4j.TwitterResponse;
 
 import twitter4j.User;
 
-public class HomePageFragment extends Fragment {
+public class HomePageFragment extends SherlockFragment {
 
     private static final String TAG = "Finch/HomePageFragment";
 
     private ListView mMainList;
-    private PullToRefreshListView mRefreshableMainList;
+    //private PullToRefreshListView mRefreshableMainList;
     private LazyAdapter mMainListAdapter;
 
     private Twitter mTwitter;
@@ -88,7 +84,7 @@ public class HomePageFragment extends Fragment {
 
         super.onCreate(savedInstanceState);
 
-        mPrefs = getActivity().getSharedPreferences(
+        mPrefs = getSherlockActivity().getSharedPreferences(
                 "twitterPrefs", Context.MODE_PRIVATE);
 
 		/* Load the twitter4j helper */
@@ -106,7 +102,7 @@ public class HomePageFragment extends Fragment {
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 /* Stop spinner */
-                HomePageFragment.this.getActivity().
+                HomePageFragment.this.getSherlockActivity().
                     setProgressBarIndeterminateVisibility(false);
 
                 mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
@@ -116,7 +112,7 @@ public class HomePageFragment extends Fragment {
                 mMainListAdapter.notifyDataSetChanged();
 
                 /* Notify main list that it has been refreshed */
-                mRefreshableMainList.onRefreshComplete();
+                //mRefreshableMainList.onRefreshComplete();
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();
@@ -129,13 +125,14 @@ public class HomePageFragment extends Fragment {
             Bundle savedInstanceState) {
 
         RelativeLayout layout = (RelativeLayout)inflater
-            .inflate(R.layout.pull_refresh_list, container, false);
+            .inflate(R.layout.standard_list_fragment, container, false);
 
         /* Setup main ListView */
-        mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
-                R.id.list);
-        mMainList = mRefreshableMainList.getRefreshableView();
-        mMainListAdapter = new LazyAdapter(getActivity());
+        //mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
+        //        R.id.list);
+        //mMainList = mRefreshableMainList.getRefreshableView();
+        mMainList = (ListView)layout.findViewById(R.id.list);
+        mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
         mMainList.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
@@ -143,11 +140,11 @@ public class HomePageFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View v,
                     int position, long id) {
                 Intent profileActivity = new Intent(
-                    HomePageFragment.this.getActivity(),
+                    HomePageFragment.this.getSherlockActivity(),
                     ProfileActivity.class);
                 // Minus one as list is not zero indexed
                 String screenName = (
-                    (Status)mHomeTimeline.get(position-1)).getUser()
+                    (Status)mHomeTimeline.get(position)).getUser()
                     .getScreenName();
                 profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
                         "/" + screenName));
@@ -156,17 +153,19 @@ public class HomePageFragment extends Fragment {
         });
 
         /* Set up refreshableMainList callback */
+        /*
 		mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {
             @Override
             public void onRefresh() {
                 TwitterTaskParams getTimelineParams =
                      new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
-                         new Object[] {getActivity(), mMainListAdapter,
+                         new Object[] {getSherlockActivity(), mMainListAdapter,
                              mRefreshableMainList});
                 new TwitterTask(getTimelineParams, mHomeListCallback,
                     mTwitter).execute();
             }
         });
+        */
 
         /* Setup prefs and check if credentials present */
 		if (mPrefs.contains(FinchApplication.PREF_ACCESS_TOKEN)) {
@@ -175,7 +174,7 @@ public class HomePageFragment extends Fragment {
 		} else {
 			Log.d(TAG, "New User");
             Intent intent = new Intent();
-            intent.setClass(getActivity(), LoginActivity.class);
+            intent.setClass(getSherlockActivity(), LoginActivity.class);
             startActivity(intent);
 		}
 
@@ -194,7 +193,7 @@ public class HomePageFragment extends Fragment {
 
 		mAccessToken = new AccessToken(token, secret);
 		mTwitter.setOAuthAccessToken(mAccessToken);
-        ((FinchApplication)getActivity().getApplication()).
+        ((FinchApplication)getSherlockActivity().getApplication()).
             setTwitter(mTwitter);
 
         onLogin();
@@ -202,14 +201,14 @@ public class HomePageFragment extends Fragment {
 
     private void onLogin() {
 
-		Toast.makeText(getActivity(), "Welcome back!",
+		Toast.makeText(getSherlockActivity(), "Welcome back!",
                 Toast.LENGTH_SHORT).show();
 
         /* Fetch user's timeline to populate ListView */
         TwitterTaskParams getTimelineParams = new TwitterTaskParams(
                 TwitterTask.GET_HOME_TIMELINE,
                 new Object[] {
-                    getActivity(), mMainListAdapter, mRefreshableMainList});
+                    getSherlockActivity(), mMainListAdapter, mMainList});
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
 
@@ -220,9 +219,9 @@ public class HomePageFragment extends Fragment {
             public void onSuccess(TwitterTaskParams payload) {
                 Drawable profileImage = (Drawable)payload.result;
                 ImageView homeIcon = (ImageView)HomePageFragment.this
-                    .getActivity().findViewById(android.R.id.home);
+                    .getSherlockActivity().findViewById(android.R.id.home);
                 int abHeight = ((FinchActivity)HomePageFragment.this.
-                        getActivity()).getSupportActionBar().getHeight();
+                        getSherlockActivity()).getSupportActionBar().getHeight();
                 try {
                     homeIcon.setLayoutParams(new FrameLayout.LayoutParams(
                                 abHeight, abHeight));
@@ -245,11 +244,11 @@ public class HomePageFragment extends Fragment {
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 String screenName = ((User)payload.result).getScreenName();
-                HomePageFragment.this.getActivity()
+                HomePageFragment.this.getSherlockActivity()
                     .setProgressBarIndeterminateVisibility(false);
-                ((FinchActivity)HomePageFragment.this.getActivity()).
+                ((FinchActivity)HomePageFragment.this.getSherlockActivity()).
                     getSupportActionBar().setSubtitle(screenName);
-                SharedPreferences prefs = HomePageFragment.this.getActivity()
+                SharedPreferences prefs = HomePageFragment.this.getSherlockActivity()
                     .getSharedPreferences("twitterPrefs",
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
@@ -261,7 +260,7 @@ public class HomePageFragment extends Fragment {
                  * profile image */
                 TwitterTaskParams showProfileImageParams =
                     new TwitterTaskParams(TwitterTask.GET_PROFILE_IMAGE,
-                        new Object[] {getActivity(), screenName});
+                        new Object[] {getSherlockActivity(), screenName});
                 new TwitterTask(showProfileImageParams, profileImageCallback,
                         mTwitter).execute();
             }
@@ -274,7 +273,7 @@ public class HomePageFragment extends Fragment {
          * profile image */
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.SHOW_USER,
-                new Object[] {getActivity(), mAccessToken.getUserId()});
+                new Object[] {getSherlockActivity(), mAccessToken.getUserId()});
         new TwitterTask(showUserParams, showUserCallback,
                 mTwitter).execute();
     }

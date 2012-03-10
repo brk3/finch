@@ -6,14 +6,15 @@ import android.net.Uri;
 
 import android.os.Bundle;
 
-import android.support.v4.app.ActionBar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragment;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
@@ -151,7 +152,7 @@ public class ProfileActivity extends BaseFinchActivity
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public SherlockFragment getItem(int position) {
             switch (position) {
                 case TWEETS_PAGE:
                     return new ProfileFragment(ProfileFragment.TYPE_TWEETS);

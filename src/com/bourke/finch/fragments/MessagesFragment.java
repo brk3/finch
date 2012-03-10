@@ -8,12 +8,13 @@ import android.view.ViewGroup;
 
 import android.widget.RelativeLayout;
 
-import android.support.v4.app.Fragment;
+import com.actionbarsherlock.app.SherlockFragment;
 
 import twitter4j.Twitter;
+
 import twitter4j.TwitterFactory;
 
-public class MessagesFragment extends Fragment {
+public class MessagesFragment extends SherlockFragment {
 
     private static final String TAG = "Finch/MessagesFragment";
 
