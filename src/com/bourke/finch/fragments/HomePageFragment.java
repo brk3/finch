@@ -29,12 +29,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.provider.FinchProvider;
-
-//import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-//import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,14 +59,12 @@ import twitter4j.TwitterFactory;
 import twitter4j.TwitterResponse;
 
 import twitter4j.User;
-import com.actionbarsherlock.view.MenuItem;
 
 public class HomePageFragment extends SherlockFragment {
 
     private static final String TAG = "Finch/HomePageFragment";
 
     private ListView mMainList;
-    //private PullToRefreshListView mRefreshableMainList;
     private LazyAdapter mMainListAdapter;
 
     private Twitter mTwitter;
@@ -84,6 +82,8 @@ public class HomePageFragment extends SherlockFragment {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
 
         mPrefs = getSherlockActivity().getSharedPreferences(
                 "twitterPrefs", Context.MODE_PRIVATE);
@@ -107,9 +107,6 @@ public class HomePageFragment extends SherlockFragment {
                 /* Update list adapter */
                 mMainListAdapter.setResponses(mHomeTimeline);
                 mMainListAdapter.notifyDataSetChanged();
-
-                /* Notify main list that it has been refreshed */
-                //mRefreshableMainList.onRefreshComplete();
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();
@@ -125,9 +122,6 @@ public class HomePageFragment extends SherlockFragment {
             .inflate(R.layout.standard_list_fragment, container, false);
 
         /* Setup main ListView */
-        //mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
-        //        R.id.list);
-        //mMainList = mRefreshableMainList.getRefreshableView();
         mMainList = (ListView)layout.findViewById(R.id.list);
         mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
@@ -139,7 +133,6 @@ public class HomePageFragment extends SherlockFragment {
                 Intent profileActivity = new Intent(
                     HomePageFragment.this.getSherlockActivity(),
                     ProfileActivity.class);
-                // Minus one as list is not zero indexed
                 String screenName = (
                     (Status)mHomeTimeline.get(position)).getUser()
                     .getScreenName();
@@ -148,21 +141,6 @@ public class HomePageFragment extends SherlockFragment {
                 HomePageFragment.this.startActivity(profileActivity);
             }
         });
-
-        /* Set up refreshableMainList callback */
-        /*
-		mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                TwitterTaskParams getTimelineParams =
-                     new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
-                         new Object[] {getSherlockActivity(), mMainListAdapter,
-                             mRefreshableMainList});
-                new TwitterTask(getTimelineParams, mHomeListCallback,
-                    mTwitter).execute();
-            }
-        });
-        */
 
         /* Setup prefs and check if credentials present */
 		if (mPrefs.contains(FinchApplication.PREF_ACCESS_TOKEN)) {
@@ -185,6 +163,17 @@ public class HomePageFragment extends SherlockFragment {
                         mMainList});
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                refreshHomeTimeline();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /*
@@ -226,16 +215,17 @@ public class HomePageFragment extends SherlockFragment {
                 Drawable profileImage = (Drawable)payload.result;
                 ImageView homeIcon = (ImageView)HomePageFragment.this
                     .getSherlockActivity().findViewById(android.R.id.home);
-                int abHeight = ((FinchActivity)HomePageFragment.this.
-                        getSherlockActivity()).getSupportActionBar().getHeight();
+                int abHeight = ((FinchActivity)HomePageFragment
+                        .this.getSherlockActivity()).getSupportActionBar()
+                        .getHeight();
                 try {
                     homeIcon.setLayoutParams(new FrameLayout.LayoutParams(
                                 abHeight, abHeight));
                     homeIcon.setPadding(0, 10, 10, 10);
                     homeIcon.setImageDrawable(profileImage);
                 } catch (NullPointerException e) {
-                    /* Problem on <3.0, need to test further. Hopefully ABS 4.0
-                     * might fix this. */
+                    //TODO: Problem on <3.0, need to test further. Hopefully
+                    //ABS 4.0 might fix this.
                     Log.e(TAG, "Could not get reference to home icon");
                     e.printStackTrace();
                 }
@@ -278,7 +268,8 @@ public class HomePageFragment extends SherlockFragment {
          * profile image */
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.SHOW_USER,
-                new Object[] {getSherlockActivity(), mAccessToken.getUserId()});
+                new Object[] {getSherlockActivity(), mAccessToken.getUserId()
+                });
         new TwitterTask(showUserParams, showUserCallback,
                 mTwitter).execute();
     }
