@@ -3,8 +3,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    android:background="@drawable/bg_grey_noise">
+    android:background="@drawable/bg_grey_noise"
+    android:descendantFocusability="blocksDescendants">
 
     <TextView
         android:id="@+id/text_tweet"
@@ -12,7 +12,8 @@
         android:layout_height="fill_parent"
         android:layout_gravity="left|center_vertical"
         android:layout_toLeftOf="@+id/image_profile"
-        android:textSize="15dip"
+        android:textSize="13dip"
+        android:background="@drawable/bg_grey_noise"
         android:padding="5dip" />
 
     <ImageView

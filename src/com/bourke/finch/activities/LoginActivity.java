@@ -55,8 +55,6 @@ public class LoginActivity extends SherlockFragmentActivity
         mContext = getApplicationContext();
         mPrefs = getSharedPreferences("twitterPrefs", MODE_PRIVATE);
 
-        /* Set layout and theme */
-        setTheme(FinchApplication.THEME_LIGHT);
         setContentView(R.layout.login);
         getSupportActionBar().hide();
 

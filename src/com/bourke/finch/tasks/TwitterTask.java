@@ -88,8 +88,8 @@ public class TwitterTask extends
 
     @Override
     protected void onPreExecute() {
-        Activity app = (Activity)mParams.data[0];
-        app.setProgressBarIndeterminateVisibility(Boolean.TRUE);
+        BaseFinchActivity app = (BaseFinchActivity)mParams.data[0];
+        app.showProgressIcon(true);
     }
 
     @Override
@@ -201,12 +201,13 @@ public class TwitterTask extends
 
     @Override
     public void onPostExecute(TwitterTaskParams payload) {
-        if (payload == null) {
+        if (payload == null || payload.result == null) {
+            Log.e(TAG, "payload is null, returning");
             return;
         }
 
-        Activity app = (Activity)mParams.data[0];
-        app.setProgressBarIndeterminateVisibility(Boolean.FALSE);
+        BaseFinchActivity app = (BaseFinchActivity)mParams.data[0];
+        app.showProgressIcon(false);
 
         mCallback.onSuccess(payload);
     }

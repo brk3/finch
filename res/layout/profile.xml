@@ -4,13 +4,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
+    android:background="@drawable/bg_blue_noise"
     android:layout_height="fill_parent">
 
     <RelativeLayout
         android:id="@+id/profile_layout"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:background="@drawable/bg_blue_noise"
         android:layout_weight="1">
 
         <ImageView

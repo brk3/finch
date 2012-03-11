@@ -8,6 +8,7 @@
 
     <TextView
         android:id="@+id/textWelcome"
+        android:background="@drawable/bg_grey_noise"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="35sp"

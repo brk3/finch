@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/menu_compose"
+          android:icon="@drawable/ic_action_edit"
+          android:title="@string/menu_compose" />
+
+    <item android:id="@+id/menu_refresh"
+          android:title="@string/menu_refresh"
+          android:icon="@drawable/ic_action_refresh"
+          android:visible="false"
+          android:showAsAction="always" />
+
+    <item android:id="@+id/menu_progress"
+          android:showAsAction="always"
+          android:visible="true"
+          android:actionLayout="@layout/menu_item_progress" />
+
+    <item android:id="@+id/menu_search"
+          android:icon="@drawable/ic_action_search"
+          android:title="@string/menu_search" />
+
+</menu>

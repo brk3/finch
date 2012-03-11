@@ -59,6 +59,7 @@ import twitter4j.TwitterFactory;
 import twitter4j.TwitterResponse;
 
 import twitter4j.User;
+import com.actionbarsherlock.view.MenuItem;
 
 public class HomePageFragment extends SherlockFragment {
 
@@ -101,10 +102,6 @@ public class HomePageFragment extends SherlockFragment {
         mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                /* Stop spinner */
-                HomePageFragment.this.getSherlockActivity().
-                    setProgressBarIndeterminateVisibility(false);
-
                 mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
 
                 /* Update list adapter */
@@ -181,6 +178,15 @@ public class HomePageFragment extends SherlockFragment {
         return layout;
     }
 
+    public void refreshHomeTimeline() {
+        TwitterTaskParams getTimelineParams =
+            new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
+                    new Object[] {getSherlockActivity(), mMainListAdapter,
+                        mMainList});
+        new TwitterTask(getTimelineParams, mHomeListCallback,
+                mTwitter).execute();
+    }
+
     /*
      * The user had previously given our app permission to use Twitter.
 	 */
@@ -244,13 +250,12 @@ public class HomePageFragment extends SherlockFragment {
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 String screenName = ((User)payload.result).getScreenName();
-                HomePageFragment.this.getSherlockActivity()
-                    .setProgressBarIndeterminateVisibility(false);
                 ((FinchActivity)HomePageFragment.this.getSherlockActivity()).
                     getSupportActionBar().setSubtitle(screenName);
-                SharedPreferences prefs = HomePageFragment.this.getSherlockActivity()
+                SharedPreferences prefs =
+                    HomePageFragment.this.getSherlockActivity()
                     .getSharedPreferences("twitterPrefs",
-                        Context.MODE_PRIVATE);
+                            Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString(FinchApplication.PREF_SCREEN_NAME,
                         screenName);

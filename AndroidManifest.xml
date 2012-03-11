@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:icon="@drawable/ic_launcher"
         android:name="FinchApplication"
-        android:uiOptions="splitActionBarWhenNarrow">
+        android:theme="@style/Theme.Finch_Light">
 
         <provider
            android:name="com.bourke.finch.provider.FinchProvider"
