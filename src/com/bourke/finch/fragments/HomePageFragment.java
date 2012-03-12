@@ -144,6 +144,16 @@ public class HomePageFragment extends SherlockFragment {
                 HomePageFragment.this.startActivity(profileActivity);
             }
         });
+        mMainList.setOnItemLongClickListener(
+                new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                mMode = getSherlockActivity().startActionMode(
+                    new ActionModeTweet());
+                return true;
+            }
+        });
 
         /* Setup prefs and check if credentials present */
 		if (mPrefs.contains(FinchApplication.PREF_ACCESS_TOKEN)) {
@@ -284,15 +294,25 @@ public class HomePageFragment extends SherlockFragment {
             boolean isLight = (FinchApplication.THEME ==
                 FinchApplication.THEME_LIGHT);
 
-            /*
-            menu.add("Save")
-                .setIcon(isLight ? R.drawable.ic_compose_inverse : R.drawable.ic_compose)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            menu.add("Reply")
+                .setIcon(isLight ? R.drawable.social_reply_light
+                        : R.drawable.social_reply_dark)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-            menu.add("Search")
-                .setIcon(isLight ? R.drawable.ic_search_inverse : R.drawable.ic_search)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-            */
+            menu.add("Re-tweet")
+                .setIcon(isLight ? R.drawable.av_repeat_light
+                        : R.drawable.av_repeat_dark)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+            menu.add("Favorite")
+                .setIcon(isLight ? R.drawable.rating_not_important_light
+                        : R.drawable.rating_not_important_dark)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+            menu.add("Share")
+                .setIcon(isLight ? R.drawable.ic_action_share_light
+                        : R.drawable.ic_action_share_dark)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
             return true;
         }

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- TODO: may have to define this in code if there isn't a way to define
+         light/dark resources. Just use light for now. -->
+
     <item android:id="@+id/menu_compose"
           android:icon="@drawable/ic_action_edit"
           android:title="@string/menu_compose" />
@@ -17,7 +20,7 @@
           android:actionLayout="@layout/menu_item_progress" />
 
     <item android:id="@+id/menu_search"
-          android:icon="@drawable/ic_action_search"
+          android:icon="@drawable/ic_action_search_light"
           android:title="@string/menu_search" />
 
 </menu>
