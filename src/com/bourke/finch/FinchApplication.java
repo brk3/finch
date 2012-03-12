@@ -12,6 +12,8 @@ public class FinchApplication extends Application {
     public static final int THEME_DARK = R.style.Theme_Finch;
     public static final int THEME_LIGHT = R.style.Theme_Finch_Light;
 
+    public static int THEME = THEME_LIGHT;
+
     protected static final String CALLBACK_URL = "finch-callback:///";
 
     protected static final String CONSUMER_KEY = "7QIjyQd3cA8c8jn80tRtqw";

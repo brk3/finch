@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -77,6 +78,8 @@ public class HomePageFragment extends SherlockFragment {
         <TwitterTaskParams, TwitterException> mHomeListCallback;
 
     private ResponseList<TwitterResponse> mHomeTimeline;
+
+    private ActionMode mMode;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -272,5 +275,41 @@ public class HomePageFragment extends SherlockFragment {
                 });
         new TwitterTask(showUserParams, showUserCallback,
                 mTwitter).execute();
+    }
+
+    private final class ActionModeTweet implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            /* Used to put dark icons on light action bar */
+            boolean isLight = (FinchApplication.THEME ==
+                FinchApplication.THEME_LIGHT);
+
+            /*
+            menu.add("Save")
+                .setIcon(isLight ? R.drawable.ic_compose_inverse : R.drawable.ic_compose)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+            menu.add("Search")
+                .setIcon(isLight ? R.drawable.ic_search_inverse : R.drawable.ic_search)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+            */
+
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+        }
     }
 }
