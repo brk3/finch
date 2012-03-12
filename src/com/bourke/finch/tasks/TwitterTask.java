@@ -136,7 +136,7 @@ public class TwitterTask extends
                     String p_screenName = (String)payload.data[1];
 
                     ProfileImage p = mTwitter.getProfileImage(
-                            p_screenName, ProfileImage.BIGGER);
+                            p_screenName, ProfileImage.ORIGINAL);
                     String profileImageUrl = p.getURL();
 
                     File tempFile = new File(
