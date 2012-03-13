@@ -14,7 +14,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bourke.finch.FinchApplication;
 import com.bourke.finch.R;
 
 import java.util.Collection;

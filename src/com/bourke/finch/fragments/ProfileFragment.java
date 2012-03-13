@@ -1,5 +1,7 @@
 package com.bourke.finch;
 
+import android.content.Context;
+
 import android.os.Bundle;
 
 import android.util.Log;
@@ -16,10 +18,12 @@ import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
+import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.FinchTwitterFactory;
+import com.bourke.finch.common.TwitterTask;
+import com.bourke.finch.common.TwitterTaskCallback;
+import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
-
-//import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
-//import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,8 +38,6 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
-
-import twitter4j.TwitterFactory;
 
 import twitter4j.TwitterResponse;
 
@@ -53,20 +55,22 @@ public class ProfileFragment extends SherlockFragment {
     private Twitter mTwitter;
 
     private ListView mMainList;
-    //private PullToRefreshListView mRefreshableMainList;
 
     private BaseAdapter mMainListAdapter;
 
     private ResponseList<Status> mTimeline;
+
+    private Context mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
+        mContext = getSherlockActivity().getApplicationContext();
+
 		/* Load the twitter4j helper */
-        mTwitter = ((FinchApplication)
-                getSherlockActivity().getApplication()).getTwitter();
+        mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
     }
 
     @Override
@@ -77,9 +81,6 @@ public class ProfileFragment extends SherlockFragment {
             .inflate(R.layout.standard_list_fragment, container, false);
 
         /* Setup ListView */
-        //mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
-        //        R.id.list);
-        //mMainList = mRefreshableMainList.getRefreshableView();
         mMainList = (ListView)layout.findViewById(R.id.list);
 
         /* Set up adapter depending on TYPE */

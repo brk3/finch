@@ -34,6 +34,11 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.FinchTwitterFactory;
+import com.bourke.finch.common.TwitterTask;
+import com.bourke.finch.common.TwitterTaskCallback;
+import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.provider.FinchProvider;
 
@@ -54,8 +59,6 @@ import twitter4j.Status;
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
-
-import twitter4j.TwitterFactory;
 
 import twitter4j.TwitterResponse;
 
@@ -81,10 +84,14 @@ public class HomePageFragment extends SherlockFragment {
 
     private ActionMode mMode;
 
+    private Context mContext;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        mContext = getSherlockActivity().getApplicationContext();
 
         setHasOptionsMenu(true);
 
@@ -92,14 +99,7 @@ public class HomePageFragment extends SherlockFragment {
                 "twitterPrefs", Context.MODE_PRIVATE);
 
 		/* Load the twitter4j helper */
-		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-		configurationBuilder.setOAuthConsumerKey(
-                FinchApplication.CONSUMER_KEY);
-		configurationBuilder.setOAuthConsumerSecret(
-                FinchApplication.CONSUMER_SECRET);
-		configurationBuilder.setUseSSL(true);
-		Configuration configuration = configurationBuilder.build();
-		mTwitter = new TwitterFactory(configuration).getInstance();
+        mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
 
         /* Fetch user's hometimeline */
         mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,
@@ -156,7 +156,7 @@ public class HomePageFragment extends SherlockFragment {
         });
 
         /* Setup prefs and check if credentials present */
-		if (mPrefs.contains(FinchApplication.PREF_ACCESS_TOKEN)) {
+		if (mPrefs.contains(Constants.PREF_ACCESS_TOKEN)) {
 			Log.d(TAG, "Repeat User");
 			loginAuthorisedUser();
 		} else {
@@ -194,15 +194,13 @@ public class HomePageFragment extends SherlockFragment {
 	 */
 	private void loginAuthorisedUser() {
 
-		String token = mPrefs.getString(
-                FinchApplication.PREF_ACCESS_TOKEN, null);
-		String secret = mPrefs.getString(
-                FinchApplication.PREF_ACCESS_TOKEN_SECRET, null);
+		String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
+		String secret = mPrefs.getString(Constants.PREF_ACCESS_TOKEN_SECRET,
+                null);
 
 		mAccessToken = new AccessToken(token, secret);
 		mTwitter.setOAuthAccessToken(mAccessToken);
-        ((FinchApplication)getSherlockActivity().getApplication()).
-            setTwitter(mTwitter);
+        FinchTwitterFactory.getInstance(mContext).setTwitter(mTwitter);
 
         onLogin();
 	}
@@ -260,8 +258,7 @@ public class HomePageFragment extends SherlockFragment {
                     .getSharedPreferences("twitterPrefs",
                             Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putString(FinchApplication.PREF_SCREEN_NAME,
-                        screenName);
+                editor.putString(Constants.PREF_SCREEN_NAME, screenName);
                 editor.commit();
 
                 /* Now we have screenName, start another thread to get the
@@ -291,8 +288,8 @@ public class HomePageFragment extends SherlockFragment {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             /* Used to put dark icons on light action bar */
-            boolean isLight = (FinchApplication.THEME ==
-                FinchApplication.THEME_LIGHT);
+            //boolean isLight = (Constants.THEME == Constants.THEME_LIGHT);
+            boolean isLight = true;
 
             menu.add("Reply")
                 .setIcon(isLight ? R.drawable.social_reply_light

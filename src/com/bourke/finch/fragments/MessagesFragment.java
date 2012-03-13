@@ -1,5 +1,7 @@
 package com.bourke.finch;
 
+import android.content.Context;
+
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -10,9 +12,13 @@ import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-import twitter4j.Twitter;
+import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.FinchTwitterFactory;
+import com.bourke.finch.common.TwitterTask;
+import com.bourke.finch.common.TwitterTaskCallback;
+import com.bourke.finch.common.TwitterTaskParams;
 
-import twitter4j.TwitterFactory;
+import twitter4j.Twitter;
 
 public class MessagesFragment extends SherlockFragment {
 
@@ -20,19 +26,22 @@ public class MessagesFragment extends SherlockFragment {
 
     private Twitter mTwitter;
 
+    private Context mContext;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
+        mContext = getSherlockActivity().getApplicationContext();
+
 		/* Load the twitter4j helper */
-		mTwitter = new TwitterFactory().getInstance();
+        mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-
         RelativeLayout layout = (RelativeLayout)inflater
             .inflate(R.layout.messages_fragment, container, false);
 

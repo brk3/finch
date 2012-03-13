@@ -9,9 +9,9 @@ import android.graphics.BitmapFactory;
 
 import android.widget.ImageView;
 
-import com.bourke.finch.FinchApplication;
+import com.bourke.finch.common.TwitterTask;
+import com.bourke.finch.common.FinchTwitterFactory;
 import com.bourke.finch.R;
-import com.bourke.finch.TwitterTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,8 +29,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import twitter4j.Twitter;
 import twitter4j.ProfileImage;
+
+import twitter4j.Twitter;
+
 import twitter4j.TwitterException;
 
 public class ImageLoader {
@@ -47,9 +49,12 @@ public class ImageLoader {
 
     private Activity mActivity;
 
+    private Context mContext;
+
     public ImageLoader(Activity a) {
         mActivity = a;
-        fileCache = new FileCache(mActivity.getApplicationContext());
+        mContext = a.getApplicationContext();
+        fileCache = new FileCache(mContext);
         executorService = Executors.newFixedThreadPool(5);
     }
 
@@ -80,8 +85,7 @@ public class ImageLoader {
         if (bitmap == null) {
             /* From web */
             try {
-                Twitter twitter =
-                    ((FinchApplication)mActivity.getApplication())
+                Twitter twitter = FinchTwitterFactory.getInstance(mContext)
                     .getTwitter();
                 ProfileImage p = twitter.getProfileImage(
                         screenName, ProfileImage.BIGGER);

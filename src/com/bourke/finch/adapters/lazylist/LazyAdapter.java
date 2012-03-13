@@ -16,7 +16,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bourke.finch.FinchApplication;
+import com.bourke.finch.common.Constants;
 import com.bourke.finch.R;
 
 import java.util.Collection;
@@ -82,7 +82,7 @@ public class LazyAdapter extends BaseAdapter {
             text_tweet.setText(text);
             Linkify.addLinks(text_tweet, Linkify.ALL);
             Linkify.addLinks(text_tweet, screenNameMatcher,
-                     FinchApplication.SCREEN_NAME_URI.toString() + "/");
+                     Constants.SCREEN_NAME_URI.toString() + "/");
 
             /* Set the screen name TextView */
             String screenName = "";

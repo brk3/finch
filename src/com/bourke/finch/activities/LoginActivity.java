@@ -22,6 +22,9 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
+import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.FinchTwitterFactory;
+
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
@@ -31,8 +34,6 @@ import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
-
-import twitter4j.TwitterFactory;
 
 public class LoginActivity extends SherlockFragmentActivity
         implements ActionBar.OnNavigationListener {
@@ -52,21 +53,13 @@ public class LoginActivity extends SherlockFragmentActivity
 
         super.onCreate(savedInstanceState);
 
-        mContext = getApplicationContext();
         mPrefs = getSharedPreferences("twitterPrefs", MODE_PRIVATE);
 
         setContentView(R.layout.login);
         getSupportActionBar().hide();
 
 		/* Load the twitter4j helper */
-		ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-		configurationBuilder.setOAuthConsumerKey(
-                FinchApplication.CONSUMER_KEY);
-		configurationBuilder.setOAuthConsumerSecret(
-                FinchApplication.CONSUMER_SECRET);
-		configurationBuilder.setUseSSL(true);
-		Configuration configuration = configurationBuilder.build();
-		mTwitter = new TwitterFactory(configuration).getInstance();
+        mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
     }
 
 	@Override
@@ -75,7 +68,7 @@ public class LoginActivity extends SherlockFragmentActivity
 
 		Uri uri = intent.getData();
         if (uri != null &&
-                uri.toString().startsWith(FinchApplication.CALLBACK_URL)) {
+                uri.toString().startsWith(Constants.CALLBACK_URL)) {
             new HandleAuthTask(uri).execute();
         }
 	}
@@ -102,7 +95,7 @@ public class LoginActivity extends SherlockFragmentActivity
             try {
                 Log.i(TAG, "Request App Authentication");
                 mReqToken = mTwitter.getOAuthRequestToken(
-                        FinchApplication.CALLBACK_URL);
+                        Constants.CALLBACK_URL);
                 authUrl = mReqToken.getAuthenticationURL();
 
             } catch (TwitterException e) {
@@ -162,8 +155,8 @@ public class LoginActivity extends SherlockFragmentActivity
             String token = mAccessToken.getToken();
             String secret = mAccessToken.getTokenSecret();
             SharedPreferences.Editor editor = mPrefs.edit();
-            editor.putString(FinchApplication.PREF_ACCESS_TOKEN, token);
-            editor.putString(FinchApplication.PREF_ACCESS_TOKEN_SECRET,
+            editor.putString(Constants.PREF_ACCESS_TOKEN, token);
+            editor.putString(Constants.PREF_ACCESS_TOKEN_SECRET,
                     secret);
             editor.commit();
 

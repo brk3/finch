@@ -1,4 +1,4 @@
-package com.bourke.finch;
+package com.bourke.finch.common;
 
 import android.app.Activity;
 
@@ -11,9 +11,6 @@ import android.graphics.drawable.Drawable;
 
 import android.os.AsyncTask;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
-
 import android.util.Log;
 
 import android.view.Window;
@@ -24,6 +21,10 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.MenuItem;
+
+import com.bourke.finch.BaseFinchActivity;
 import com.bourke.finch.lazylist.ImageLoader;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.Utils;

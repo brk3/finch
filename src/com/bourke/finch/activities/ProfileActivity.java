@@ -1,5 +1,7 @@
 package com.bourke.finch;
 
+import android.content.Context;
+
 import android.graphics.drawable.BitmapDrawable;
 
 import android.net.Uri;
@@ -15,6 +17,12 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
+
+import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.FinchTwitterFactory;
+import com.bourke.finch.common.TwitterTask;
+import com.bourke.finch.common.TwitterTaskCallback;
+import com.bourke.finch.common.TwitterTaskParams;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
@@ -42,6 +50,8 @@ public class ProfileActivity extends BaseFinchActivity
 
     private ImageView mProfileImage;
 
+    private Context mContext;
+
     private String mScreenName = new String();
 
     @Override
@@ -50,11 +60,12 @@ public class ProfileActivity extends BaseFinchActivity
 
         setContentView(R.layout.profile);
 
+        mContext = getApplicationContext();
+
         /* Get the URL we are being asked to view */
         Uri uri = getIntent().getData();
         if ((uri == null) && (savedInstanceState != null)) {
-            uri = Uri.parse(savedInstanceState.getString(
-                        FinchApplication.KEY_URL));
+            uri = Uri.parse(savedInstanceState.getString(Constants.KEY_URL));
         }
 
         /* Check uri appears to be in correct format */
@@ -64,7 +75,7 @@ public class ProfileActivity extends BaseFinchActivity
         mScreenName = uri.getPathSegments().get(1).replaceFirst("@", "");
 
 		/* Load the twitter4j helper */
-        mTwitter = ((FinchApplication)getApplication()).getTwitter();
+        mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
 
         /* Set up TabPageIndicator and bind viewpager to it */
         FinchPagerAdapter adapter = new FinchPagerAdapter(
@@ -88,8 +99,8 @@ public class ProfileActivity extends BaseFinchActivity
             }
         };
         TwitterTaskParams showUserParams = new TwitterTaskParams(
-                TwitterTask.GET_PROFILE_IMAGE,
-                new Object[] {this, mScreenName});
+                TwitterTask.GET_PROFILE_IMAGE, new Object[] {this, mScreenName}
+                );
         new TwitterTask(showUserParams, profileImageCallback,
                 mTwitter).execute();
 
