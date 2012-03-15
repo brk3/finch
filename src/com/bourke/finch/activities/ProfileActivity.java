@@ -1,6 +1,7 @@
 package com.bourke.finch;
 
 import android.content.Context;
+import android.content.Intent;
 
 import android.graphics.drawable.BitmapDrawable;
 
@@ -27,11 +28,14 @@ import com.bourke.finch.common.TwitterTaskParams;
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
 
+import twitter4j.ProfileImage;
+
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
 
 import twitter4j.User;
+import com.actionbarsherlock.view.MenuItem;
 
 public class ProfileActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
@@ -99,7 +103,8 @@ public class ProfileActivity extends BaseFinchActivity
             }
         };
         TwitterTaskParams showUserParams = new TwitterTaskParams(
-                TwitterTask.GET_PROFILE_IMAGE, new Object[] {this, mScreenName}
+                TwitterTask.GET_PROFILE_IMAGE, new Object[] {this, mScreenName,
+                    ProfileImage.ORIGINAL}
                 );
         new TwitterTask(showUserParams, profileImageCallback,
                 mTwitter).execute();

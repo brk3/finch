@@ -130,14 +130,15 @@ public class TwitterTask extends
                 break;
 
             case GET_PROFILE_IMAGE:
-                //TODO: add caching
                 Drawable bitmap = null;
                 try {
                     Activity app = (Activity)payload.data[0];
                     String p_screenName = (String)payload.data[1];
 
+                    ProfileImage.ImageSize imageSize =
+                        (ProfileImage.ImageSize)payload.data[2];
                     ProfileImage p = mTwitter.getProfileImage(
-                            p_screenName, ProfileImage.ORIGINAL);
+                            p_screenName, imageSize);
                     String profileImageUrl = p.getURL();
 
                     File tempFile = new File(

@@ -48,8 +48,6 @@ public class FinchActivity extends BaseFinchActivity
             public void onPageScrollStateChanged(int arg0) {
             }
         });
-
-		Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
     }
 
     @Override

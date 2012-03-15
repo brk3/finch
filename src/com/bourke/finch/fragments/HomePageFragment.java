@@ -52,6 +52,8 @@ import twitter4j.auth.AccessToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
+import twitter4j.ProfileImage;
+
 import twitter4j.ResponseList;
 
 import twitter4j.Status;
@@ -265,7 +267,8 @@ public class HomePageFragment extends SherlockFragment {
                  * profile image */
                 TwitterTaskParams showProfileImageParams =
                     new TwitterTaskParams(TwitterTask.GET_PROFILE_IMAGE,
-                        new Object[] {getSherlockActivity(), screenName});
+                        new Object[] {getSherlockActivity(), screenName,
+                            ProfileImage.NORMAL});
                 new TwitterTask(showProfileImageParams, profileImageCallback,
                         mTwitter).execute();
             }
