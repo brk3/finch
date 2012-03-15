@@ -42,6 +42,9 @@ import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.provider.FinchProvider;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +74,7 @@ public class HomePageFragment extends SherlockFragment {
     private static final String TAG = "Finch/HomePageFragment";
 
     private ListView mMainList;
+    private PullToRefreshListView mRefreshableMainList;
     private LazyAdapter mMainListAdapter;
 
     private Twitter mTwitter;
@@ -124,12 +128,27 @@ public class HomePageFragment extends SherlockFragment {
             Bundle savedInstanceState) {
 
         RelativeLayout layout = (RelativeLayout)inflater
-            .inflate(R.layout.standard_list_fragment, container, false);
+            .inflate(R.layout.pull_refresh_list, container, false);
 
         /* Setup main ListView */
-        mMainList = (ListView)layout.findViewById(R.id.list);
+        mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
+                R.id.list);
+        mMainList = mRefreshableMainList.getRefreshableView();
         mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
+        mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                /* Fetch user's timeline to populate ListView */
+                TwitterTaskParams getTimelineParams =
+                     new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
+                         new Object[] {
+                             getSherlockActivity(), mMainListAdapter,
+                             mRefreshableMainList});
+                new TwitterTask(getTimelineParams, mHomeListCallback,
+                    mTwitter).execute();
+            }
+        });
         mMainList.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
             @Override
@@ -175,7 +194,7 @@ public class HomePageFragment extends SherlockFragment {
         TwitterTaskParams getTimelineParams =
             new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
                     new Object[] {getSherlockActivity(), mMainListAdapter,
-                        mMainList});
+                        mRefreshableMainList});
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
     }
@@ -214,9 +233,9 @@ public class HomePageFragment extends SherlockFragment {
 
         /* Fetch user's timeline to populate ListView */
         TwitterTaskParams getTimelineParams = new TwitterTaskParams(
-                TwitterTask.GET_HOME_TIMELINE,
-                new Object[] {
-                    getSherlockActivity(), mMainListAdapter, mMainList});
+                TwitterTask.GET_HOME_TIMELINE, new Object[] {
+                    getSherlockActivity(), mMainListAdapter,
+                          mRefreshableMainList});
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
 
