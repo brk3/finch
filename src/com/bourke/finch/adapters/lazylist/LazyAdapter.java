@@ -17,9 +17,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.PrettyDate;
 import com.bourke.finch.R;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,7 +44,6 @@ public class LazyAdapter extends BaseAdapter {
     private static LayoutInflater inflater = null;
 
     public ImageLoader imageLoader;
-
     private Pattern screenNameMatcher = Pattern.compile("@\\w+");
 
     public LazyAdapter(Activity a) {
@@ -83,6 +84,22 @@ public class LazyAdapter extends BaseAdapter {
             Linkify.addLinks(text_tweet, Linkify.ALL);
             Linkify.addLinks(text_tweet, screenNameMatcher,
                      Constants.SCREEN_NAME_URI.toString() + "/");
+
+            /* Set the tweet time Textview */
+            TextView text_time = (TextView)vi.findViewById(R.id.text_time);
+            Date createdAt = new Date();
+            if (currentEntity instanceof User) {
+                if (((User)currentEntity).getStatus() != null) {
+                    createdAt = ((User)currentEntity).getStatus()
+                        .getCreatedAt();
+                }
+            } else if (currentEntity instanceof Status) {
+                createdAt = ((Status)currentEntity).getCreatedAt();
+            } else {
+                Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
+                        + currentEntity.getClass().getName());
+            }
+            text_time.setText(new PrettyDate(createdAt).toString());
 
             /* Set the screen name TextView */
             String screenName = "";
