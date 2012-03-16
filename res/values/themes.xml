@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
 
+<resources>
     <style name="Theme.Finch" parent="Theme.Sherlock">
         <!-- TODO -->
     </style>
 
     <style name="Theme.Finch_Light" parent="Theme.Sherlock.Light">
+        <!-- Style the actionbar -->
+        <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
+
+        <!-- Style the TabPageIndicator -->
+        <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator
+        </item>
+        <item name="vpiTabTextStyle">@style/Widget.TabPageIndicator.Text</item>
+    </style>
+
+    <style name="Widget.Styled.ActionBar"
+       parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
+
         <item name="titleTextStyle">@style/CustomTitle</item>
         <item name="android:titleTextStyle">@style/CustomTitle</item>
 
@@ -15,17 +28,17 @@
         <item name="actionBarSize">55dp</item>
         <item name="android:actionBarSize">55dp</item>
 
+        <!--
         <item name="background">#ffdedede</item>
         <item name="android:background">#ffdedede</item>
+        -->
+        <item name="background">@drawable/bg_light_grey_stripe</item>
+        <item name="android:background">@drawable/bg_light_grey_stripe</item>
 
-        <!-- Style the TagPageIndicator -->
-        <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator
-        </item>
-        <item name="vpiTabTextStyle">@style/Widget.TabPageIndicator.Text</item>
     </style>
 
     <style name="CustomTitle">
-        <item name="android:textSize">25sp</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="CustomSubTitle">

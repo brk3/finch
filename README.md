@@ -14,3 +14,7 @@ via git submodules.
   https://github.com/JakeWharton/Android-ViewPagerIndicator
 
 * Twitter4J, 2.2.5, http://twitter4j.org/en/index.html
+
+* Android-PullToRefresh, 077f497b,
+  https://github.com/brk3/Android-PullToRefresh (currently forked, pull request
+  submitted upstream)
