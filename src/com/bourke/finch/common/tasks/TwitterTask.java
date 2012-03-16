@@ -43,6 +43,8 @@ import java.util.List;
 
 import twitter4j.IDs;
 
+import twitter4j.Paging;
+
 import twitter4j.ProfileImage;
 
 import twitter4j.ResponseList;
@@ -123,8 +125,9 @@ public class TwitterTask extends
 
             case GET_HOME_TIMELINE:
                 List<twitter4j.Status> homeTimeline = null;
+                Paging page = (Paging)payload.data[3];
                 try {
-                    homeTimeline = mTwitter.getHomeTimeline();
+                    homeTimeline = mTwitter.getHomeTimeline(page);
                 } catch (TwitterException e) {
                     e.printStackTrace();
                 }

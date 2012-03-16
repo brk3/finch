@@ -123,8 +123,15 @@ public class LazyAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setResponses(ResponseList<TwitterResponse> data) {
+    public void prependResponses(ResponseList<TwitterResponse> data) {
+        if (mResponses != null) {
+            data.addAll(mResponses);
+        }
         mResponses = data;
+    }
+
+    public void appendResponses(ResponseList<TwitterResponse> data) {
+        mResponses.addAll(data);
     }
 
 }

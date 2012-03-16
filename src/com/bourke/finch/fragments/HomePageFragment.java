@@ -42,7 +42,7 @@ import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.provider.FinchProvider;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.util.ArrayList;
@@ -54,6 +54,8 @@ import twitter4j.auth.AccessToken;
 
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
+import twitter4j.Paging;
 
 import twitter4j.ProfileImage;
 
@@ -92,6 +94,8 @@ public class HomePageFragment extends SherlockFragment {
 
     private Context mContext;
 
+    private int mHomeTimelinePage = 1;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -111,10 +115,9 @@ public class HomePageFragment extends SherlockFragment {
         mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
-
                 /* Update list adapter */
-                mMainListAdapter.setResponses(mHomeTimeline);
+                mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
+                mMainListAdapter.prependResponses((ResponseList)mHomeTimeline);
                 mMainListAdapter.notifyDataSetChanged();
             }
             public void onFailure(TwitterException e) {
@@ -136,16 +139,45 @@ public class HomePageFragment extends SherlockFragment {
         mMainList = mRefreshableMainList.getRefreshableView();
         mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
-        mRefreshableMainList.setOnRefreshListener(new OnRefreshListener() {
-            @Override
-            public void onRefresh() {
+        mRefreshableMainList.setOnRefreshListener(new OnRefreshListener2() {
+
+			@Override
+			public void onPullDownToRefresh() {
                 /* Fetch user's timeline to populate ListView */
                 TwitterTaskParams getTimelineParams =
                      new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
                          new Object[] {
                              getSherlockActivity(), mMainListAdapter,
-                             mRefreshableMainList});
+                             mRefreshableMainList, new Paging(1)});
                 new TwitterTask(getTimelineParams, mHomeListCallback,
+                    mTwitter).execute();
+			}
+
+			@Override
+			public void onPullUpToRefresh() {
+                TwitterTaskCallback pullUpRefreshCallback =
+                        new TwitterTaskCallback<TwitterTaskParams,
+                                                TwitterException>() {
+                    public void onSuccess(TwitterTaskParams payload) {
+                        /* Append responses to list adapter */
+                        mHomeTimeline = (ResponseList<TwitterResponse>)
+                            payload.result;
+                        mMainListAdapter.appendResponses((ResponseList)
+                                mHomeTimeline);
+                        mMainListAdapter.notifyDataSetChanged();
+                    }
+                    public void onFailure(TwitterException e) {
+                        e.printStackTrace();
+                    }
+                };
+                Paging paging = new Paging(++mHomeTimelinePage);
+                Log.d(TAG, "Fetching page " + mHomeTimelinePage);
+                TwitterTaskParams getTimelineParams =
+                     new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
+                         new Object[] {
+                             getSherlockActivity(), mMainListAdapter,
+                             mRefreshableMainList, paging});
+                new TwitterTask(getTimelineParams, pullUpRefreshCallback,
                     mTwitter).execute();
             }
         });
@@ -159,7 +191,7 @@ public class HomePageFragment extends SherlockFragment {
                     ProfileActivity.class);
                 String screenName = (
                     (Status)mHomeTimeline.get(position)).getUser()
-                    .getScreenName();
+                        .getScreenName();
                 profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
                         "/" + screenName));
                 HomePageFragment.this.startActivity(profileActivity);
@@ -194,7 +226,7 @@ public class HomePageFragment extends SherlockFragment {
         TwitterTaskParams getTimelineParams =
             new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
                     new Object[] {getSherlockActivity(), mMainListAdapter,
-                        mRefreshableMainList});
+                        mRefreshableMainList, new Paging(1)});
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
     }
@@ -228,16 +260,13 @@ public class HomePageFragment extends SherlockFragment {
 
     private void onLogin() {
 
-		Toast.makeText(getSherlockActivity(), "Welcome back!",
-                Toast.LENGTH_SHORT).show();
-
         /* Fetch user's timeline to populate ListView */
         TwitterTaskParams getTimelineParams = new TwitterTaskParams(
                 TwitterTask.GET_HOME_TIMELINE, new Object[] {
                     getSherlockActivity(), mMainListAdapter,
-                          mRefreshableMainList});
-        new TwitterTask(getTimelineParams, mHomeListCallback,
-                mTwitter).execute();
+                          mRefreshableMainList, new Paging(1)});
+        new TwitterTask(getTimelineParams, mHomeListCallback, mTwitter)
+            .execute();
 
         final TwitterTaskCallback<TwitterTaskParams, TwitterException>
             profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,

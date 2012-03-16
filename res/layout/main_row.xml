@@ -12,7 +12,7 @@
         android:layout_height="fill_parent"
         android:layout_gravity="left|center_vertical"
         android:layout_toLeftOf="@+id/image_profile"
-        android:textSize="13dip"
+        android:textSize="15dip"
         android:background="@drawable/bg_grey_noise"
         android:padding="5dip" />
 
