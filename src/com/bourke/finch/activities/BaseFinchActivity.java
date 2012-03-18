@@ -19,6 +19,8 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
 
+import com.bourke.finch.common.IcsColorDrawable;
+
 public abstract class BaseFinchActivity extends SherlockFragmentActivity
         implements ActionBar.OnNavigationListener {
 
@@ -31,22 +33,17 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getSupportActionBar().setIcon(R.drawable.ic_contact_picture);
+
         /*
-         * Workaround for http://b.android.com/15340 from
-         * http://stackoverflow.com/a/5852198/132047
+         * Set up actionbar and split backgrounds / color
+         * Workaround for http://b.android.com/15340
          */
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             BitmapDrawable bg = (BitmapDrawable)getResources().getDrawable(
                     R.drawable.bg_light_grey_stripe);
             bg.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
             getSupportActionBar().setBackgroundDrawable(bg);
-
-            /*
-            BitmapDrawable bgSplit = (BitmapDrawable)getResources()
-                .getDrawable(R.drawable.bg_striped_split_img);
-            bgSplit.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
-            getSupportActionBar().setSplitBackgroundDrawable(bgSplit);
-            */
         }
         /* Set up actionbar navigation spinner */
         ArrayAdapter<CharSequence> list =
@@ -67,20 +64,6 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity
         mMenuItemRefresh = menu.findItem(R.id.menu_refresh);
 
         return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // app icon in action bar clicked; go home
-                //Intent intent = new Intent(this, HomeActivity.class);
-                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                //startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override

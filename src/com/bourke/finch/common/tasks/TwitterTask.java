@@ -76,7 +76,8 @@ public class TwitterTask extends
     public static final int GET_PROFILE_IMAGE = 2;
     public static final int GET_USER_TIMELINE = 3;
     public static final int GET_FOLLOWING_IDS = 4;
-    public static final int LOOKUP_USERS = 5;
+    public static final int GET_MENTIONS = 5;
+    public static final int LOOKUP_USERS = 6;
 
     private TwitterTaskParams mParams;
 
@@ -201,6 +202,17 @@ public class TwitterTask extends
                 }
                 payload.result = users;
                 break;
+
+            case GET_MENTIONS:
+                List<twitter4j.Status> mentions = null;
+                Paging mentions_page = (Paging)payload.data[3];
+                try {
+                    mentions = mTwitter.getMentions(mentions_page);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                }
+                payload.result = mentions;
+                break;
         }
 
         return payload;
@@ -217,7 +229,7 @@ public class TwitterTask extends
         app.showProgressIcon(false);
 
         switch (mParams.taskType) {
-            case GET_HOME_TIMELINE:
+            case GET_HOME_TIMELINE: case GET_MENTIONS:
                 /* Notify main list that it has been refreshed */
                 PullToRefreshListView mainList =
                     (PullToRefreshListView)payload.data[2];

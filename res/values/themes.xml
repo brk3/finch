@@ -5,10 +5,16 @@
         <!-- TODO -->
     </style>
 
-    <style name="Theme.Finch_Light" parent="Theme.Sherlock.Light">
+    <style name="Theme.Finch_Light"
+            parent="Theme.Sherlock.Light.DarkActionBar">
         <!-- Style the actionbar -->
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
-        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar
+        </item>
+
+        <!-- Style the list navigation -->
+        <item name="actionDropDownStyle">@style/MyDropDownNav</item>
+        <item name="android:actionDropDownStyle">@style/MyDropDownNav</item>
 
         <!-- Style the TabPageIndicator -->
         <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator
@@ -28,13 +34,14 @@
         <item name="actionBarSize">55dp</item>
         <item name="android:actionBarSize">55dp</item>
 
-        <!--
-        <item name="background">#ffdedede</item>
-        <item name="android:background">#ffdedede</item>
-        -->
         <item name="background">@drawable/bg_light_grey_stripe</item>
         <item name="android:background">@drawable/bg_light_grey_stripe</item>
+    </style>
 
+    <style name="MyDropDownNav"
+        parent="Widget.Sherlock.Light.Spinner.DropDown.ActionBar">
+        <item name="android:background">
+            @drawable/abs__spinner_ab_default_holo_light</item>
     </style>
 
     <style name="CustomTitle">

@@ -79,10 +79,11 @@ public class ImageLoader {
         File f = fileCache.getFile(screenName);
 
         /* From sd cache. Original lazylist code uses a custom decodeFile
-         * method here, but our should come prescaled courtesy of twitter4j. */
-        Bitmap bitmap = BitmapFactory.decodeFile(f.toString());
+         * method here, but ours comes prescaled courtesy of twitter */
+        //Bitmap bitmap = BitmapFactory.decodeFile(f.toString());
+        Bitmap bitmap = null;
 
-        if (bitmap == null) {
+        //if (bitmap == null) {
             /* From web */
             try {
                 Twitter twitter = FinchTwitterFactory.getInstance(mContext)
@@ -107,7 +108,7 @@ public class ImageLoader {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+        //}
 
         return bitmap;
     }

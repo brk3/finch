@@ -20,7 +20,7 @@ public class FinchActivity extends BaseFinchActivity
     private static final int NUM_ITEMS = 2;
 
     public static final int HOME_PAGE = 0;
-    public static final int MESSAGES_PAGE = 1;
+    public static final int CONNECTIONS_PAGE = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,8 +71,8 @@ public class FinchActivity extends BaseFinchActivity
             switch (position) {
                 case HOME_PAGE:
                     return new HomePageFragment();
-                case MESSAGES_PAGE:
-                    return new MessagesFragment();
+                case CONNECTIONS_PAGE:
+                    return new ConnectionsFragment();
             }
             return null;
         }

@@ -2,7 +2,7 @@
 <resources>
     <string-array name="locations">
         <item>Home</item>
-        <item>Messages</item>
+        <item>Connections</item>
         <item>Trending</item>
     </string-array>
 </resources>
