@@ -12,10 +12,7 @@ public class FileCache {
         /* Find the dir to save cached images */
         if (android.os.Environment.getExternalStorageState().equals(
                     android.os.Environment.MEDIA_MOUNTED)) {
-            // TODO: change this to use application storage area
-            cacheDir=new File(android.os.Environment.getExternalStorageDirectory(),"LazyList");
-        } else {
-            cacheDir=context.getCacheDir();
+            cacheDir = new File(context.getCacheDir(), "lazylist");
         }
         if(!cacheDir.exists()) {
             cacheDir.mkdirs();

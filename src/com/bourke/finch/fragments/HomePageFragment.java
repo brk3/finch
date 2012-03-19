@@ -190,7 +190,7 @@ public class HomePageFragment extends SherlockFragment {
                     HomePageFragment.this.getSherlockActivity(),
                     ProfileActivity.class);
                 String screenName = (
-                    (Status)mHomeTimeline.get(position)).getUser()
+                    (Status)mHomeTimeline.get(position-1)).getUser()
                         .getScreenName();
                 profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
                         "/" + screenName));

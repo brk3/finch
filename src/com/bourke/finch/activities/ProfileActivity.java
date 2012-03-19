@@ -104,7 +104,7 @@ public class ProfileActivity extends BaseFinchActivity
         };
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.GET_PROFILE_IMAGE, new Object[] {this, mScreenName,
-                    ProfileImage.ORIGINAL}
+                    ProfileImage.BIGGER}
                 );
         new TwitterTask(showUserParams, profileImageCallback,
                 mTwitter).execute();
