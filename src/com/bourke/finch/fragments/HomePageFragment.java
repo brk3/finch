@@ -45,6 +45,15 @@ import com.bourke.finch.provider.FinchProvider;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -102,20 +111,19 @@ public class HomePageFragment extends SherlockFragment {
         super.onCreate(savedInstanceState);
 
         mContext = getSherlockActivity().getApplicationContext();
-
-        setHasOptionsMenu(true);
-
         mPrefs = getSherlockActivity().getSharedPreferences(
                 "twitterPrefs", Context.MODE_PRIVATE);
+
+        /* Register this fragment with the options menu */
+        setHasOptionsMenu(true);
 
 		/* Load the twitter4j helper */
         mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
 
-        /* Fetch user's hometimeline */
+        /* Set up callback to fetch user's hometimeline */
         mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                /* Update list adapter */
                 mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
                 mMainListAdapter.prependResponses((ResponseList)mHomeTimeline);
                 mMainListAdapter.notifyDataSetChanged();
@@ -133,7 +141,7 @@ public class HomePageFragment extends SherlockFragment {
         RelativeLayout layout = (RelativeLayout)inflater
             .inflate(R.layout.pull_refresh_list, container, false);
 
-        /* Setup main ListView */
+        /* Setup main ListView with pulldown and pullup callbacks */
         mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
                 R.id.list);
         mMainList = mRefreshableMainList.getRefreshableView();
@@ -143,14 +151,7 @@ public class HomePageFragment extends SherlockFragment {
 
 			@Override
 			public void onPullDownToRefresh() {
-                /* Fetch user's timeline to populate ListView */
-                TwitterTaskParams getTimelineParams =
-                     new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
-                         new Object[] {
-                             getSherlockActivity(), mMainListAdapter,
-                             mRefreshableMainList, new Paging(1)});
-                new TwitterTask(getTimelineParams, mHomeListCallback,
-                    mTwitter).execute();
+                refreshHomeTimeline(new Paging(1));
 			}
 
 			@Override
@@ -181,6 +182,7 @@ public class HomePageFragment extends SherlockFragment {
                     mTwitter).execute();
             }
         });
+
         mMainList.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
             @Override
@@ -208,25 +210,100 @@ public class HomePageFragment extends SherlockFragment {
             }
         });
 
-        /* Setup prefs and check if credentials present */
+        return layout;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        /* Save currently displayed tweets */
+        try {
+            FileOutputStream fos = mContext.openFileOutput(
+                    Constants.PREF_HOMETIMELINE_PAGE, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(mHomeTimeline);
+            os.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /* Save page position */
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putInt(Constants.PREF_HOMETIMELINE_POS,
+                mMainList.getFirstVisiblePosition());
+        editor.commit();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        /* Check if credentials present */
 		if (mPrefs.contains(Constants.PREF_ACCESS_TOKEN)) {
 			Log.d(TAG, "Repeat User");
-			loginAuthorisedUser();
+            /* Load last viewed tweets, if any */
+            File cacheFile = mContext.getCacheDir();
+            try {
+                FileInputStream fis = mContext.openFileInput(
+                        Constants.PREF_HOMETIMELINE_PAGE);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                mHomeTimeline = (ResponseList<TwitterResponse>)
+                    ois.readObject();
+                if (mHomeTimeline != null) {
+                    mMainListAdapter.appendResponses(mHomeTimeline);
+                    mMainListAdapter.notifyDataSetChanged();
+                    Log.d(TAG, "Restored hometimeline");
+                }
+                ois.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (StreamCorruptedException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            /* Restore list position */
+            int timelinePos = mPrefs.getInt(Constants.PREF_HOMETIMELINE_POS,
+                    -1);
+            if (timelinePos != -1) {
+                mMainList.setSelection(timelinePos);
+                mMainListAdapter.notifyDataSetChanged();
+            }
+
+            /* Initialise the twitter4j client with creds */
+            String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
+            String secret = mPrefs.getString(
+                    Constants.PREF_ACCESS_TOKEN_SECRET, null);
+            mAccessToken = new AccessToken(token, secret);
+            mTwitter.setOAuthAccessToken(mAccessToken);
+            FinchTwitterFactory.getInstance(mContext).setTwitter(mTwitter);
+
+            Paging page = new Paging();
+            if (mHomeTimeline != null) {
+                long sinceId = ((Status)mHomeTimeline.get(0)).getId();
+                page.setSinceId(sinceId);
+            }
+            refreshHomeTimeline(new Paging(1));
+            showUserInActionbar();
 		} else {
 			Log.d(TAG, "New User");
             Intent intent = new Intent();
             intent.setClass(getSherlockActivity(), LoginActivity.class);
             startActivity(intent);
 		}
-
-        return layout;
     }
 
-    public void refreshHomeTimeline() {
+    public void refreshHomeTimeline(Paging page) {
         TwitterTaskParams getTimelineParams =
             new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
                     new Object[] {getSherlockActivity(), mMainListAdapter,
-                        mRefreshableMainList, new Paging(1)});
+                        mRefreshableMainList, page});
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
     }
@@ -235,39 +312,15 @@ public class HomePageFragment extends SherlockFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                refreshHomeTimeline();
+                refreshHomeTimeline(new Paging(1));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    /*
-     * The user had previously given our app permission to use Twitter.
-	 */
-	private void loginAuthorisedUser() {
-
-		String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
-		String secret = mPrefs.getString(Constants.PREF_ACCESS_TOKEN_SECRET,
-                null);
-
-		mAccessToken = new AccessToken(token, secret);
-		mTwitter.setOAuthAccessToken(mAccessToken);
-        FinchTwitterFactory.getInstance(mContext).setTwitter(mTwitter);
-
-        onLogin();
-	}
-
-    private void onLogin() {
-
-        /* Fetch user's timeline to populate ListView */
-        TwitterTaskParams getTimelineParams = new TwitterTaskParams(
-                TwitterTask.GET_HOME_TIMELINE, new Object[] {
-                    getSherlockActivity(), mMainListAdapter,
-                          mRefreshableMainList, new Paging(1)});
-        new TwitterTask(getTimelineParams, mHomeListCallback, mTwitter)
-            .execute();
-
+    private void showUserInActionbar() {
+        /* Set up callback to set user's profile image to actionbar */
         final TwitterTaskCallback<TwitterTaskParams, TwitterException>
             profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,
                                                     TwitterException>() {
@@ -340,7 +393,7 @@ public class HomePageFragment extends SherlockFragment {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             /* Used to put dark icons on light action bar */
             //boolean isLight = (Constants.THEME == Constants.THEME_LIGHT);
-            boolean isLight = true;
+            boolean isLight = false;
 
             menu.add("Reply")
                 .setIcon(isLight ? R.drawable.social_reply_light

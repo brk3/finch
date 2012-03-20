@@ -53,6 +53,7 @@ public class LoginActivity extends SherlockFragmentActivity
 
         super.onCreate(savedInstanceState);
 
+        mContext = getApplicationContext();
         mPrefs = getSharedPreferences("twitterPrefs", MODE_PRIVATE);
 
         setContentView(R.layout.login);

@@ -148,7 +148,15 @@ public class LazyAdapter extends BaseAdapter {
     }
 
     public void appendResponses(ResponseList<TwitterResponse> data) {
-        mResponses.addAll(data);
+        if (mResponses != null) {
+            mResponses.addAll(data);
+        } else {
+            mResponses = data;
+        }
+    }
+
+    public void clearResponses() {
+        mResponses.clear();
     }
 
 }

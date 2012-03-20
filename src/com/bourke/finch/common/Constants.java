@@ -19,6 +19,9 @@ public class Constants {
 	public static final String PREF_ACCESS_TOKEN_SECRET = "accessTokenSecret";
 	public static final String PREF_SCREEN_NAME = "screenName";
 
+    public static final String PREF_HOMETIMELINE_PAGE = "hometimelinePage";
+    public static final String PREF_HOMETIMELINE_POS = "hometimelinePosition";
+
     public static final Uri SCREEN_NAME_URI = Uri.parse(
             "content://com.bourke.finch.provider/screenname");
 
