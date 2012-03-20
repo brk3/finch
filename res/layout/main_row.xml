@@ -38,6 +38,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         android:src="@drawable/ic_contact_picture"
         android:scaleType="centerCrop" />
 
@@ -48,11 +49,11 @@
         android:padding="2dp"
         android:singleLine="true"
         android:ellipsize="end"
-        android:layout_alignLeft="@id/image_profile"
         android:background="@color/transparent_black"
         android:text="\@test_name"
         android:textColor="@color/white"
+        android:layout_alignLeft="@id/image_profile"
         android:layout_alignRight="@id/image_profile"
-        android:layout_alignBottom="@id/image_profile" />
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
