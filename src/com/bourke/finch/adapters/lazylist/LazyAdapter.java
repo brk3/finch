@@ -4,6 +4,8 @@ import android.app.Activity;
 
 import android.content.Context;
 
+import android.graphics.Typeface;
+
 import android.text.util.Linkify;
 
 import android.util.Log;
@@ -44,12 +46,17 @@ public class LazyAdapter extends BaseAdapter {
     private static LayoutInflater inflater = null;
 
     public ImageLoader imageLoader;
+
     private Pattern screenNameMatcher = Pattern.compile("@\\w+");
+
+    private Typeface mTypeface;
 
     public LazyAdapter(Activity a) {
         activity = a;
         inflater = (LayoutInflater)activity.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
+        mTypeface = Typeface.createFromAsset(a.getAssets(),
+                Constants.ROBOTO_REGULAR);
         imageLoader = new ImageLoader(activity);
     }
 
@@ -81,6 +88,7 @@ public class LazyAdapter extends BaseAdapter {
                         + currentEntity.getClass().getName());
             }
             text_tweet.setText(text);
+            text_tweet.setTypeface(mTypeface);
             Linkify.addLinks(text_tweet, Linkify.ALL);
             Linkify.addLinks(text_tweet, screenNameMatcher,
                      Constants.SCREEN_NAME_URI.toString() + "/");
@@ -100,6 +108,7 @@ public class LazyAdapter extends BaseAdapter {
                         + currentEntity.getClass().getName());
             }
             text_time.setText(new PrettyDate(createdAt).toString());
+            text_time.setTypeface(mTypeface);
 
             /* Set the screen name TextView */
             String screenName = "";
@@ -114,6 +123,7 @@ public class LazyAdapter extends BaseAdapter {
             TextView text_screenname =
                 (TextView)vi.findViewById(R.id.text_screenname);
             text_screenname.setText("@"+screenName);
+            text_screenname.setTypeface(mTypeface);
 
             /* Set the profile image ImageView */
             ImageView image_profile = (ImageView)vi.findViewById(

@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.bourke.finch.R;
 
+
 public class Constants {
 
     public static final int THEME_DARK = R.style.Theme_Finch;
@@ -26,5 +27,7 @@ public class Constants {
             "content://com.bourke.finch.provider/screenname");
 
     public static final String KEY_URL = "finchURL";
+
+    public static final String ROBOTO_REGULAR = "fonts/Roboto-Regular.ttf";
 
 }

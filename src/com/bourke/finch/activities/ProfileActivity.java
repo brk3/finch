@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Typeface;
 
 import android.net.Uri;
 
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.MenuItem;
 
 import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.FinchTwitterFactory;
@@ -35,7 +37,6 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import twitter4j.User;
-import com.actionbarsherlock.view.MenuItem;
 
 public class ProfileActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
@@ -58,6 +59,8 @@ public class ProfileActivity extends BaseFinchActivity
 
     private String mScreenName = new String();
 
+    private Typeface mTypeFace;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +68,9 @@ public class ProfileActivity extends BaseFinchActivity
         setContentView(R.layout.profile);
 
         mContext = getApplicationContext();
+
+        mTypeFace = Typeface.createFromAsset(getAssets(),
+                Constants.ROBOTO_REGULAR);
 
         /* Get the URL we are being asked to view */
         Uri uri = getIntent().getData();
@@ -133,11 +139,13 @@ public class ProfileActivity extends BaseFinchActivity
         TextView textViewScreenName = (TextView)findViewById(
                 R.id.text_screenname);
         textViewScreenName.setText("@"+user.getScreenName());
+        textViewScreenName.setTypeface(mTypeFace);
 
         /* Set textview for description */
         TextView textViewDescription = (TextView)findViewById(
                 R.id.text_description);
         textViewDescription.setText(user.getDescription());
+        textViewDescription.setTypeface(mTypeFace);
     }
 
     @Override
