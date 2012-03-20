@@ -6,7 +6,7 @@
     </style>
 
     <style name="Theme.Finch_Light"
-            parent="Theme.Sherlock.Light.DarkActionBar">
+            parent="Theme.Sherlock.Light.DarkActionBar.ForceOverflow">
         <!-- Style the actionbar -->
         <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar
