@@ -12,15 +12,20 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 
+import com.viewpagerindicator.TabPageIndicator;
+import com.viewpagerindicator.TitleProvider;
+
 public class FinchActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
 
     private static final String TAG = "finch/FinchActivity";
 
-    private static final int NUM_ITEMS = 2;
-
     public static final int HOME_PAGE = 0;
     public static final int CONNECTIONS_PAGE = 1;
+
+    //TODO: add to R.strings
+    public static final String[] CONTENT = new String[] {
+        "Home", "Messages" };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,10 @@ public class FinchActivity extends BaseFinchActivity
         FinchPagerAdapter adapter = new FinchPagerAdapter(
                 getSupportFragmentManager());
         viewPager.setAdapter(adapter);
+        TabPageIndicator indicator =
+            (TabPageIndicator)findViewById(R.id.indicator);
+        indicator.setViewPager(viewPager);
+        /*
         viewPager.setOnPageChangeListener(new OnPageChangeListener() {
 
             @Override
@@ -48,6 +57,7 @@ public class FinchActivity extends BaseFinchActivity
             public void onPageScrollStateChanged(int arg0) {
             }
         });
+        */
     }
 
     @Override
@@ -55,7 +65,8 @@ public class FinchActivity extends BaseFinchActivity
         return true;
     }
 
-    public static class FinchPagerAdapter extends FragmentPagerAdapter {
+    public static class FinchPagerAdapter extends FragmentPagerAdapter
+            implements TitleProvider {
 
         public FinchPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -63,7 +74,13 @@ public class FinchActivity extends BaseFinchActivity
 
         @Override
         public int getCount() {
-            return NUM_ITEMS;
+            return CONTENT.length;
+        }
+
+        @Override
+        public String getTitle(int position) {
+            return CONTENT[ position % ProfileActivity.CONTENT.length]
+                .toUpperCase();
         }
 
         @Override

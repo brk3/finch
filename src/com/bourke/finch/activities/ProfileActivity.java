@@ -110,7 +110,7 @@ public class ProfileActivity extends BaseFinchActivity
         };
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.GET_PROFILE_IMAGE, new Object[] {this, mScreenName,
-                    ProfileImage.BIGGER}
+                    ProfileImage.ORIGINAL}
                 );
         new TwitterTask(showUserParams, profileImageCallback,
                 mTwitter).execute();
@@ -166,13 +166,13 @@ public class ProfileActivity extends BaseFinchActivity
 
         @Override
         public int getCount() {
-            return ProfileActivity.CONTENT.length;
+            return CONTENT.length;
         }
 
         @Override
         public String getTitle(int position) {
-            return ProfileActivity.CONTENT[
-                position % ProfileActivity.CONTENT.length].toUpperCase();
+            return CONTENT[position % ProfileActivity.CONTENT.length]
+                .toUpperCase();
         }
 
         @Override

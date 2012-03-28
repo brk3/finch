@@ -88,7 +88,7 @@ public class ImageLoader {
                 Twitter twitter = FinchTwitterFactory.getInstance(mContext)
                     .getTwitter();
                 ProfileImage p = twitter.getProfileImage(
-                        screenName, ProfileImage.BIGGER);
+                        screenName, ProfileImage.ORIGINAL);
 
                 URL imageUrl = new URL(p.getURL());
                 HttpURLConnection conn =

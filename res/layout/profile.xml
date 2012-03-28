@@ -16,6 +16,7 @@
             android:id="@+id/image_profile"
             android:layout_width="125dip"
             android:layout_height="125dip"
+            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:paddingLeft="10dip"
             android:paddingTop="20dip"
@@ -38,8 +39,10 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/image_profile"
             android:paddingLeft="15dip"
+            android:paddingRight="10dip"
+            android:textStyle="italic"
             android:layout_below="@id/text_screenname"
-            android:textColor="@color/white" />
+            android:textColor="@color/text_faded" />
 
     </RelativeLayout>
 
