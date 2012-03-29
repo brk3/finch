@@ -102,11 +102,10 @@ public class ConnectionsFragment extends SherlockFragment {
         super.onCreate(savedInstanceState);
 
         mContext = getSherlockActivity().getApplicationContext();
-
-        setHasOptionsMenu(true);
-
         mPrefs = getSherlockActivity().getSharedPreferences(
                 "twitterPrefs", Context.MODE_PRIVATE);
+
+        setHasOptionsMenu(true);
 
 		/* Load the twitter4j helper */
         mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();

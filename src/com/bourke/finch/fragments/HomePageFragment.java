@@ -240,63 +240,7 @@ public class HomePageFragment extends SherlockFragment {
     @Override
     public void onResume() {
         super.onResume();
-
-        /* Check if credentials present */
-		if (mPrefs.contains(Constants.PREF_ACCESS_TOKEN)) {
-			Log.d(TAG, "Repeat User");
-            /* Load last viewed tweets, if any */
-            File cacheFile = mContext.getCacheDir();
-            try {
-                FileInputStream fis = mContext.openFileInput(
-                        Constants.PREF_HOMETIMELINE_PAGE);
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                mHomeTimeline = (ResponseList<TwitterResponse>)
-                    ois.readObject();
-                if (mHomeTimeline != null) {
-                    mMainListAdapter.appendResponses(mHomeTimeline);
-                    mMainListAdapter.notifyDataSetChanged();
-                    Log.d(TAG, "Restored hometimeline");
-                }
-                ois.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (StreamCorruptedException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            /* Restore list position */
-            int timelinePos = mPrefs.getInt(Constants.PREF_HOMETIMELINE_POS,
-                    -1);
-            if (timelinePos != -1) {
-                mMainList.setSelection(timelinePos);
-                mMainListAdapter.notifyDataSetChanged();
-            }
-
-            /* Initialise the twitter4j client with creds */
-            String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
-            String secret = mPrefs.getString(
-                    Constants.PREF_ACCESS_TOKEN_SECRET, null);
-            mAccessToken = new AccessToken(token, secret);
-            mTwitter.setOAuthAccessToken(mAccessToken);
-            FinchTwitterFactory.getInstance(mContext).setTwitter(mTwitter);
-
-            Paging page = new Paging();
-            if (mHomeTimeline != null) {
-                long sinceId = ((Status)mHomeTimeline.get(0)).getId();
-                page.setSinceId(sinceId);
-            }
-            refreshHomeTimeline(new Paging(1));
-            showUserInActionbar();
-		} else {
-			Log.d(TAG, "New User");
-            Intent intent = new Intent();
-            intent.setClass(getSherlockActivity(), LoginActivity.class);
-            startActivity(intent);
-		}
+        refreshHomeTimeline(new Paging(1));
     }
 
     public void refreshHomeTimeline(Paging page) {
@@ -382,8 +326,9 @@ public class HomePageFragment extends SherlockFragment {
          * profile image */
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.SHOW_USER,
-                new Object[] {getSherlockActivity(), mAccessToken.getUserId()
-                });
+                new Object[] {getSherlockActivity(),
+                    ((FinchActivity)getSherlockActivity()).getAccessToken()
+                .getUserId()});
         new TwitterTask(showUserParams, showUserCallback,
                 mTwitter).execute();
     }

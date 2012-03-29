@@ -1,5 +1,8 @@
 package com.bourke.finch;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import android.os.Bundle;
 
 import android.support.v4.app.FragmentManager;
@@ -12,8 +15,15 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 
+import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.FinchTwitterFactory;
+
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
+
+import twitter4j.auth.AccessToken;
+
+import twitter4j.Twitter;
 
 public class FinchActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
@@ -22,6 +32,12 @@ public class FinchActivity extends BaseFinchActivity
 
     public static final int HOME_PAGE = 0;
     public static final int CONNECTIONS_PAGE = 1;
+
+    private AccessToken mAccessToken;
+
+    private SharedPreferences mPrefs;
+
+    private Context mContext;
 
     //TODO: add to R.strings
     public static final String[] CONTENT = new String[] {
@@ -34,6 +50,19 @@ public class FinchActivity extends BaseFinchActivity
 
         setContentView(R.layout.main);
 
+        mContext = getApplicationContext();
+        mPrefs = getSharedPreferences("twitterPrefs", Context.MODE_PRIVATE);
+
+        /* Initialise the twitter4j client with creds */
+        String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
+        String secret = mPrefs.getString(
+                Constants.PREF_ACCESS_TOKEN_SECRET, null);
+        mAccessToken = new AccessToken(token, secret);
+        Twitter twitter = FinchTwitterFactory.getInstance(mContext)
+            .getTwitter();
+        twitter.setOAuthAccessToken(mAccessToken);
+        FinchTwitterFactory.getInstance(mContext).setTwitter(twitter);
+
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         FinchPagerAdapter adapter = new FinchPagerAdapter(
                 getSupportFragmentManager());
@@ -41,28 +70,15 @@ public class FinchActivity extends BaseFinchActivity
         TabPageIndicator indicator =
             (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(viewPager);
-        /*
-        viewPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int page) {
-                //TODO: update nav spinner
-            }
-
-            @Override
-            public void onPageScrolled(int arg0, float arg1, int arg2) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int arg0) {
-            }
-        });
-        */
     }
 
     @Override
     public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         return true;
+    }
+
+    public AccessToken getAccessToken() {
+        return mAccessToken;
     }
 
     public static class FinchPagerAdapter extends FragmentPagerAdapter
