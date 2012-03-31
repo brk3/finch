@@ -42,9 +42,6 @@ import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.provider.FinchProvider;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -76,7 +73,6 @@ public class ConnectionsFragment extends SherlockFragment {
     private static final String TAG = "Finch/ConnectionsFragment";
 
     private ListView mMainList;
-    private PullToRefreshListView mRefreshableMainList;
     private LazyAdapter mMainListAdapter;
 
     private Twitter mTwitter;
@@ -101,13 +97,11 @@ public class ConnectionsFragment extends SherlockFragment {
 
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         mContext = getSherlockActivity().getApplicationContext();
         mPrefs = getSherlockActivity().getSharedPreferences(
                 "twitterPrefs", Context.MODE_PRIVATE);
-
-        setHasOptionsMenu(true);
-
-		/* Load the twitter4j helper */
         mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
 
         /* Fetch user's mentions */
@@ -130,56 +124,13 @@ public class ConnectionsFragment extends SherlockFragment {
             Bundle savedInstanceState) {
 
         RelativeLayout layout = (RelativeLayout)inflater
-            .inflate(R.layout.pull_refresh_list, container, false);
+            .inflate(R.layout.standard_list_fragment, container, false);
 
         /* Setup main ListView */
-        mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
-                R.id.list);
-        mMainList = mRefreshableMainList.getRefreshableView();
+        mMainList = (ListView)layout.findViewById(R.id.list);
         mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
-        mRefreshableMainList.setOnRefreshListener(new OnRefreshListener2() {
 
-			@Override
-			public void onPullDownToRefresh() {
-                /* Fetch user's timeline to populate ListView */
-                TwitterTaskParams getMentionsParams =
-                     new TwitterTaskParams(TwitterTask.GET_MENTIONS,
-                         new Object[] {
-                             getSherlockActivity(), mMainListAdapter,
-                             mRefreshableMainList, new Paging(1)});
-                new TwitterTask(getMentionsParams, mMentionsCallback,
-                    mTwitter).execute();
-			}
-
-			@Override
-			public void onPullUpToRefresh() {
-                TwitterTaskCallback pullUpRefreshCallback =
-                        new TwitterTaskCallback<TwitterTaskParams,
-                                                TwitterException>() {
-                    public void onSuccess(TwitterTaskParams payload) {
-                        /* Append responses to list adapter */
-                        mMentions = (ResponseList<TwitterResponse>)
-                            payload.result;
-                        mMainListAdapter.appendResponses((ResponseList)
-                                mMentions);
-                        mMainListAdapter.notifyDataSetChanged();
-                    }
-                    public void onFailure(TwitterException e) {
-                        e.printStackTrace();
-                    }
-                };
-                Paging paging = new Paging(++mMentionsPage);
-                Log.d(TAG, "Fetching page " + mMentionsPage);
-                TwitterTaskParams getMentionsParams =
-                     new TwitterTaskParams(TwitterTask.GET_MENTIONS,
-                         new Object[] {
-                             getSherlockActivity(), mMainListAdapter,
-                             mRefreshableMainList, paging});
-                new TwitterTask(getMentionsParams, pullUpRefreshCallback,
-                    mTwitter).execute();
-            }
-        });
         mMainList.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
             @Override
@@ -225,7 +176,7 @@ public class ConnectionsFragment extends SherlockFragment {
         TwitterTaskParams getMentionsParams =
             new TwitterTaskParams(TwitterTask.GET_MENTIONS,
                     new Object[] {getSherlockActivity(), mMainListAdapter,
-                        mRefreshableMainList, new Paging(1)});
+                        mMainList, new Paging(1)});
         new TwitterTask(getMentionsParams, mMentionsCallback,
                 mTwitter).execute();
     }
@@ -247,7 +198,7 @@ public class ConnectionsFragment extends SherlockFragment {
         TwitterTaskParams getTimelineParams = new TwitterTaskParams(
                 TwitterTask.GET_MENTIONS, new Object[] {
                     getSherlockActivity(), mMainListAdapter,
-                          mRefreshableMainList, new Paging(1)});
+                          mMainList, new Paging(1)});
         new TwitterTask(getTimelineParams, mMentionsCallback, mTwitter)
             .execute();
     }

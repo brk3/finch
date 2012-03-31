@@ -53,15 +53,7 @@ public class FinchActivity extends BaseFinchActivity
         mContext = getApplicationContext();
         mPrefs = getSharedPreferences("twitterPrefs", Context.MODE_PRIVATE);
 
-        /* Initialise the twitter4j client with creds */
-        String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
-        String secret = mPrefs.getString(
-                Constants.PREF_ACCESS_TOKEN_SECRET, null);
-        mAccessToken = new AccessToken(token, secret);
-        Twitter twitter = FinchTwitterFactory.getInstance(mContext)
-            .getTwitter();
-        twitter.setOAuthAccessToken(mAccessToken);
-        FinchTwitterFactory.getInstance(mContext).setTwitter(twitter);
+        initTwitter();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         FinchPagerAdapter adapter = new FinchPagerAdapter(
@@ -70,6 +62,17 @@ public class FinchActivity extends BaseFinchActivity
         TabPageIndicator indicator =
             (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(viewPager);
+    }
+
+    private void initTwitter() {
+        String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
+        String secret = mPrefs.getString(
+                Constants.PREF_ACCESS_TOKEN_SECRET, null);
+        mAccessToken = new AccessToken(token, secret);
+        Twitter twitter = FinchTwitterFactory.getInstance(mContext)
+            .getTwitter();
+        twitter.setOAuthAccessToken(mAccessToken);
+        FinchTwitterFactory.getInstance(mContext).setTwitter(twitter);
     }
 
     @Override

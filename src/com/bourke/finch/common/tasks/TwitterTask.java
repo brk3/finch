@@ -29,8 +29,6 @@ import com.bourke.finch.lazylist.ImageLoader;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.Utils;
 
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -227,15 +225,6 @@ public class TwitterTask extends
 
         BaseFinchActivity app = (BaseFinchActivity)mParams.data[0];
         app.showProgressIcon(false);
-
-        switch (mParams.taskType) {
-            case GET_HOME_TIMELINE: case GET_MENTIONS:
-                /* Notify main list that it has been refreshed */
-                PullToRefreshListView mainList =
-                    (PullToRefreshListView)payload.data[2];
-                mainList.onRefreshComplete();
-                break;
-        }
 
         mCallback.onSuccess(payload);
     }

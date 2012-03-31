@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -41,9 +43,6 @@ import com.bourke.finch.common.TwitterTaskCallback;
 import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.provider.FinchProvider;
-
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,12 +79,12 @@ import twitter4j.TwitterResponse;
 
 import twitter4j.User;
 
-public class HomePageFragment extends SherlockFragment {
+public class HomePageFragment extends SherlockFragment
+        implements OnScrollListener {
 
     private static final String TAG = "Finch/HomePageFragment";
 
     private ListView mMainList;
-    private PullToRefreshListView mRefreshableMainList;
     private LazyAdapter mMainListAdapter;
 
     private Twitter mTwitter;
@@ -93,9 +92,6 @@ public class HomePageFragment extends SherlockFragment {
     private AccessToken mAccessToken;
 
     private SharedPreferences mPrefs;
-
-    private TwitterTaskCallback
-        <TwitterTaskParams, TwitterException> mHomeListCallback;
 
     private ResponseList<TwitterResponse> mHomeTimeline;
 
@@ -105,33 +101,19 @@ public class HomePageFragment extends SherlockFragment {
 
     private int mHomeTimelinePage = 1;
 
+    private boolean mLoadingPage = false;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true);
+
         mContext = getSherlockActivity().getApplicationContext();
         mPrefs = getSherlockActivity().getSharedPreferences(
                 "twitterPrefs", Context.MODE_PRIVATE);
-
-        /* Register this fragment with the options menu */
-        setHasOptionsMenu(true);
-
-		/* Load the twitter4j helper */
         mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
-
-        /* Set up callback to fetch user's hometimeline */
-        mHomeListCallback = new TwitterTaskCallback<TwitterTaskParams,
-                                                    TwitterException>() {
-            public void onSuccess(TwitterTaskParams payload) {
-                mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
-                mMainListAdapter.prependResponses((ResponseList)mHomeTimeline);
-                mMainListAdapter.notifyDataSetChanged();
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
     }
 
     @Override
@@ -139,50 +121,60 @@ public class HomePageFragment extends SherlockFragment {
             Bundle savedInstanceState) {
 
         RelativeLayout layout = (RelativeLayout)inflater
-            .inflate(R.layout.pull_refresh_list, container, false);
+            .inflate(R.layout.standard_list_fragment, container, false);
 
-        /* Setup main ListView with pulldown and pullup callbacks */
-        mRefreshableMainList = (PullToRefreshListView)layout.findViewById(
-                R.id.list);
-        mMainList = mRefreshableMainList.getRefreshableView();
+        initMainList(layout);
+
+        return layout;
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisible, int visibleCount,
+            int totalCount) {
+
+        if (totalCount <= 0 || mLoadingPage)
+            return;
+
+        boolean loadMore = firstVisible + visibleCount >= totalCount;
+
+        if (loadMore) {
+            mLoadingPage = true;
+            loadNextPage();
+        }
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView v, int s) {
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //savePosition();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshHomeTimeline(new Paging(1));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_refresh:
+                refreshHomeTimeline(new Paging(1));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void initMainList(ViewGroup layout) {
+        mMainList = (ListView)layout.findViewById(R.id.list);
         mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
-        mRefreshableMainList.setOnRefreshListener(new OnRefreshListener2() {
-
-			@Override
-			public void onPullDownToRefresh() {
-                refreshHomeTimeline(new Paging(1));
-			}
-
-			@Override
-			public void onPullUpToRefresh() {
-                TwitterTaskCallback pullUpRefreshCallback =
-                        new TwitterTaskCallback<TwitterTaskParams,
-                                                TwitterException>() {
-                    public void onSuccess(TwitterTaskParams payload) {
-                        /* Append responses to list adapter */
-                        mHomeTimeline = (ResponseList<TwitterResponse>)
-                            payload.result;
-                        mMainListAdapter.appendResponses((ResponseList)
-                                mHomeTimeline);
-                        mMainListAdapter.notifyDataSetChanged();
-                    }
-                    public void onFailure(TwitterException e) {
-                        e.printStackTrace();
-                    }
-                };
-                Paging paging = new Paging(++mHomeTimelinePage);
-                Log.d(TAG, "Fetching page " + mHomeTimelinePage);
-                TwitterTaskParams getTimelineParams =
-                     new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
-                         new Object[] {
-                             getSherlockActivity(), mMainListAdapter,
-                             mRefreshableMainList, paging});
-                new TwitterTask(getTimelineParams, pullUpRefreshCallback,
-                    mTwitter).execute();
-            }
-        });
-
+        mMainList.setOnScrollListener(this);
         mMainList.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
             @Override
@@ -192,7 +184,7 @@ public class HomePageFragment extends SherlockFragment {
                     HomePageFragment.this.getSherlockActivity(),
                     ProfileActivity.class);
                 String screenName = (
-                    (Status)mHomeTimeline.get(position-1)).getUser()
+                    (Status)mHomeTimeline.get(position)).getUser()
                         .getScreenName();
                 profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
                         "/" + screenName));
@@ -209,14 +201,36 @@ public class HomePageFragment extends SherlockFragment {
                 return true;
             }
         });
-
-        return layout;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
+    private void loadNextPage() {
+        TwitterTaskCallback pullUpRefreshCallback =
+                new TwitterTaskCallback<TwitterTaskParams,
+                                        TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                /* Append responses to list adapter */
+                mHomeTimeline = (ResponseList<TwitterResponse>)
+                    payload.result;
+                mMainListAdapter.appendResponses((ResponseList)
+                        mHomeTimeline);
+                mMainListAdapter.notifyDataSetChanged();
+                mLoadingPage = false;
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+        Paging paging = new Paging(++mHomeTimelinePage);
+        Log.d(TAG, "Fetching page " + mHomeTimelinePage);
+        TwitterTaskParams getTimelineParams =
+             new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
+                 new Object[] { getSherlockActivity(), mMainListAdapter,
+                     mMainList, paging});
+        new TwitterTask(getTimelineParams, pullUpRefreshCallback,
+            mTwitter).execute();
+    }
 
+    private void savePosition() {
         /* Save currently displayed tweets */
         try {
             FileOutputStream fos = mContext.openFileOutput(
@@ -237,30 +251,24 @@ public class HomePageFragment extends SherlockFragment {
         editor.commit();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        refreshHomeTimeline(new Paging(1));
-    }
-
     public void refreshHomeTimeline(Paging page) {
         TwitterTaskParams getTimelineParams =
             new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
                     new Object[] {getSherlockActivity(), mMainListAdapter,
-                        mRefreshableMainList, page});
+                        mMainList, page});
+        TwitterTaskCallback mHomeListCallback = new TwitterTaskCallback
+                <TwitterTaskParams, TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                mHomeTimeline = (ResponseList<TwitterResponse>)payload.result;
+                mMainListAdapter.prependResponses((ResponseList)mHomeTimeline);
+                mMainListAdapter.notifyDataSetChanged();
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_refresh:
-                refreshHomeTimeline(new Paging(1));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     private void showUserInActionbar() {
