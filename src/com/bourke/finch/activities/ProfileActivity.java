@@ -1,7 +1,6 @@
 package com.bourke.finch;
 
 import android.content.Context;
-import android.content.Intent;
 
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Typeface;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
-import com.actionbarsherlock.view.MenuItem;
 
 import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.FinchTwitterFactory;

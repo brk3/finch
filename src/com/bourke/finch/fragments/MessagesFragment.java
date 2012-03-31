@@ -12,11 +12,7 @@ import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.FinchTwitterFactory;
-import com.bourke.finch.common.TwitterTask;
-import com.bourke.finch.common.TwitterTaskCallback;
-import com.bourke.finch.common.TwitterTaskParams;
 
 import twitter4j.Twitter;
 

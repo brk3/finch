@@ -9,13 +9,10 @@ import android.graphics.BitmapFactory;
 
 import android.widget.ImageView;
 
-import com.bourke.finch.common.TwitterTask;
 import com.bourke.finch.common.FinchTwitterFactory;
 import com.bourke.finch.R;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,7 +31,6 @@ import twitter4j.ProfileImage;
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
-import android.util.Log;
 
 public class ImageLoader {
 

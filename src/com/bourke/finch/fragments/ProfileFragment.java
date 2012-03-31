@@ -11,23 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
-import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.FinchTwitterFactory;
 import com.bourke.finch.common.TwitterTask;
 import com.bourke.finch.common.TwitterTaskCallback;
 import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import twitter4j.IDs;
 
@@ -41,7 +37,6 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
 
-import twitter4j.User;
 
 public class ProfileFragment extends SherlockFragment {
 

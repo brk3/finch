@@ -9,14 +9,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import android.text.Editable;
-import android.text.TextWatcher;
-
 import android.util.Log;
 
 import android.view.View;
 
-import android.widget.EditText;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -27,9 +23,6 @@ import com.bourke.finch.common.FinchTwitterFactory;
 
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
-
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
 
 import twitter4j.Twitter;
 

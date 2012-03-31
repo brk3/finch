@@ -22,9 +22,7 @@ import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.PrettyDate;
 import com.bourke.finch.R;
 
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import twitter4j.ResponseList;

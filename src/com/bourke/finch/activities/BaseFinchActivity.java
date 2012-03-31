@@ -6,20 +6,13 @@ import android.graphics.Shader.TileMode;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.support.v4.app.FragmentActivity;
-
-import android.util.Log;
-
 import android.widget.ArrayAdapter;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 
-import com.bourke.finch.common.IcsColorDrawable;
 
 public abstract class BaseFinchActivity extends SherlockFragmentActivity
         implements ActionBar.OnNavigationListener {

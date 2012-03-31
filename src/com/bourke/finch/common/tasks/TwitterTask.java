@@ -2,31 +2,13 @@ package com.bourke.finch.common;
 
 import android.app.Activity;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 
 import android.os.AsyncTask;
 
 import android.util.Log;
 
-import android.view.Window;
-
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.view.MenuItem;
-
 import com.bourke.finch.BaseFinchActivity;
-import com.bourke.finch.lazylist.ImageLoader;
-import com.bourke.finch.lazylist.LazyAdapter;
 import com.bourke.finch.lazylist.Utils;
 
 import java.io.File;
@@ -46,8 +28,6 @@ import twitter4j.Paging;
 import twitter4j.ProfileImage;
 
 import twitter4j.ResponseList;
-
-import twitter4j.Status;
 
 import twitter4j.Twitter;
 

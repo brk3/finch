@@ -1,16 +1,13 @@
 package com.bourke.finch.provider;
 
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import android.net.Uri;
 
-import android.util.Log;
 
 public class FinchProvider extends ContentProvider {
 
