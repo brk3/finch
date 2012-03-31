@@ -34,6 +34,7 @@ import twitter4j.ProfileImage;
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
+import android.util.Log;
 
 public class ImageLoader {
 
@@ -78,9 +79,8 @@ public class ImageLoader {
     private Bitmap getBitmap(String screenName) {
         File f = fileCache.getFile(screenName);
 
-        /* From sd cache. Original lazylist code uses a custom decodeFile
-         * method here, but ours comes prescaled courtesy of twitter */
-        Bitmap bitmap = BitmapFactory.decodeFile(f.toString());
+        /* From sd cache */
+        Bitmap bitmap = Utils.decodeFile(f);
 
         if (bitmap == null) {
             /* From web */
