@@ -105,7 +105,6 @@ public class HomePageFragment extends SherlockFragment
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
@@ -156,14 +155,14 @@ public class HomePageFragment extends SherlockFragment
     @Override
     public void onResume() {
         super.onResume();
-        refreshHomeTimeline(new Paging(1));
+        refreshHomeTimeline();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_refresh:
-                refreshHomeTimeline(new Paging(1));
+                refreshHomeTimeline();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -251,11 +250,22 @@ public class HomePageFragment extends SherlockFragment
         editor.commit();
     }
 
-    public void refreshHomeTimeline(Paging page) {
+    public void refreshHomeTimeline() {
+        Paging page = new Paging(1);
+        if (mHomeTimeline != null) {
+            long sinceId = ((Status)mHomeTimeline.get(0)).getId();
+            page.setSinceId(sinceId);
+            Log.d(TAG, "sinceId=" + sinceId + ", only fetching tweets since "
+                    + "then");
+        } else {
+            Log.d(TAG, "No sinceId found, fetching first page of tweets");
+        }
+
         TwitterTaskParams getTimelineParams =
             new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
                     new Object[] {getSherlockActivity(), mMainListAdapter,
                         mMainList, page});
+
         TwitterTaskCallback mHomeListCallback = new TwitterTaskCallback
                 <TwitterTaskParams, TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
@@ -267,6 +277,7 @@ public class HomePageFragment extends SherlockFragment
                 e.printStackTrace();
             }
         };
+
         new TwitterTask(getTimelineParams, mHomeListCallback,
                 mTwitter).execute();
     }
