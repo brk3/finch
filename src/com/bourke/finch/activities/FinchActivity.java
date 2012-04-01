@@ -21,6 +21,7 @@ import com.viewpagerindicator.TitleProvider;
 import twitter4j.auth.AccessToken;
 
 import twitter4j.Twitter;
+import android.content.Intent;
 
 public class FinchActivity extends BaseFinchActivity
         implements ActionBar.OnNavigationListener {
@@ -50,8 +51,6 @@ public class FinchActivity extends BaseFinchActivity
         mContext = getApplicationContext();
         mPrefs = getSharedPreferences("twitterPrefs", Context.MODE_PRIVATE);
 
-        initTwitter();
-
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         FinchPagerAdapter adapter = new FinchPagerAdapter(
                 getSupportFragmentManager());
@@ -59,17 +58,27 @@ public class FinchActivity extends BaseFinchActivity
         TabPageIndicator indicator =
             (TabPageIndicator)findViewById(R.id.indicator);
         indicator.setViewPager(viewPager);
+
+        if (!initTwitter()) {
+            Intent intent = new Intent();
+            intent.setClass(this, LoginActivity.class);
+            startActivity(intent);
+        }
     }
 
-    private void initTwitter() {
+    private boolean initTwitter() {
         String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
         String secret = mPrefs.getString(
                 Constants.PREF_ACCESS_TOKEN_SECRET, null);
+        if (token == null || secret == null) {
+            return false;
+        }
         mAccessToken = new AccessToken(token, secret);
         Twitter twitter = FinchTwitterFactory.getInstance(mContext)
             .getTwitter();
         twitter.setOAuthAccessToken(mAccessToken);
         FinchTwitterFactory.getInstance(mContext).setTwitter(twitter);
+        return true;
     }
 
     @Override

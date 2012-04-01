@@ -57,6 +57,7 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterResponse;
 
 import twitter4j.User;
+import android.widget.TextView;
 
 public abstract class BaseFinchFragment extends SherlockFragment
         implements OnScrollListener {
@@ -82,6 +83,15 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected boolean mLoadingPage = false;
 
+    private TextView mUnreadCountView;
+    //private int mLastFirstVisible = 0;
+    private int mUnreadCount = 0;
+
+    private View mActionCustomView;
+
+    /* Update the unread display on scrolling every X items */
+    private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +102,13 @@ public abstract class BaseFinchFragment extends SherlockFragment
         mPrefs = getSherlockActivity().getSharedPreferences(
                 "twitterPrefs", Context.MODE_PRIVATE);
         mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
+
+        mActionCustomView = getSherlockActivity().getLayoutInflater()
+            .inflate(R.layout.actionbar_layout, null);
+        mUnreadCountView = (TextView)mActionCustomView.findViewById(
+                R.id.text_unread_count);
+        getSherlockActivity().getSupportActionBar().setCustomView(
+                mActionCustomView);
     }
 
     @Override
@@ -100,7 +117,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
         RelativeLayout layout = (RelativeLayout)inflater
             .inflate(R.layout.standard_list_fragment, container, false);
-
         initMainList(layout);
 
         return layout;
@@ -270,6 +286,13 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 .getUserId()});
         new TwitterTask(showUserParams, showUserCallback,
                 mTwitter).execute();
+    }
+
+    public void updateUnreadDisplay(int count) {
+        mUnreadCount += count;
+        mUnreadCountView.setText(mUnreadCount+"");
+        getSherlockActivity().getSupportActionBar().setCustomView(
+                mActionCustomView);
     }
 
     protected abstract void loadNextPage();

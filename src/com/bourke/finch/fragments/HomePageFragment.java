@@ -2,8 +2,6 @@ package com.bourke.finch;
 
 import android.util.Log;
 
-import android.widget.AbsListView.OnScrollListener;
-
 import com.bourke.finch.common.TwitterTask;
 import com.bourke.finch.common.TwitterTaskCallback;
 import com.bourke.finch.common.TwitterTaskParams;
@@ -17,10 +15,9 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
+import java.util.List;
 
-
-public class HomePageFragment extends BaseFinchFragment
-        implements OnScrollListener {
+public class HomePageFragment extends BaseFinchFragment {
 
     private static final String TAG = "Finch/HomePageFragment";
 
@@ -31,7 +28,9 @@ public class HomePageFragment extends BaseFinchFragment
                                         TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 /* Append responses to list adapter */
-                mListContents = (ResponseList<TwitterResponse>)payload.result;
+                ResponseList<TwitterResponse> res =
+                    (ResponseList<TwitterResponse>)payload.result;
+                mListContents = res;
                 mMainListAdapter.appendResponses((ResponseList)mListContents);
                 mMainListAdapter.notifyDataSetChanged();
                 mLoadingPage = false;
@@ -70,9 +69,12 @@ public class HomePageFragment extends BaseFinchFragment
         TwitterTaskCallback mHomeListCallback = new TwitterTaskCallback
                 <TwitterTaskParams, TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                mListContents = (ResponseList<TwitterResponse>)payload.result;
+                ResponseList<TwitterResponse> res =
+                    (ResponseList<TwitterResponse>)payload.result;
+                mListContents = res;
                 mMainListAdapter.prependResponses((ResponseList)mListContents);
                 mMainListAdapter.notifyDataSetChanged();
+                updateUnreadDisplay(res.size());
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();

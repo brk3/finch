@@ -2,8 +2,6 @@ package com.bourke.finch;
 
 import android.util.Log;
 
-import android.widget.AbsListView.OnScrollListener;
-
 import com.bourke.finch.common.TwitterTask;
 import com.bourke.finch.common.TwitterTaskCallback;
 import com.bourke.finch.common.TwitterTaskParams;
@@ -16,9 +14,7 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
 
-
-public class ConnectionsFragment extends BaseFinchFragment
-        implements OnScrollListener {
+public class ConnectionsFragment extends BaseFinchFragment {
 
     private static final String TAG = "Finch/ConnectionsFragment";
 

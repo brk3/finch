@@ -1,6 +1,7 @@
 <resources>
 
     <color name="text_faded">#ff7c7c7c</color>
+    <color name="text_light">#ffbbbbbb</color>
     <color name="text_primary">#fff1f1f1</color>
 
     <color name="white">#ffffffff</color>

@@ -12,7 +12,8 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-
+import android.widget.TextView;
+import android.view.View;
 
 public abstract class BaseFinchActivity extends SherlockFragmentActivity
         implements ActionBar.OnNavigationListener {
@@ -38,7 +39,11 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity
             bg.setTileModeXY(TileMode.REPEAT, TileMode.REPEAT);
             getSupportActionBar().setBackgroundDrawable(bg);
         }
+
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+
         /* Set up actionbar navigation spinner */
+        /*
         ArrayAdapter<CharSequence> list =
             ArrayAdapter.createFromResource(this, R.array.locations,
                 R.layout.spinner_title);
@@ -47,6 +52,7 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity
         getSupportActionBar().setNavigationMode(
                 ActionBar.NAVIGATION_MODE_LIST);
         getSupportActionBar().setListNavigationCallbacks(list, this);
+        */
     }
 
     @Override

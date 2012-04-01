@@ -23,7 +23,11 @@
     </style>
 
     <style name="Widget.Styled.ActionBar"
-       parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
+            parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
+        <item name="android:displayOptions">
+            showHome|useLogo|showTitle|showCustom</item>
+        <item name="android:customNavigationLayout">
+            @layout/actionbar_layout</item>
 
         <item name="titleTextStyle">@style/CustomTitle</item>
         <item name="android:titleTextStyle">@style/CustomTitle</item>
