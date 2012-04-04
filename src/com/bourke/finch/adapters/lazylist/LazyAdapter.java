@@ -167,4 +167,7 @@ public class LazyAdapter extends BaseAdapter {
         mResponses.clear();
     }
 
+    public ResponseList<TwitterResponse> getResponses() {
+        return mResponses;
+    }
 }

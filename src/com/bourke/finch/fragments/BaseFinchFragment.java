@@ -73,8 +73,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected SharedPreferences mPrefs;
 
-    protected ResponseList<TwitterResponse> mListContents;
-
     protected ActionMode mMode;
 
     protected Context mContext;
@@ -84,13 +82,14 @@ public abstract class BaseFinchFragment extends SherlockFragment
     protected boolean mLoadingPage = false;
 
     private TextView mUnreadCountView;
-    //private int mLastFirstVisible = 0;
     private int mUnreadCount = 0;
 
     private View mActionCustomView;
 
     /* Update the unread display on scrolling every X items */
     private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
+
+    protected long mSinceId = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -138,19 +137,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
     }
 
     @Override
-    public void onScrollStateChanged(AbsListView v, int s) {
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        //savePosition();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        refresh();
+    public void onScrollStateChanged(AbsListView v, int scrollState) {
     }
 
     @Override
@@ -177,8 +164,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 Intent profileActivity = new Intent(
                     BaseFinchFragment.this.getSherlockActivity(),
                     ProfileActivity.class);
-                String screenName = (
-                    (Status)mListContents.get(position)).getUser()
+                ResponseList<TwitterResponse> content = mMainListAdapter
+                        .getResponses();
+                String screenName = ((Status)content.get(position)).getUser()
                         .getScreenName();
                 profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
                         "/" + screenName));
@@ -195,27 +183,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 return true;
             }
         });
-    }
-
-    private void savePosition() {
-        /* Save currently displayed tweets */
-        try {
-            FileOutputStream fos = mContext.openFileOutput(
-                    Constants.PREF_HOMETIMELINE_PAGE, Context.MODE_PRIVATE);
-            ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(mListContents);
-            os.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        /* Save page position */
-        SharedPreferences.Editor editor = mPrefs.edit();
-        editor.putInt(Constants.PREF_HOMETIMELINE_POS,
-                mMainList.getFirstVisiblePosition());
-        editor.commit();
     }
 
     private void showUserInActionbar() {
@@ -255,11 +222,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 String screenName = ((User)payload.result).getScreenName();
                 ((FinchActivity)BaseFinchFragment.this.getSherlockActivity()).
                     getSupportActionBar().setSubtitle(screenName);
-                SharedPreferences prefs =
-                    BaseFinchFragment.this.getSherlockActivity()
-                    .getSharedPreferences("twitterPrefs",
-                            Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
+                SharedPreferences.Editor editor = mPrefs.edit();
                 editor.putString(Constants.PREF_SCREEN_NAME, screenName);
                 editor.commit();
 
@@ -289,6 +252,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
     }
 
     public void updateUnreadDisplay(int count) {
+        Log.d(TAG, "Adding " + count + " to total unread");
         mUnreadCount += count;
         mUnreadCountView.setText(mUnreadCount+"");
         getSherlockActivity().getSupportActionBar().setCustomView(
@@ -303,7 +267,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             /* Used to put dark icons on light action bar */
             //boolean isLight = (Constants.THEME == Constants.THEME_LIGHT);
-            boolean isLight = true;
+            boolean isLight = false;
 
             menu.add("Reply")
                 .setIcon(isLight ? R.drawable.social_reply_light

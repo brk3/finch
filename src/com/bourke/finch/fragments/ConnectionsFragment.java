@@ -25,8 +25,9 @@ public class ConnectionsFragment extends BaseFinchFragment {
                                         TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 /* Append responses to list adapter */
-                mListContents = (ResponseList<TwitterResponse>)payload.result;
-                mMainListAdapter.appendResponses((ResponseList)mListContents);
+                ResponseList<TwitterResponse> res = (
+                        ResponseList<TwitterResponse>)payload.result;
+                mMainListAdapter.appendResponses(res);
                 mMainListAdapter.notifyDataSetChanged();
                 mLoadingPage = false;
             }
@@ -44,13 +45,15 @@ public class ConnectionsFragment extends BaseFinchFragment {
             mTwitter).execute();
     }
 
+    @Override
     protected void refresh() {
         /* Fetch user's mentions */
         TwitterTaskCallback mentionsCallback = new TwitterTaskCallback<
                 TwitterTaskParams, TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                mListContents = (ResponseList<TwitterResponse>)payload.result;
-                mMainListAdapter.prependResponses((ResponseList)mListContents);
+                ResponseList<TwitterResponse> res = (
+                        ResponseList<TwitterResponse>)payload.result;
+                mMainListAdapter.prependResponses(res);
                 mMainListAdapter.notifyDataSetChanged();
             }
             public void onFailure(TwitterException e) {
