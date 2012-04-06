@@ -85,6 +85,7 @@ public class TwitterTask extends
         switch(taskType) {
 
             case SHOW_USER:
+                Log.d(TAG, "Running taskType SHOW_USER");
                 User user = null;
                 try {
                     Object userId = payload.data[1];
@@ -103,6 +104,7 @@ public class TwitterTask extends
                 break;
 
             case GET_HOME_TIMELINE:
+                Log.d(TAG, "Running taskType GET_HOME_TIMELINE");
                 List<twitter4j.Status> homeTimeline = null;
                 Paging page = (Paging)payload.data[3];
                 try {
@@ -114,6 +116,7 @@ public class TwitterTask extends
                 break;
 
             case GET_PROFILE_IMAGE:
+                Log.d(TAG, "Running taskType GET_PROFILE_IMAGE");
                 Drawable bitmap = null;
                 try {
                     Activity app = (Activity)payload.data[0];
@@ -148,6 +151,7 @@ public class TwitterTask extends
                 break;
 
             case GET_USER_TIMELINE:
+                Log.d(TAG, "Running taskType GET_USER_TIMELINE");
                 List<twitter4j.Status> userTimeLine = null;
                 String u_screenName = (String)payload.data[1];
                 try {
@@ -159,6 +163,7 @@ public class TwitterTask extends
                 break;
 
             case GET_FOLLOWING_IDS:
+                Log.d(TAG, "Running taskType GET_FOLLOWING_IDS");
                 IDs ids = null;
                 String f_screenName = (String)payload.data[1];
                 try {
@@ -171,6 +176,7 @@ public class TwitterTask extends
                 break;
 
             case LOOKUP_USERS:
+                Log.d(TAG, "Running taskType LOOKUP_USERS");
                 ResponseList<User> users = null;
                 long[] l_ids = (long[])payload.data[1];
                 try {
@@ -182,6 +188,7 @@ public class TwitterTask extends
                 break;
 
             case GET_MENTIONS:
+                Log.d(TAG, "Running taskType GET_MENTIONS");
                 List<twitter4j.Status> mentions = null;
                 Paging mentions_page = (Paging)payload.data[3];
                 try {

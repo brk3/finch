@@ -24,8 +24,7 @@
 
     <style name="Widget.Styled.ActionBar"
             parent="Widget.Sherlock.Light.ActionBar.Solid.Inverse">
-        <item name="android:displayOptions">
-            showHome|useLogo|showTitle|showCustom</item>
+        <item name="android:displayOptions">showCustom</item>
         <item name="android:customNavigationLayout">
             @layout/actionbar_layout</item>
 

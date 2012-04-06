@@ -6,12 +6,54 @@
     android:background="@drawable/bg_grey_noise"
     android:descendantFocusability="blocksDescendants">
 
+    <ImageView
+        android:id="@+id/image_profile"
+        android:layout_width="73dp"
+        android:layout_height="73dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="6dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_contact_picture"
+        android:background="@drawable/border"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/text_tweet"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/image_profile"
+        android:textSize="12dp"
+        android:background="@drawable/bg_grey_noise"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp" />
+
+    <TextView
+        android:id="@+id/text_screenname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:background="@color/transparent_black"
+        android:text="\@test_name"
+        android:textColor="@color/white"
+        android:layout_marginBottom="5dp"
+        android:padding="3dp"
+        android:layout_alignLeft="@id/image_profile"
+        android:layout_alignRight="@id/image_profile"
+        android:layout_alignBottom="@id/image_profile" />
+
     <TextView
         android:id="@+id/text_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/image_profile"
+        android:layout_alignParentBottom="true"
         android:textSize="10sp"
+        android:layout_marginBottom="8dp"
         android:paddingRight="5dp" />
 
     <ImageView
@@ -19,41 +61,9 @@
         android:layout_width="15dp"
         android:layout_height="15dp"
         android:layout_toLeftOf="@id/text_time"
-        android:src="@drawable/ic_device_access_time_light" />
-
-    <TextView
-        android:id="@+id/text_tweet"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left|center_vertical"
-        android:layout_toLeftOf="@id/image_profile"
-        android:layout_below="@id/text_time"
-        android:textSize="15dp"
-        android:background="@drawable/bg_grey_noise"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp" />
-
-    <ImageView
-        android:id="@+id/image_profile"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:src="@drawable/ic_contact_picture"
-        android:scaleType="centerCrop" />
-
-    <TextView
-        android:id="@+id/text_screenname"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:background="@color/transparent_black"
-        android:text="\@test_name"
-        android:textColor="@color/white"
-        android:layout_alignLeft="@id/image_profile"
-        android:layout_alignRight="@id/image_profile"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/ic_device_access_time_light"
+        android:paddingRight="3dp" />
 
 </RelativeLayout>

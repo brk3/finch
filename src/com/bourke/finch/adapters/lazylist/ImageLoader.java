@@ -76,7 +76,8 @@ public class ImageLoader {
         File f = fileCache.getFile(screenName);
 
         /* From sd cache */
-        Bitmap bitmap = Utils.decodeFile(f);
+        //Bitmap bitmap = Utils.decodeFile(f);
+        Bitmap bitmap = BitmapFactory.decodeFile(f.toString());
 
         if (bitmap == null) {
             /* From web */
@@ -84,7 +85,7 @@ public class ImageLoader {
                 Twitter twitter = FinchTwitterFactory.getInstance(mContext)
                     .getTwitter();
                 ProfileImage p = twitter.getProfileImage(
-                        screenName, ProfileImage.ORIGINAL);
+                        screenName, ProfileImage.BIGGER);
 
                 URL imageUrl = new URL(p.getURL());
                 HttpURLConnection conn =

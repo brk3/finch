@@ -108,6 +108,8 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 R.id.text_unread_count);
         getSherlockActivity().getSupportActionBar().setCustomView(
                 mActionCustomView);
+
+        //showUserInActionbar();
     }
 
     @Override
@@ -186,6 +188,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
     }
 
     private void showUserInActionbar() {
+        //TODO: this entire function badly needs to be cached
         /* Set up callback to set user's profile image to actionbar */
         final TwitterTaskCallback<TwitterTaskParams, TwitterException>
             profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,
@@ -193,22 +196,16 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
             public void onSuccess(TwitterTaskParams payload) {
                 Drawable profileImage = (Drawable)payload.result;
-                ImageView homeIcon = (ImageView)BaseFinchFragment.this
-                    .getSherlockActivity().findViewById(android.R.id.home);
-                int abHeight = ((FinchActivity)BaseFinchFragment
-                        .this.getSherlockActivity()).getSupportActionBar()
-                        .getHeight();
-                try {
-                    homeIcon.setLayoutParams(new FrameLayout.LayoutParams(
-                                abHeight, abHeight));
-                    homeIcon.setPadding(0, 10, 10, 10);
-                    homeIcon.setImageDrawable(profileImage);
-                } catch (NullPointerException e) {
-                    //TODO: Problem on <3.0, need to test further. Hopefully
-                    //ABS 4.0 might fix this.
-                    Log.e(TAG, "Could not get reference to home icon");
-                    e.printStackTrace();
-                }
+                ImageView homeIcon = (ImageView)mActionCustomView
+                    .findViewById(R.id.image_profile);
+                int abHeight = getSherlockActivity().getSupportActionBar()
+                    .getHeight();
+                RelativeLayout.LayoutParams layoutParams =
+                    new RelativeLayout.LayoutParams(abHeight, abHeight);
+                layoutParams.setMargins(5, 5, 5, 5);
+                homeIcon.setLayoutParams(new RelativeLayout.LayoutParams(
+                            abHeight, abHeight));
+                homeIcon.setImageDrawable(profileImage);
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();
@@ -220,11 +217,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 String screenName = ((User)payload.result).getScreenName();
-                ((FinchActivity)BaseFinchFragment.this.getSherlockActivity()).
-                    getSupportActionBar().setSubtitle(screenName);
-                SharedPreferences.Editor editor = mPrefs.edit();
-                editor.putString(Constants.PREF_SCREEN_NAME, screenName);
-                editor.commit();
 
                 /* Now we have screenName, start another thread to get the
                  * profile image */
@@ -255,8 +247,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
         Log.d(TAG, "Adding " + count + " to total unread");
         mUnreadCount += count;
         mUnreadCountView.setText(mUnreadCount+"");
-        getSherlockActivity().getSupportActionBar().setCustomView(
-                mActionCustomView);
     }
 
     protected abstract void loadNextPage();

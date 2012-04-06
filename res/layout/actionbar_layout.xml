@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center_vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="fill_parent">
+
+    <ImageView
+        android:id="@+id/image_profile"
+        android:layout_alignParentLeft="true"
+        android:scaleType="centerCrop"
+        android:background="@drawable/border"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent" />
 
     <TextView
         android:id="@+id/text_unread_count"
         android:text="0"
-        android:textSize="40sp"
+        android:textSize="36sp"
         android:layout_alignParentRight="true"
+        android:layout_marginRight="12dp"
         android:textColor="@color/text_light"
-        android:paddingRight="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
