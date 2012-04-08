@@ -56,6 +56,8 @@ public class TwitterTask extends
     public static final int GET_FOLLOWING_IDS = 4;
     public static final int GET_MENTIONS = 5;
     public static final int LOOKUP_USERS = 6;
+    public static final int CREATE_FAVORITE = 7;
+    public static final int DESTROY_FAVORITE = 8;
 
     private TwitterTaskParams mParams;
 
@@ -197,6 +199,30 @@ public class TwitterTask extends
                     e.printStackTrace();
                 }
                 payload.result = mentions;
+                break;
+
+            case CREATE_FAVORITE:
+                Log.d(TAG, "Running taskType CREATE_FAVORITE");
+                twitter4j.Status createdFavorite = null;
+                Long createFavId = (Long)payload.data[1];
+                try {
+                    createdFavorite = mTwitter.createFavorite(createFavId);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                }
+                payload.result = createdFavorite;
+                break;
+
+            case DESTROY_FAVORITE:
+                Log.d(TAG, "Running taskType DESTROY_FAVORITE");
+                twitter4j.Status destroyedFavorite = null;
+                Long destroyFavId = (Long)payload.data[1];
+                try {
+                    destroyedFavorite = mTwitter.destroyFavorite(destroyFavId);
+                } catch (TwitterException e) {
+                    e.printStackTrace();
+                }
+                payload.result = destroyedFavorite;
                 break;
         }
 

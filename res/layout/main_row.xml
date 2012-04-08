@@ -3,7 +3,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_grey_noise"
     android:descendantFocusability="blocksDescendants">
 
     <ImageView
@@ -27,7 +26,6 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/image_profile"
         android:textSize="12dp"
-        android:background="@drawable/bg_grey_noise"
         android:paddingLeft="12dp"
         android:paddingRight="12dp" />
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_reply"
+          android:title="Reply"
+          android:icon="@drawable/social_reply_dark"
+          android:showAsAction="always|withText" />
+
+    <item android:id="@+id/menu_retweet"
+          android:title="Re-tweet"
+          android:icon="@drawable/av_repeat_dark"
+          android:showAsAction="always|withText" />
+
+    <item android:id="@+id/menu_favorite"
+          android:title="Favorite"
+          android:icon="@drawable/rating_not_important_dark"
+          android:showAsAction="always|withText" />
+
+    <item android:id="@+id/menu_share"
+          android:title="Share"
+          android:icon="@drawable/ic_action_share_dark"
+          android:showAsAction="always|withText" />
+</menu>
+

@@ -19,7 +19,7 @@ public class ConnectionsFragment extends BaseFinchFragment {
     private static final String TAG = "Finch/ConnectionsFragment";
 
     @Override
-    protected void loadNextPage() {
+    public void loadNextPage() {
         TwitterTaskCallback pullUpRefreshCallback =
                 new TwitterTaskCallback<TwitterTaskParams,
                                         TwitterException>() {
@@ -46,7 +46,7 @@ public class ConnectionsFragment extends BaseFinchFragment {
     }
 
     @Override
-    protected void refresh() {
+    public void refresh() {
         /* Fetch user's mentions */
         TwitterTaskCallback mentionsCallback = new TwitterTaskCallback<
                 TwitterTaskParams, TwitterException>() {
@@ -66,5 +66,9 @@ public class ConnectionsFragment extends BaseFinchFragment {
                         mMainList, new Paging(1)});
         new TwitterTask(getMentionsParams, mentionsCallback,
                 mTwitter).execute();
+    }
+
+    public void setupActionMode() {
+        // TODO
     }
 }

@@ -3,8 +3,11 @@ package com.bourke.finch.lazylist;
 import android.app.Activity;
 
 import android.content.Context;
+import android.content.Intent;
 
 import android.graphics.Typeface;
+
+import android.net.Uri;
 
 import android.text.util.Linkify;
 
@@ -14,12 +17,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.PrettyDate;
+import com.bourke.finch.ProfileActivity;
+import com.bourke.finch.provider.FinchProvider;
 import com.bourke.finch.R;
 
 import java.util.Date;
@@ -58,11 +64,26 @@ public class LazyAdapter extends BaseAdapter {
         imageLoader = new ImageLoader(activity);
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView,
+            ViewGroup parent) {
 
         View vi = convertView;
         if (convertView == null) {
             vi = inflater.inflate(R.layout.main_row, null);
+            ImageView imageProfile = (ImageView)vi.findViewById(
+                    R.id.image_profile);
+            imageProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent profileActivity = new Intent(activity,
+                        ProfileActivity.class);
+                    String screenName = ((Status)mResponses.get(position))
+                        .getUser().getScreenName();
+                    profileActivity.setData(Uri.parse(
+                            FinchProvider.CONTENT_URI + "/" + screenName));
+                    activity.startActivity(profileActivity);
+                }
+            });
         }
 
         if (mResponses != null) {

@@ -109,7 +109,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
         getSherlockActivity().getSupportActionBar().setCustomView(
                 mActionCustomView);
 
-        //showUserInActionbar();
+        showUserInActionbar();
     }
 
     @Override
@@ -158,33 +158,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
         mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
         mMainList.setOnScrollListener(this);
-        mMainList.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View v,
-                    int position, long id) {
-                Intent profileActivity = new Intent(
-                    BaseFinchFragment.this.getSherlockActivity(),
-                    ProfileActivity.class);
-                ResponseList<TwitterResponse> content = mMainListAdapter
-                        .getResponses();
-                String screenName = ((Status)content.get(position)).getUser()
-                        .getScreenName();
-                profileActivity.setData(Uri.parse(FinchProvider.CONTENT_URI +
-                        "/" + screenName));
-                BaseFinchFragment.this.startActivity(profileActivity);
-            }
-        });
-        mMainList.setOnItemLongClickListener(
-                new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view,
-                    int position, long id) {
-                mMode = getSherlockActivity().startActionMode(
-                    new ActionModeTweet());
-                return true;
-            }
-        });
+        setupActionMode();
     }
 
     private void showUserInActionbar() {
@@ -197,7 +171,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
             public void onSuccess(TwitterTaskParams payload) {
                 Drawable profileImage = (Drawable)payload.result;
                 ImageView homeIcon = (ImageView)mActionCustomView
-                    .findViewById(R.id.image_profile);
+                    .findViewById(R.id.home_icon);
                 int abHeight = getSherlockActivity().getSupportActionBar()
                     .getHeight();
                 RelativeLayout.LayoutParams layoutParams =
@@ -247,54 +221,11 @@ public abstract class BaseFinchFragment extends SherlockFragment
         Log.d(TAG, "Adding " + count + " to total unread");
         mUnreadCount += count;
         mUnreadCountView.setText(mUnreadCount+"");
+        getSherlockActivity().getSupportActionBar().setCustomView(
+                mActionCustomView);
     }
 
-    protected abstract void loadNextPage();
-    protected abstract void refresh();
-
-    private final class ActionModeTweet implements ActionMode.Callback {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            /* Used to put dark icons on light action bar */
-            //boolean isLight = (Constants.THEME == Constants.THEME_LIGHT);
-            boolean isLight = false;
-
-            menu.add("Reply")
-                .setIcon(isLight ? R.drawable.social_reply_light
-                        : R.drawable.social_reply_dark)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-            menu.add("Re-tweet")
-                .setIcon(isLight ? R.drawable.av_repeat_light
-                        : R.drawable.av_repeat_dark)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-            menu.add("Favorite")
-                .setIcon(isLight ? R.drawable.rating_not_important_light
-                        : R.drawable.rating_not_important_dark)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-            menu.add("Share")
-                .setIcon(isLight ? R.drawable.ic_action_share_light
-                        : R.drawable.ic_action_share_dark)
-                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            mode.finish();
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-        }
-    }
+    public abstract void loadNextPage();
+    public abstract void refresh();
+    public abstract void setupActionMode();
 }
