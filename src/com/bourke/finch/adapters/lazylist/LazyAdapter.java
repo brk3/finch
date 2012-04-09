@@ -66,15 +66,31 @@ public class LazyAdapter extends BaseAdapter {
         imageLoader = new ImageLoader(activity);
     }
 
+    // TODO: may be able to speed this up slightly by having a seperate
+    // LazyAdapter for User/Status types.
     public View getView(final int position, View convertView,
             ViewGroup parent) {
-
+        ViewHolder holder;
         View vi = convertView;
+
         if (convertView == null) {
             vi = inflater.inflate(R.layout.main_row, null);
-            ImageView imageProfile = (ImageView)vi.findViewById(
+            holder = new ViewHolder();
+
+            holder.imageProfile = (ImageView)vi.findViewById(
                     R.id.image_profile);
-            imageProfile.setOnClickListener(new View.OnClickListener() {
+            holder.text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
+            holder.imageFavStar = (ImageView)vi.findViewById(
+                    R.id.image_fav_star);
+            holder.text_time = (TextView)vi.findViewById(R.id.text_time);
+            holder.text_screenname = (TextView)vi.findViewById(
+                    R.id.text_screenname);
+            holder.image_profile = (ImageView)vi.findViewById(
+                    R.id.image_profile);
+
+            vi.setTag(holder);
+
+            holder.imageProfile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent profileActivity = new Intent(activity,
@@ -95,6 +111,8 @@ public class LazyAdapter extends BaseAdapter {
                     return false;
                 }
             });
+        } else {
+            holder = (ViewHolder)vi.getTag();
         }
 
         if (mResponses != null) {
@@ -102,7 +120,6 @@ public class LazyAdapter extends BaseAdapter {
 
             /* Set the tweet TextView. If the user is protected, this may be
              * null, so account for that. */
-            TextView text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
             String text = "";
             if (currentEntity instanceof User) {
                 if (((User)currentEntity).getStatus() == null) {
@@ -116,22 +133,19 @@ public class LazyAdapter extends BaseAdapter {
 
                 /* Show star if status is favorited */
                 if (((Status)currentEntity).isFavorited()) {
-                    ImageView imageFavStar = (ImageView)vi.findViewById(
-                            R.id.image_fav_star);
-                    imageFavStar.setVisibility(View.VISIBLE);
+                    holder.imageFavStar.setVisibility(View.VISIBLE);
                 }
             } else {
                 Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
                         + currentEntity.getClass().getName());
             }
-            text_tweet.setText(text);
-            text_tweet.setTypeface(mTypeface);
-            Linkify.addLinks(text_tweet, Linkify.ALL);
-            Linkify.addLinks(text_tweet, screenNameMatcher,
+            holder.text_tweet.setText(text);
+            holder.text_tweet.setTypeface(mTypeface);
+            Linkify.addLinks(holder.text_tweet, Linkify.ALL);
+            Linkify.addLinks(holder.text_tweet, screenNameMatcher,
                      Constants.SCREEN_NAME_URI.toString() + "/");
 
             /* Set the tweet time Textview */
-            TextView text_time = (TextView)vi.findViewById(R.id.text_time);
             Date createdAt = new Date();
             if (currentEntity instanceof User) {
                 if (((User)currentEntity).getStatus() != null) {
@@ -144,8 +158,8 @@ public class LazyAdapter extends BaseAdapter {
                 Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
                         + currentEntity.getClass().getName());
             }
-            text_time.setText(new PrettyDate(createdAt).toString());
-            text_time.setTypeface(mTypeface);
+            holder.text_time.setText(new PrettyDate(createdAt).toString());
+            holder.text_time.setTypeface(mTypeface);
 
             /* Set the screen name TextView */
             String screenName = "";
@@ -157,15 +171,11 @@ public class LazyAdapter extends BaseAdapter {
                 Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
                         + currentEntity.getClass().getName());
             }
-            TextView text_screenname =
-                (TextView)vi.findViewById(R.id.text_screenname);
-            text_screenname.setText("@"+screenName);
-            text_screenname.setTypeface(mTypeface);
+            holder.text_screenname.setText("@"+screenName);
+            holder.text_screenname.setTypeface(mTypeface);
 
             /* Set the profile image ImageView */
-            ImageView image_profile = (ImageView)vi.findViewById(
-                    R.id.image_profile);
-            imageLoader.displayImage(screenName, image_profile);
+            imageLoader.displayImage(screenName, holder.image_profile);
         }
 
         return vi;
@@ -217,6 +227,15 @@ public class LazyAdapter extends BaseAdapter {
         } else {
             Log.e(TAG, "mLastSelectedView == null");
         }
+    }
+
+    static class ViewHolder {
+        ImageView imageProfile;
+        TextView text_tweet;
+        ImageView imageFavStar;
+        TextView text_time;
+        TextView text_screenname;
+        ImageView image_profile;
     }
 
 }

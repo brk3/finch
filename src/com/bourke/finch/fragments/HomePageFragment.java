@@ -182,10 +182,11 @@ public class HomePageFragment extends BaseFinchFragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                     int position, long id) {
+                /* Show action mode */
                 mMode = getSherlockActivity().startActionMode(
                     new ActionModeTweet());
                 mLastSelectedIndex = position;
-                return false;
+                return true;
             }
         });
     }
@@ -196,8 +197,7 @@ public class HomePageFragment extends BaseFinchFragment {
                                         TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 Log.d(TAG, "XXX: favorite completed for tweet id: " + tweetId);
-                // TODO: set ribbon or some visual indication on tweet row that
-                // this is now a favorite
+                mMainListAdapter.notifyDataSetChanged();
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();
