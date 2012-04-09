@@ -3,6 +3,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:background="@android:color/background_light"
     android:descendantFocusability="blocksDescendants">
 
     <ImageView
@@ -62,6 +63,17 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="8dp"
         android:src="@drawable/ic_device_access_time_light"
+        android:paddingRight="3dp" />
+
+    <ImageView
+        android:id="@+id/image_fav_star"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_toLeftOf="@id/image_clock"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/star_colored"
+        android:visibility="gone"
         android:paddingRight="3dp" />
 
 </RelativeLayout>

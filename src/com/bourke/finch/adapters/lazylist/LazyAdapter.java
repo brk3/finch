@@ -55,6 +55,8 @@ public class LazyAdapter extends BaseAdapter {
 
     private Typeface mTypeface;
 
+    private View mLastSelectedView;
+
     public LazyAdapter(Activity a) {
         activity = a;
         inflater = (LayoutInflater)activity.getSystemService(
@@ -84,6 +86,15 @@ public class LazyAdapter extends BaseAdapter {
                     activity.startActivity(profileActivity);
                 }
             });
+            vi.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    view.setBackgroundResource(
+                        android.R.color.holo_blue_light);
+                    mLastSelectedView = view;
+                    return false;
+                }
+            });
         }
 
         if (mResponses != null) {
@@ -102,6 +113,13 @@ public class LazyAdapter extends BaseAdapter {
                 }
             } else if (currentEntity instanceof Status) {
                 text = ((Status)currentEntity).getText();
+
+                /* Show star if status is favorited */
+                if (((Status)currentEntity).isFavorited()) {
+                    ImageView imageFavStar = (ImageView)vi.findViewById(
+                            R.id.image_fav_star);
+                    imageFavStar.setVisibility(View.VISIBLE);
+                }
             } else {
                 Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
                         + currentEntity.getClass().getName());
@@ -191,4 +209,14 @@ public class LazyAdapter extends BaseAdapter {
     public ResponseList<TwitterResponse> getResponses() {
         return mResponses;
     }
+
+    public void unselectLastView() {
+        if (mLastSelectedView != null) {
+            mLastSelectedView.setBackgroundResource(
+                    android.R.color.background_light);
+        } else {
+            Log.e(TAG, "mLastSelectedView == null");
+        }
+    }
+
 }

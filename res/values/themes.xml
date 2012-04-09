@@ -60,7 +60,7 @@
     <style name="TextAppearance.TabPageIndicator" parent="Widget" />
     <style name="Widget.TabPageIndicator" parent="Widget">
         <item name="android:gravity">center_horizontal</item>
-        <item name="android:background">@drawable/vpi__tab_indicator</item>
+        <item name="android:background">@drawable/custom_tab_indicator</item>
         <item name="android:paddingLeft">22dip</item>
         <item name="android:paddingRight">22dip</item>
         <item name="android:paddingTop">12dp</item>

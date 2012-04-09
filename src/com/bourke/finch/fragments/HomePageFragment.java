@@ -185,7 +185,7 @@ public class HomePageFragment extends BaseFinchFragment {
                 mMode = getSherlockActivity().startActionMode(
                     new ActionModeTweet());
                 mLastSelectedIndex = position;
-                return true;
+                return false;
             }
         });
     }
@@ -252,6 +252,7 @@ public class HomePageFragment extends BaseFinchFragment {
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
+            mMainListAdapter.unselectLastView();
         }
     }
 

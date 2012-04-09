@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    android:background="@drawable/bg_grey_noise">
+    android:background="@android:color/background_light">
 
     <TextView
         android:id="@+id/text_tweet"
