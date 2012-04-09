@@ -134,6 +134,7 @@ public class LazyAdapter extends BaseAdapter {
                 /* Show star if status is favorited */
                 if (((Status)currentEntity).isFavorited()) {
                     holder.imageFavStar.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "set imageFavStar visibility to VISIBILE");
                 }
             } else {
                 Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
@@ -218,6 +219,18 @@ public class LazyAdapter extends BaseAdapter {
 
     public ResponseList<TwitterResponse> getResponses() {
         return mResponses;
+    }
+
+    public void updateResponse(Status statusToUpdate) {
+        for (int i=0; i<mResponses.size(); i++) {
+            if (((Status)mResponses.get(i)).getId() ==
+                    statusToUpdate.getId()) {
+                mResponses.set(i, statusToUpdate);
+                Log.d(TAG, "Updated status in mResponses");
+                return;
+            }
+        }
+        Log.d(TAG, "Couldn't find statusToUpdate in mResponses");
     }
 
     public void unselectLastView() {

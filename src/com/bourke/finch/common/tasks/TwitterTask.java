@@ -231,14 +231,13 @@ public class TwitterTask extends
 
     @Override
     public void onPostExecute(TwitterTaskParams payload) {
+        BaseFinchActivity app = (BaseFinchActivity)mParams.data[0];
+        app.showProgressIcon(false);
+
         if (payload == null || payload.result == null) {
             Log.e(TAG, "payload is null, returning");
             return;
         }
-
-        BaseFinchActivity app = (BaseFinchActivity)mParams.data[0];
-        app.showProgressIcon(false);
-
         mCallback.onSuccess(payload);
     }
 

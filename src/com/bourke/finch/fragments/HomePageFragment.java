@@ -191,12 +191,15 @@ public class HomePageFragment extends BaseFinchFragment {
         });
     }
 
-    private void favoriteTweet(final long tweetId) {
+    private void favoriteTweet(final long statusId) {
         TwitterTaskCallback favoriteTweetCallback =
                 new TwitterTaskCallback<TwitterTaskParams,
                                         TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                Log.d(TAG, "XXX: favorite completed for tweet id: " + tweetId);
+                Status favStatus = (Status) payload.result;
+                Log.d(TAG, "Favorite completed for tweet id: " +
+                        favStatus.getId());
+                mMainListAdapter.updateResponse(favStatus);
                 mMainListAdapter.notifyDataSetChanged();
             }
             public void onFailure(TwitterException e) {
@@ -205,7 +208,7 @@ public class HomePageFragment extends BaseFinchFragment {
         };
         TwitterTaskParams favoriteTweetParams =
              new TwitterTaskParams(TwitterTask.CREATE_FAVORITE,
-                 new Object[] {getSherlockActivity(), tweetId});
+                 new Object[] {getSherlockActivity(), statusId});
         new TwitterTask(favoriteTweetParams, favoriteTweetCallback,
             mTwitter).execute();
     }
