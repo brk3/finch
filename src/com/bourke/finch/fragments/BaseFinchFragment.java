@@ -109,7 +109,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
         getSherlockActivity().getSupportActionBar().setCustomView(
                 mActionCustomView);
 
-        showUserInActionbar();
+        if (((FinchActivity)getSherlockActivity()).initTwitter()) {
+            showUserInActionbar();
+        }
     }
 
     @Override

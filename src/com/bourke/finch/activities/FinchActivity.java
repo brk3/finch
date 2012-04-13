@@ -49,7 +49,6 @@ public class FinchActivity extends BaseFinchActivity
         setContentView(R.layout.main);
 
         mContext = getApplicationContext();
-        mPrefs = getSharedPreferences("twitterPrefs", Context.MODE_PRIVATE);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
         FinchPagerAdapter adapter = new FinchPagerAdapter(
@@ -66,7 +65,8 @@ public class FinchActivity extends BaseFinchActivity
         }
     }
 
-    private boolean initTwitter() {
+    public boolean initTwitter() {
+        mPrefs = getSharedPreferences("twitterPrefs", Context.MODE_PRIVATE);
         String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
         String secret = mPrefs.getString(
                 Constants.PREF_ACCESS_TOKEN_SECRET, null);
