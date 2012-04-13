@@ -36,8 +36,7 @@ import twitter4j.TwitterException;
 
 import twitter4j.User;
 
-public class ProfileActivity extends BaseFinchActivity
-        implements ActionBar.OnNavigationListener {
+public class ProfileActivity extends BaseFinchActivity {
 
     private static final String TAG = "finch/ProfileActivity";
 
@@ -144,11 +143,6 @@ public class ProfileActivity extends BaseFinchActivity
                 R.id.text_description);
         textViewDescription.setText(user.getDescription());
         textViewDescription.setTypeface(mTypeFace);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        return true;
     }
 
     public String getScreenName() {

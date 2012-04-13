@@ -28,8 +28,7 @@ import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
 
-public class LoginActivity extends SherlockFragmentActivity
-        implements ActionBar.OnNavigationListener {
+public class LoginActivity extends SherlockFragmentActivity {
 
     private static final String TAG = "Finch/LoginActivity";
 
@@ -69,11 +68,6 @@ public class LoginActivity extends SherlockFragmentActivity
 
     public void loginUser(View view) {
         new RequestAuthTask().execute();
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-        return true;
     }
 
     private class RequestAuthTask extends AsyncTask<String, String, String> {

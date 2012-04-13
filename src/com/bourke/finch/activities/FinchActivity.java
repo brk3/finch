@@ -23,8 +23,7 @@ import twitter4j.auth.AccessToken;
 import twitter4j.Twitter;
 import android.content.Intent;
 
-public class FinchActivity extends BaseFinchActivity
-        implements ActionBar.OnNavigationListener {
+public class FinchActivity extends BaseFinchActivity {
 
     private static final String TAG = "finch/FinchActivity";
 
@@ -78,11 +77,6 @@ public class FinchActivity extends BaseFinchActivity
             .getTwitter();
         twitter.setOAuthAccessToken(mAccessToken);
         FinchTwitterFactory.getInstance(mContext).setTwitter(twitter);
-        return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         return true;
     }
 

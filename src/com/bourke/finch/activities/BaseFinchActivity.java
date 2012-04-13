@@ -15,8 +15,7 @@ import com.actionbarsherlock.view.MenuItem;
 import android.widget.TextView;
 import android.view.View;
 
-public abstract class BaseFinchActivity extends SherlockFragmentActivity
-        implements ActionBar.OnNavigationListener {
+public abstract class BaseFinchActivity extends SherlockFragmentActivity {
 
     private static final String TAG = "finch/BaseFinchActivity";
 
@@ -26,8 +25,6 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getSupportActionBar().setIcon(R.drawable.ic_contact_picture);
 
         /*
          * Set up actionbar and split backgrounds / color
@@ -41,18 +38,6 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity
         }
 
         getSupportActionBar().setDisplayShowCustomEnabled(true);
-
-        /* Set up actionbar navigation spinner */
-        /*
-        ArrayAdapter<CharSequence> list =
-            ArrayAdapter.createFromResource(this, R.array.locations,
-                R.layout.spinner_title);
-        list.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
-        getSupportActionBar().setNavigationMode(
-                ActionBar.NAVIGATION_MODE_LIST);
-        getSupportActionBar().setListNavigationCallbacks(list, this);
-        */
     }
 
     @Override
@@ -62,11 +47,6 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity
         mMenuItemProgress = menu.findItem(R.id.menu_progress);
         mMenuItemRefresh = menu.findItem(R.id.menu_refresh);
 
-        return true;
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(int itemPosition, long itemId) {
         return true;
     }
 
