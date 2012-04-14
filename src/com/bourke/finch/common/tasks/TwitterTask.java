@@ -1,15 +1,14 @@
 package com.bourke.finch.common;
 
-import android.app.Activity;
-
 import android.graphics.drawable.Drawable;
 
 import android.os.AsyncTask;
 
 import android.util.Log;
 
-import com.bourke.finch.BaseFinchActivity;
 import com.bourke.finch.lazylist.Utils;
+import com.bourke.finch.BaseFinchActivity;
+import com.bourke.finch.FinchActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -121,7 +120,8 @@ public class TwitterTask extends
                 Log.d(TAG, "Running taskType GET_PROFILE_IMAGE");
                 Drawable bitmap = null;
                 try {
-                    Activity app = (Activity)payload.data[0];
+                    BaseFinchActivity a = (BaseFinchActivity)payload.data[0];
+                    File cacheDir = a.getCacheDir();
                     String p_screenName = (String)payload.data[1];
 
                     ProfileImage.ImageSize imageSize =
@@ -130,9 +130,7 @@ public class TwitterTask extends
                             p_screenName, imageSize);
                     String profileImageUrl = p.getURL();
 
-                    File tempFile = new File(
-                            app.getApplicationContext().getCacheDir(),
-                            "profile_image");
+                    File tempFile = new File(cacheDir, "profile_image");
                     URL imageUrl = new URL(p.getURL());
                     HttpURLConnection conn =
                         (HttpURLConnection)imageUrl.openConnection();

@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 import com.bourke.finch.common.Constants;
@@ -27,8 +28,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 
-import twitter4j.Paging;
-
 import twitter4j.ResponseList;
 
 import twitter4j.Status;
@@ -36,8 +35,6 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
-import com.actionbarsherlock.view.MenuInflater;
-import android.widget.TextView;
 
 public class HomePageFragment extends BaseFinchFragment {
 
@@ -205,5 +202,4 @@ public class HomePageFragment extends BaseFinchFragment {
             mMainListAdapter.unselectLastView();
         }
     }
-
 }

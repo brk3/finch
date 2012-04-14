@@ -16,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragment;
 
 import com.bourke.finch.common.Constants;

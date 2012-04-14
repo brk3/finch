@@ -15,7 +15,6 @@ import android.view.View;
 
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
 import com.bourke.finch.common.Constants;

@@ -1,12 +1,7 @@
 package com.bourke.finch;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-
-import android.graphics.drawable.Drawable;
-
-import android.net.Uri;
 
 import android.os.Bundle;
 
@@ -18,38 +13,24 @@ import android.view.ViewGroup;
 
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.AdapterView;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.FinchTwitterFactory;
 import com.bourke.finch.common.TwitterTask;
 import com.bourke.finch.common.TwitterTaskCallback;
 import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
-import com.bourke.finch.provider.FinchProvider;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import twitter4j.auth.AccessToken;
+
 import twitter4j.Paging;
 
-import twitter4j.ProfileImage;
-
 import twitter4j.ResponseList;
-
-import twitter4j.Status;
 
 import twitter4j.Twitter;
 
@@ -57,16 +38,13 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
 
-import twitter4j.User;
-import android.widget.TextView;
-import android.graphics.Typeface;
-
 public abstract class BaseFinchFragment extends SherlockFragment
         implements OnScrollListener {
 
     protected static final String TAG = "Finch/BaseFinchFragment";
 
     protected ListView mMainList;
+
     protected LazyAdapter mMainListAdapter;
 
     protected Twitter mTwitter;
@@ -83,10 +61,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected boolean mLoadingPage = false;
 
-    private TextView mUnreadCountView;
-    private int mUnreadCount = 0;
-
-    private View mActionCustomView;
+    private BaseFinchActivity mActivity;
 
     /* Update the unread display on scrolling every X items */
     private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
@@ -105,15 +80,11 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
         setHasOptionsMenu(true);
 
-        mContext = getSherlockActivity().getApplicationContext();
-        mPrefs = getSherlockActivity().getSharedPreferences(
-                "twitterPrefs", Context.MODE_PRIVATE);
+        mActivity = (BaseFinchActivity)getSherlockActivity();
+        mContext = mActivity.getApplicationContext();
+        mPrefs = mActivity.getSharedPreferences("twitterPrefs",
+                Context.MODE_PRIVATE);
         mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
-
-        mActionCustomView = getSherlockActivity().getLayoutInflater()
-            .inflate(R.layout.actionbar_layout, null);
-        mUnreadCountView = (TextView)mActionCustomView.findViewById(
-                R.id.text_unread_count);
     }
 
     @Override
@@ -123,18 +94,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
         RelativeLayout layout = (RelativeLayout)inflater
             .inflate(R.layout.standard_list_fragment, container, false);
         initMainList(layout);
-
-        /* Set up actionbar */
-        Typeface typeface = Typeface.createFromAsset(getSherlockActivity()
-                .getAssets(), Constants.SHADOWS_INTO_LIGHT_REG);
-        TextView titleTextView = (TextView)mActionCustomView.findViewById(
-                R.id.text_title);
-        titleTextView.setTypeface(typeface);
-        getSherlockActivity().getSupportActionBar().setCustomView(
-                mActionCustomView);
-        if (((FinchActivity)getSherlockActivity()).initTwitter()) {
-            showUserInActionbar();
-        }
 
         return layout;
     }
@@ -168,6 +127,38 @@ public abstract class BaseFinchFragment extends SherlockFragment
         }
     }
 
+    protected void refresh() {
+        Paging page = new Paging(1);
+
+        if (mSinceId > -1) {
+            page.setSinceId(mSinceId);
+            Log.d(TAG, "sinceId=" + mSinceId + ", only fetching tweets after "
+                    + "then");
+        } else {
+            Log.d(TAG, "No sinceId found, fetching first page of tweets");
+        }
+
+        TwitterTaskParams taskParams = new TwitterTaskParams(
+                mTwitterTaskType, new Object[] {mActivity, mMainListAdapter,
+                    mMainList, page});
+
+        TwitterTaskCallback taskCallback = new TwitterTaskCallback
+                <TwitterTaskParams, TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                ResponseList<TwitterResponse> res =
+                    (ResponseList<TwitterResponse>)payload.result;
+                //updateUnreadDisplay(FinchActivity.HOME_PAGE,
+                //        res.size());
+                mMainListAdapter.prependResponses((ResponseList)res);
+                mMainListAdapter.notifyDataSetChanged();
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+        new TwitterTask(taskParams, taskCallback, mTwitter).execute();
+    }
+
     protected void loadNextPage() {
         TwitterTaskCallback taskCallback = new TwitterTaskCallback
                 <TwitterTaskParams, TwitterException>() {
@@ -186,120 +177,16 @@ public abstract class BaseFinchFragment extends SherlockFragment
         Paging paging = new Paging(++mPage);
         Log.d(TAG, "Fetching page " + mPage);
         TwitterTaskParams taskParams = new TwitterTaskParams(mTwitterTaskType,
-                new Object[] {getSherlockActivity(), mMainListAdapter,
-                    mMainList, paging});
+                new Object[] {mActivity, mMainListAdapter, mMainList, paging});
         new TwitterTask(taskParams, taskCallback, mTwitter).execute();
     }
 
     private void initMainList(ViewGroup layout) {
         mMainList = (ListView)layout.findViewById(R.id.list);
-        mMainListAdapter = new LazyAdapter(getSherlockActivity());
+        mMainListAdapter = new LazyAdapter(mActivity);
         mMainList.setAdapter(mMainListAdapter);
         mMainList.setOnScrollListener(this);
         setupActionMode();
-    }
-
-    private void showUserInActionbar() {
-        //TODO: this entire function badly needs to be cached
-        /* Set up callback to set user's profile image to actionbar */
-        final TwitterTaskCallback<TwitterTaskParams, TwitterException>
-            profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,
-                                                    TwitterException>() {
-
-            public void onSuccess(TwitterTaskParams payload) {
-                Drawable profileImage = (Drawable)payload.result;
-                ImageView homeIcon = (ImageView)mActionCustomView
-                    .findViewById(R.id.home_icon);
-                int abHeight = getSherlockActivity().getSupportActionBar()
-                    .getHeight();
-                RelativeLayout.LayoutParams layoutParams =
-                    new RelativeLayout.LayoutParams(abHeight, abHeight);
-                layoutParams.setMargins(5, 5, 5, 5);
-                homeIcon.setLayoutParams(layoutParams);
-                homeIcon.setImageDrawable(profileImage);
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
-
-        TwitterTaskCallback<TwitterTaskParams, TwitterException>
-            showUserCallback =  new TwitterTaskCallback<TwitterTaskParams,
-                                                    TwitterException>() {
-            public void onSuccess(TwitterTaskParams payload) {
-                String screenName = ((User)payload.result).getScreenName();
-                TextView textScreenName = (TextView)mActionCustomView
-                    .findViewById(R.id.text_screenname);
-                textScreenName.setText("@"+screenName);
-
-                /* Now we have screenName, start another thread to get the
-                 * profile image */
-                TwitterTaskParams showProfileImageParams =
-                    new TwitterTaskParams(TwitterTask.GET_PROFILE_IMAGE,
-                        new Object[] {getSherlockActivity(), screenName,
-                            ProfileImage.NORMAL});
-                new TwitterTask(showProfileImageParams, profileImageCallback,
-                        mTwitter).execute();
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
-
-        /* Set actionbar subtitle to user's username, and home icon to user's
-         * profile image */
-        TwitterTaskParams showUserParams = new TwitterTaskParams(
-                TwitterTask.SHOW_USER,
-                new Object[] {getSherlockActivity(),
-                    ((FinchActivity)getSherlockActivity()).getAccessToken()
-                .getUserId()});
-        new TwitterTask(showUserParams, showUserCallback,
-                mTwitter).execute();
-    }
-
-    protected void refresh() {
-        Paging page = new Paging(1);
-
-        if (mSinceId > -1) {
-            page.setSinceId(mSinceId);
-            Log.d(TAG, "sinceId=" + mSinceId + ", only fetching tweets after "
-                    + "then");
-        } else {
-            Log.d(TAG, "No sinceId found, fetching first page of tweets");
-        }
-
-        TwitterTaskParams taskParams = new TwitterTaskParams(
-                mTwitterTaskType, new Object[] {
-                getSherlockActivity(), mMainListAdapter, mMainList, page});
-
-        TwitterTaskCallback taskCallback = new TwitterTaskCallback
-                <TwitterTaskParams, TwitterException>() {
-            public void onSuccess(TwitterTaskParams payload) {
-                ResponseList<TwitterResponse> res =
-                    (ResponseList<TwitterResponse>)payload.result;
-                updateUnreadDisplay(res.size());
-                mMainListAdapter.prependResponses((ResponseList)res);
-                mMainListAdapter.notifyDataSetChanged();
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
-        new TwitterTask(taskParams, taskCallback, mTwitter).execute();
-    }
-
-    protected void updateUnreadDisplay(int count) {
-        Log.d(TAG, "Adding " + count + " to total unread");
-        mUnreadCount += count;
-        mUnreadCountView.setText(mUnreadCount+"");
-        getSherlockActivity().getSupportActionBar().setCustomView(
-                mActionCustomView);
-        if (mUnreadCount > 0) {
-            TextView tabIndicatorTextView = (TextView)getSherlockActivity()
-                .findViewById(android.R.id.text1);
-            tabIndicatorTextView.setShadowLayer(15, 0, 0,
-                    Constants.COLOR_FINCH_YELLOW);
-        }
     }
 
     public abstract void setupActionMode();
