@@ -179,8 +179,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 RelativeLayout.LayoutParams layoutParams =
                     new RelativeLayout.LayoutParams(abHeight, abHeight);
                 layoutParams.setMargins(5, 5, 5, 5);
-                homeIcon.setLayoutParams(new RelativeLayout.LayoutParams(
-                            abHeight, abHeight));
+                homeIcon.setLayoutParams(layoutParams);
                 homeIcon.setImageDrawable(profileImage);
             }
             public void onFailure(TwitterException e) {
@@ -193,6 +192,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 String screenName = ((User)payload.result).getScreenName();
+                TextView textScreenName = (TextView)mActionCustomView
+                    .findViewById(R.id.text_screenname);
+                textScreenName.setText("@"+screenName);
 
                 /* Now we have screenName, start another thread to get the
                  * profile image */

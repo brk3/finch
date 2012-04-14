@@ -38,7 +38,7 @@ public class FinchActivity extends BaseFinchActivity {
 
     //TODO: add to R.strings
     public static final String[] CONTENT = new String[] {
-        "Home", "Messages" };
+        "Home", "Connect" };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
