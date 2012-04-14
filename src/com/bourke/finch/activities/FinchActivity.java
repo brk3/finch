@@ -25,7 +25,7 @@ import android.content.Intent;
 
 public class FinchActivity extends BaseFinchActivity {
 
-    private static final String TAG = "finch/FinchActivity";
+    private static final String TAG = "Finch/FinchActivity";
 
     public static final int HOME_PAGE = 0;
     public static final int CONNECTIONS_PAGE = 1;

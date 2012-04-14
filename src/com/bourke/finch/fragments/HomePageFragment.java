@@ -117,6 +117,8 @@ public class HomePageFragment extends BaseFinchFragment {
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(mMainListAdapter.getResponses());
             os.close();
+            Log.d(TAG, "Wrote home timeline, size " +
+                    mMainListAdapter.getResponses().size());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -199,7 +201,7 @@ public class HomePageFragment extends BaseFinchFragment {
                 Status favStatus = (Status) payload.result;
                 Log.d(TAG, "Favorite completed for tweet id: " +
                         favStatus.getId());
-                mMainListAdapter.updateResponse(favStatus);
+                mMainListAdapter.showFavStatus(favStatus);
                 mMainListAdapter.notifyDataSetChanged();
             }
             public void onFailure(TwitterException e) {

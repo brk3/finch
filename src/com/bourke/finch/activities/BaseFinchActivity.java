@@ -17,7 +17,7 @@ import android.view.View;
 
 public abstract class BaseFinchActivity extends SherlockFragmentActivity {
 
-    private static final String TAG = "finch/BaseFinchActivity";
+    private static final String TAG = "Finch/BaseFinchActivity";
 
     private MenuItem mMenuItemProgress;
     private MenuItem mMenuItemRefresh;

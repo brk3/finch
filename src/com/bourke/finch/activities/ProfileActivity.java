@@ -38,7 +38,7 @@ import twitter4j.User;
 
 public class ProfileActivity extends BaseFinchActivity {
 
-    private static final String TAG = "finch/ProfileActivity";
+    private static final String TAG = "Finch/ProfileActivity";
 
     //TODO: add to R.strings
     public static final String[] CONTENT = new String[] {

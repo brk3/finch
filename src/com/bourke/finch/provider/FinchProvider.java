@@ -11,7 +11,7 @@ import android.net.Uri;
 
 public class FinchProvider extends ContentProvider {
 
-    public static final String TAG = "finch/FinchProvider";
+    public static final String TAG = "Finch/FinchProvider";
 
     /* The root authority for this provider */
     public static final String AUTHORITY = "com.bourke.finch.provider";

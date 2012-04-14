@@ -38,10 +38,11 @@ import twitter4j.Status;
 import twitter4j.TwitterResponse;
 
 import twitter4j.User;
+import java.util.ArrayList;
 
 public class LazyAdapter extends BaseAdapter {
 
-    private static final String TAG = "finch/LazyAdapter";
+    private static final String TAG = "Finch/LazyAdapter";
 
     private Activity activity;
 
@@ -57,6 +58,10 @@ public class LazyAdapter extends BaseAdapter {
 
     private View mLastSelectedView;
 
+    /* Statuses recently marked favorite that should be updated on the next
+     * call to getView */
+    private ArrayList<Long> mFavQueue = new ArrayList<Long>();
+
     public LazyAdapter(Activity a) {
         activity = a;
         inflater = (LayoutInflater)activity.getSystemService(
@@ -70,47 +75,11 @@ public class LazyAdapter extends BaseAdapter {
     // LazyAdapter for User/Status types.
     public View getView(final int position, View convertView,
             ViewGroup parent) {
-        ViewHolder holder;
         View vi = convertView;
-
+        ViewHolder holder;
         if (convertView == null) {
             vi = inflater.inflate(R.layout.main_row, null);
-            holder = new ViewHolder();
-
-            holder.imageProfile = (ImageView)vi.findViewById(
-                    R.id.image_profile);
-            holder.text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
-            holder.imageFavStar = (ImageView)vi.findViewById(
-                    R.id.image_fav_star);
-            holder.text_time = (TextView)vi.findViewById(R.id.text_time);
-            holder.text_screenname = (TextView)vi.findViewById(
-                    R.id.text_screenname);
-            holder.image_profile = (ImageView)vi.findViewById(
-                    R.id.image_profile);
-
-            vi.setTag(holder);
-
-            holder.imageProfile.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent profileActivity = new Intent(activity,
-                        ProfileActivity.class);
-                    String screenName = ((Status)mResponses.get(position))
-                        .getUser().getScreenName();
-                    profileActivity.setData(Uri.parse(
-                            FinchProvider.CONTENT_URI + "/" + screenName));
-                    activity.startActivity(profileActivity);
-                }
-            });
-            vi.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    view.setBackgroundResource(
-                        android.R.color.holo_blue_light);
-                    mLastSelectedView = view;
-                    return false;
-                }
-            });
+            holder = initViewHolder(vi, position);
         } else {
             holder = (ViewHolder)vi.getTag();
         }
@@ -118,10 +87,11 @@ public class LazyAdapter extends BaseAdapter {
         if (mResponses != null) {
             TwitterResponse currentEntity = mResponses.get(position);
 
-            /* Set the tweet TextView. If the user is protected, this may be
-             * null, so account for that. */
+            /* Get the entity text */
             String text = "";
             if (currentEntity instanceof User) {
+                /* If the user is protected, the status may be null, so account
+                 * for that. */
                 if (((User)currentEntity).getStatus() == null) {
                     // TODO: add to strings.xml
                     text = "You need to follow this user to see their status.";
@@ -130,11 +100,13 @@ public class LazyAdapter extends BaseAdapter {
                 }
             } else if (currentEntity instanceof Status) {
                 text = ((Status)currentEntity).getText();
-
                 /* Show star if status is favorited */
-                if (((Status)currentEntity).isFavorited()) {
+                long entityId = ((Status)currentEntity).getId();
+                if (mFavQueue.contains(entityId) ||
+                        ((Status)currentEntity).isFavorited()) {
                     holder.imageFavStar.setVisibility(View.VISIBLE);
-                    Log.d(TAG, "set imageFavStar visibility to VISIBILE");
+                } else {
+                    holder.imageFavStar.setVisibility(View.GONE);
                 }
             } else {
                 Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
@@ -182,6 +154,46 @@ public class LazyAdapter extends BaseAdapter {
         return vi;
     }
 
+    private ViewHolder initViewHolder(View vi, final int position) {
+        ViewHolder holder = new ViewHolder();
+        holder.imageProfile = (ImageView)vi.findViewById(
+                R.id.image_profile);
+        holder.text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
+        holder.imageFavStar = (ImageView)vi.findViewById(
+                R.id.image_fav_star);
+        holder.text_time = (TextView)vi.findViewById(R.id.text_time);
+        holder.text_screenname = (TextView)vi.findViewById(
+                R.id.text_screenname);
+        holder.image_profile = (ImageView)vi.findViewById(
+                R.id.image_profile);
+
+        vi.setTag(holder);
+
+        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent profileActivity = new Intent(activity,
+                    ProfileActivity.class);
+                String screenName = ((Status)mResponses.get(position))
+                    .getUser().getScreenName();
+                profileActivity.setData(Uri.parse(
+                        FinchProvider.CONTENT_URI + "/" + screenName));
+                activity.startActivity(profileActivity);
+            }
+        });
+        vi.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                view.setBackgroundResource(
+                    android.R.color.holo_blue_light);
+                mLastSelectedView = view;
+                return false;
+            }
+        });
+
+        return holder;
+    }
+
     public int getCount() {
         int count = 0;
         if (mResponses != null) {
@@ -221,16 +233,8 @@ public class LazyAdapter extends BaseAdapter {
         return mResponses;
     }
 
-    public void updateResponse(Status statusToUpdate) {
-        for (int i=0; i<mResponses.size(); i++) {
-            if (((Status)mResponses.get(i)).getId() ==
-                    statusToUpdate.getId()) {
-                mResponses.set(i, statusToUpdate);
-                Log.d(TAG, "Updated status in mResponses");
-                return;
-            }
-        }
-        Log.d(TAG, "Couldn't find statusToUpdate in mResponses");
+    public void showFavStatus(Status statusToUpdate) {
+        mFavQueue.add(statusToUpdate.getId());
     }
 
     public void unselectLastView() {
