@@ -37,6 +37,7 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
 import com.actionbarsherlock.view.MenuInflater;
+import android.widget.TextView;
 
 public class HomePageFragment extends BaseFinchFragment {
 
@@ -44,66 +45,8 @@ public class HomePageFragment extends BaseFinchFragment {
 
     private int mLastSelectedIndex;
 
-    @Override
-    public void loadNextPage() {
-        TwitterTaskCallback pullUpRefreshCallback =
-                new TwitterTaskCallback<TwitterTaskParams,
-                                        TwitterException>() {
-            public void onSuccess(TwitterTaskParams payload) {
-                /* Append responses to list adapter */
-                ResponseList<TwitterResponse> res =
-                    (ResponseList<TwitterResponse>)payload.result;
-                mMainListAdapter.appendResponses((ResponseList)res);
-                mMainListAdapter.notifyDataSetChanged();
-                mLoadingPage = false;
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
-        Paging paging = new Paging(++mPage);
-        Log.d(TAG, "Fetching page " + mPage);
-        TwitterTaskParams getTimelineParams =
-             new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
-                 new Object[] {getSherlockActivity(), mMainListAdapter,
-                     mMainList, paging});
-        new TwitterTask(getTimelineParams, pullUpRefreshCallback,
-            mTwitter).execute();
-    }
-
-    @Override
-    public void refresh() {
-        Paging page = new Paging(1);
-
-        if (mSinceId > -1) {
-            page.setSinceId(mSinceId);
-            Log.d(TAG, "sinceId=" + mSinceId + ", only fetching tweets after "
-                    + "then");
-        } else {
-            Log.d(TAG, "No sinceId found, fetching first page of tweets");
-        }
-
-        TwitterTaskParams getTimelineParams =
-            new TwitterTaskParams(TwitterTask.GET_HOME_TIMELINE,
-                    new Object[] {getSherlockActivity(), mMainListAdapter,
-                        mMainList, page});
-
-        TwitterTaskCallback mHomeListCallback = new TwitterTaskCallback
-                <TwitterTaskParams, TwitterException>() {
-            public void onSuccess(TwitterTaskParams payload) {
-                ResponseList<TwitterResponse> res =
-                    (ResponseList<TwitterResponse>)payload.result;
-                updateUnreadDisplay(res.size());
-                mMainListAdapter.prependResponses((ResponseList)res);
-                mMainListAdapter.notifyDataSetChanged();
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
-
-        new TwitterTask(getTimelineParams, mHomeListCallback,
-                mTwitter).execute();
+    public HomePageFragment() {
+        super(TwitterTask.GET_HOME_TIMELINE);
     }
 
     @Override
@@ -137,6 +80,7 @@ public class HomePageFragment extends BaseFinchFragment {
         editor.commit();
     }
 
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -178,6 +122,7 @@ public class HomePageFragment extends BaseFinchFragment {
         refresh();
     }
 
+    @Override
     public void setupActionMode() {
         mMainList.setOnItemLongClickListener(
                 new AdapterView.OnItemLongClickListener() {

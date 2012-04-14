@@ -10,6 +10,8 @@ public class Constants {
     public static final int THEME_DARK = R.style.Theme_Finch;
     public static final int THEME_LIGHT = R.style.Theme_Finch_Light;
 
+    public static final int COLOR_FINCH_YELLOW = 0xffffbb33;
+
     public static final String CALLBACK_URL = "finch-callback:///";
 
     public static final String CONSUMER_KEY = "7QIjyQd3cA8c8jn80tRtqw";
@@ -33,5 +35,6 @@ public class Constants {
     public static final String KEY_URL = "finchURL";
 
     public static final String ROBOTO_REGULAR = "fonts/Roboto-Regular.ttf";
-
+    public static final String SHADOWS_INTO_LIGHT_REG =
+        "fonts/ShadowsIntoLightTwo-Regular.ttf";
 }

@@ -15,8 +15,9 @@
     <TextView
         android:id="@+id/text_title"
         android:text="Finch"
-        android:textSize="18sp"
-        android:includeFontPadding="false"
+        android:textSize="25sp"
+        android:layout_marginTop="-2dp"
+        android:layout_marginBottom="-10dp"
         android:layout_toRightOf="@id/home_icon"
         android:textColor="@android:color/secondary_text_light"
         android:layout_marginLeft="5dp"
@@ -25,8 +26,7 @@
 
     <TextView
         android:id="@+id/text_screenname"
-        android:textSize="20sp"
-        android:includeFontPadding="false"
+        android:textSize="17sp"
         android:layout_below="@id/text_title"
         android:layout_toRightOf="@id/home_icon"
         android:layout_marginLeft="5dp"

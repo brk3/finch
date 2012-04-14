@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 import twitter4j.auth.AccessToken;
+import twitter4j.Paging;
 
 import twitter4j.ProfileImage;
 
@@ -58,6 +59,7 @@ import twitter4j.TwitterResponse;
 
 import twitter4j.User;
 import android.widget.TextView;
+import android.graphics.Typeface;
 
 public abstract class BaseFinchFragment extends SherlockFragment
         implements OnScrollListener {
@@ -91,6 +93,12 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected long mSinceId = -1;
 
+    private int mTwitterTaskType;
+
+    public BaseFinchFragment(int twitterTaskType) {
+        mTwitterTaskType = twitterTaskType;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,12 +114,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
             .inflate(R.layout.actionbar_layout, null);
         mUnreadCountView = (TextView)mActionCustomView.findViewById(
                 R.id.text_unread_count);
-        getSherlockActivity().getSupportActionBar().setCustomView(
-                mActionCustomView);
-
-        if (((FinchActivity)getSherlockActivity()).initTwitter()) {
-            showUserInActionbar();
-        }
     }
 
     @Override
@@ -121,6 +123,18 @@ public abstract class BaseFinchFragment extends SherlockFragment
         RelativeLayout layout = (RelativeLayout)inflater
             .inflate(R.layout.standard_list_fragment, container, false);
         initMainList(layout);
+
+        /* Set up actionbar */
+        Typeface typeface = Typeface.createFromAsset(getSherlockActivity()
+                .getAssets(), Constants.SHADOWS_INTO_LIGHT_REG);
+        TextView titleTextView = (TextView)mActionCustomView.findViewById(
+                R.id.text_title);
+        titleTextView.setTypeface(typeface);
+        getSherlockActivity().getSupportActionBar().setCustomView(
+                mActionCustomView);
+        if (((FinchActivity)getSherlockActivity()).initTwitter()) {
+            showUserInActionbar();
+        }
 
         return layout;
     }
@@ -133,7 +147,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
             return;
 
         boolean loadMore = firstVisible + visibleCount >= totalCount;
-
         if (loadMore) {
             mLoadingPage = true;
             loadNextPage();
@@ -155,7 +168,30 @@ public abstract class BaseFinchFragment extends SherlockFragment
         }
     }
 
-    public void initMainList(ViewGroup layout) {
+    protected void loadNextPage() {
+        TwitterTaskCallback taskCallback = new TwitterTaskCallback
+                <TwitterTaskParams, TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                /* Append responses to list adapter */
+                ResponseList<TwitterResponse> res =
+                    (ResponseList<TwitterResponse>)payload.result;
+                mMainListAdapter.appendResponses((ResponseList)res);
+                mMainListAdapter.notifyDataSetChanged();
+                mLoadingPage = false;
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+        Paging paging = new Paging(++mPage);
+        Log.d(TAG, "Fetching page " + mPage);
+        TwitterTaskParams taskParams = new TwitterTaskParams(mTwitterTaskType,
+                new Object[] {getSherlockActivity(), mMainListAdapter,
+                    mMainList, paging});
+        new TwitterTask(taskParams, taskCallback, mTwitter).execute();
+    }
+
+    private void initMainList(ViewGroup layout) {
         mMainList = (ListView)layout.findViewById(R.id.list);
         mMainListAdapter = new LazyAdapter(getSherlockActivity());
         mMainList.setAdapter(mMainListAdapter);
@@ -221,15 +257,50 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 mTwitter).execute();
     }
 
-    public void updateUnreadDisplay(int count) {
+    protected void refresh() {
+        Paging page = new Paging(1);
+
+        if (mSinceId > -1) {
+            page.setSinceId(mSinceId);
+            Log.d(TAG, "sinceId=" + mSinceId + ", only fetching tweets after "
+                    + "then");
+        } else {
+            Log.d(TAG, "No sinceId found, fetching first page of tweets");
+        }
+
+        TwitterTaskParams taskParams = new TwitterTaskParams(
+                mTwitterTaskType, new Object[] {
+                getSherlockActivity(), mMainListAdapter, mMainList, page});
+
+        TwitterTaskCallback taskCallback = new TwitterTaskCallback
+                <TwitterTaskParams, TwitterException>() {
+            public void onSuccess(TwitterTaskParams payload) {
+                ResponseList<TwitterResponse> res =
+                    (ResponseList<TwitterResponse>)payload.result;
+                updateUnreadDisplay(res.size());
+                mMainListAdapter.prependResponses((ResponseList)res);
+                mMainListAdapter.notifyDataSetChanged();
+            }
+            public void onFailure(TwitterException e) {
+                e.printStackTrace();
+            }
+        };
+        new TwitterTask(taskParams, taskCallback, mTwitter).execute();
+    }
+
+    protected void updateUnreadDisplay(int count) {
         Log.d(TAG, "Adding " + count + " to total unread");
         mUnreadCount += count;
         mUnreadCountView.setText(mUnreadCount+"");
         getSherlockActivity().getSupportActionBar().setCustomView(
                 mActionCustomView);
+        if (mUnreadCount > 0) {
+            TextView tabIndicatorTextView = (TextView)getSherlockActivity()
+                .findViewById(android.R.id.text1);
+            tabIndicatorTextView.setShadowLayer(15, 0, 0,
+                    Constants.COLOR_FINCH_YELLOW);
+        }
     }
 
-    public abstract void loadNextPage();
-    public abstract void refresh();
     public abstract void setupActionMode();
 }
