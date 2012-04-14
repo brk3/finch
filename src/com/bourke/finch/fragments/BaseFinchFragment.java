@@ -78,6 +78,8 @@ public abstract class BaseFinchFragment extends SherlockFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d(TAG, "onCreate()");
+
         setHasOptionsMenu(true);
 
         mActivity = (BaseFinchActivity)getSherlockActivity();
@@ -90,6 +92,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView()");
 
         RelativeLayout layout = (RelativeLayout)inflater
             .inflate(R.layout.standard_list_fragment, container, false);
@@ -128,6 +131,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
     }
 
     protected void refresh() {
+        Log.d(TAG, "refresh()");
         Paging page = new Paging(1);
 
         if (mSinceId > -1) {

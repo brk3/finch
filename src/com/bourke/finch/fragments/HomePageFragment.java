@@ -50,6 +50,8 @@ public class HomePageFragment extends BaseFinchFragment {
     public void onPause() {
         super.onPause();
 
+        Log.d(TAG, "onPause()");
+
         /* Save currently displayed tweets */
         try {
             FileOutputStream fos = mContext.openFileOutput(
@@ -80,6 +82,8 @@ public class HomePageFragment extends BaseFinchFragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        Log.d(TAG, "onResume()");
 
         /* Load last viewed tweets, if any */
         if (mMainListAdapter.getResponses() == null) {

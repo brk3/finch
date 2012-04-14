@@ -12,13 +12,20 @@ import com.actionbarsherlock.app.SherlockFragment;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
+import android.util.Log;
 
-public class FinchActivity extends BaseFinchActivity {
+public class FinchActivity extends BaseFinchActivity
+        implements ViewPager.OnPageChangeListener {
 
     private static final String TAG = "Finch/FinchActivity";
 
     public static final int HOME_PAGE = 0;
     public static final int CONNECTIONS_PAGE = 1;
+
+    private HomePageFragment mHomePageFragment = new HomePageFragment();
+
+    private ConnectionsFragment mConnectionsFragment =
+        new ConnectionsFragment();
 
     private int mCurrentlyShowingFragment;
 
@@ -31,10 +38,33 @@ public class FinchActivity extends BaseFinchActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.d(TAG, "onCreate()");
+
         mContext = getApplicationContext();
 
         setContentView(R.layout.main);
         initViewPager();
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset,
+            int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        Log.d(TAG, "onPageSelected()");
+        switch (position) {
+            case HOME_PAGE:
+                mHomePageFragment.refresh();
+            case CONNECTIONS_PAGE:
+                mConnectionsFragment.refresh();
+        }
     }
 
     public void updateUnreadDisplay(int fragmentId, int count) {
@@ -63,10 +93,11 @@ public class FinchActivity extends BaseFinchActivity {
         viewPager.setAdapter(adapter);
         TabPageIndicator indicator =
             (TabPageIndicator)findViewById(R.id.indicator);
+        indicator.setOnPageChangeListener(this);
         indicator.setViewPager(viewPager);
     }
 
-    public static class FinchPagerAdapter extends FragmentPagerAdapter
+    class FinchPagerAdapter extends FragmentPagerAdapter
             implements TitleProvider {
 
         public FinchPagerAdapter(FragmentManager fm) {
@@ -88,9 +119,9 @@ public class FinchActivity extends BaseFinchActivity {
         public SherlockFragment getItem(int position) {
             switch (position) {
                 case HOME_PAGE:
-                    return new HomePageFragment();
+                    return mHomePageFragment;
                 case CONNECTIONS_PAGE:
-                    return new ConnectionsFragment();
+                    return mConnectionsFragment;
             }
             return null;
         }
