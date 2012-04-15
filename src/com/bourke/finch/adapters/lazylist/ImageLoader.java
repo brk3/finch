@@ -5,20 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import android.widget.ImageView;
 
-import com.bourke.finch.common.FinchTwitterFactory;
 import com.bourke.finch.R;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 import java.util.Collections;
 import java.util.concurrent.Executors;
@@ -26,87 +16,41 @@ import java.util.concurrent.ExecutorService;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import twitter4j.ProfileImage;
-
-import twitter4j.Twitter;
-
-import twitter4j.TwitterException;
-
-public class ImageLoader {
+public abstract class ImageLoader {
 
     private MemoryCache memoryCache = new MemoryCache();
-    private FileCache fileCache;
-
     private Map<ImageView, String> imageViews =
         Collections.synchronizedMap(new WeakHashMap<ImageView, String>());
-
     private ExecutorService executorService;
 
-    private final int stub_id = R.drawable.ic_contact_picture;
-
-    private Activity mActivity;
-
-    private Context mContext;
+    protected Activity mActivity;
+    protected Context mContext;
+    protected FileCache mFileCache;
+    protected final int stub_id = R.drawable.ic_contact_picture;
 
     public ImageLoader(Activity a) {
         mActivity = a;
         mContext = a.getApplicationContext();
-        fileCache = new FileCache(mContext);
+        mFileCache = new FileCache(mContext);
         executorService = Executors.newFixedThreadPool(5);
     }
 
     public void displayImage(String screenName, ImageView imageView) {
         imageViews.put(imageView, screenName);
         Bitmap bitmap = memoryCache.get(screenName);
-
-        if (bitmap != null)
+        if (bitmap != null) {
             imageView.setImageBitmap(bitmap);
-        else {
+        } else {
             queuePhoto(screenName, imageView);
             imageView.setImageResource(stub_id);
         }
     }
 
+    public abstract Bitmap getBitmap(String entityTag);
+
     private void queuePhoto(String screenName, ImageView imageView) {
         PhotoToLoad p = new PhotoToLoad(screenName, imageView);
         executorService.submit(new PhotosLoader(p));
-    }
-
-    private Bitmap getBitmap(String screenName) {
-        File f = fileCache.getFile(screenName);
-
-        /* From sd cache */
-        //Bitmap bitmap = Utils.decodeFile(f);
-        Bitmap bitmap = BitmapFactory.decodeFile(f.toString());
-
-        if (bitmap == null) {
-            /* From web */
-            try {
-                Twitter twitter = FinchTwitterFactory.getInstance(mContext)
-                    .getTwitter();
-                ProfileImage p = twitter.getProfileImage(
-                        screenName, ProfileImage.BIGGER);
-
-                URL imageUrl = new URL(p.getURL());
-                HttpURLConnection conn =
-                    (HttpURLConnection)imageUrl.openConnection();
-                conn.setConnectTimeout(30000);
-                conn.setReadTimeout(30000);
-                conn.setInstanceFollowRedirects(true);
-                InputStream is = conn.getInputStream();
-                OutputStream os = new FileOutputStream(f);
-                Utils.CopyStream(is, os);
-                os.close();
-
-                bitmap = BitmapFactory.decodeFile(f.toString());
-            } catch (TwitterException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        return bitmap;
     }
 
     private boolean imageViewReused(PhotoToLoad photoToLoad) {
@@ -119,7 +63,7 @@ public class ImageLoader {
 
     public void clearCache() {
         memoryCache.clear();
-        fileCache.clear();
+        mFileCache.clear();
     }
 
     /* Task for the queue */
@@ -177,5 +121,4 @@ public class ImageLoader {
             }
         }
     }
-
 }

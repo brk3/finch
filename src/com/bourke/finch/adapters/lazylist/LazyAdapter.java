@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Typeface;
 
 import android.net.Uri;
@@ -17,17 +18,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.MediaEntityTask;
 import com.bourke.finch.common.PrettyDate;
+import com.bourke.finch.common.TwitterTaskCallback;
+import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.ProfileActivity;
 import com.bourke.finch.provider.FinchProvider;
 import com.bourke.finch.R;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -35,22 +40,25 @@ import twitter4j.ResponseList;
 
 import twitter4j.Status;
 
+import twitter4j.TwitterException;
+
 import twitter4j.TwitterResponse;
 
+import twitter4j.URLEntity;
+
 import twitter4j.User;
-import java.util.ArrayList;
 
 public class LazyAdapter extends BaseAdapter {
 
     private static final String TAG = "Finch/LazyAdapter";
 
-    private Activity activity;
+    private Activity mActivity;
 
     private ResponseList<TwitterResponse> mResponses;
 
     private static LayoutInflater inflater = null;
 
-    public ImageLoader imageLoader;
+    public ProfileImageLoader imageLoader;
 
     private Pattern screenNameMatcher = Pattern.compile("@\\w+");
 
@@ -63,12 +71,12 @@ public class LazyAdapter extends BaseAdapter {
     private ArrayList<Long> mFavQueue = new ArrayList<Long>();
 
     public LazyAdapter(Activity a) {
-        activity = a;
-        inflater = (LayoutInflater)activity.getSystemService(
+        mActivity = a;
+        inflater = (LayoutInflater)mActivity.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         mTypeface = Typeface.createFromAsset(a.getAssets(),
                 Constants.ROBOTO_REGULAR);
-        imageLoader = new ImageLoader(activity);
+        imageLoader = new ProfileImageLoader(mActivity);
     }
 
     public View getView(final int position, View convertView,
@@ -127,6 +135,19 @@ public class LazyAdapter extends BaseAdapter {
 
         /* Set the profile image ImageView */
         imageLoader.displayImage(screenName, holder.image_profile);
+
+        URLEntity[] urlEntities = currentEntity.getURLEntities();
+        if (urlEntities != null) {
+            for (URLEntity u : urlEntities) {
+                String imageURL = u.getExpandedURL().toString();
+                if (imageURL.contains("yfrog.com")) {
+                    //new MediaEntityLoader(mActivity).displayImage(imageURL,
+                    //        holder.image_media_entity);
+                    //holder.image_media_entity.setVisibility(View.VISIBLE);
+                    break;  /* Just show first one */
+                }
+            }
+        }
     }
 
     private void showUserView(ViewHolder holder, User currentEntity) {
@@ -175,26 +196,27 @@ public class LazyAdapter extends BaseAdapter {
                 R.id.text_screenname);
         holder.image_profile = (ImageView)vi.findViewById(
                 R.id.image_profile);
+        //holder.image_media_entity = (ImageView)vi.findViewById(
+        //        R.id.image_media_entity);
 
         vi.setTag(holder);
 
         holder.imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent profileActivity = new Intent(activity,
+                Intent profileActivity = new Intent(mActivity,
                     ProfileActivity.class);
                 String screenName = ((Status)mResponses.get(position))
                     .getUser().getScreenName();
                 profileActivity.setData(Uri.parse(
                         FinchProvider.CONTENT_URI + "/" + screenName));
-                activity.startActivity(profileActivity);
+                mActivity.startActivity(profileActivity);
             }
         });
         vi.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                view.setBackgroundResource(
-                    android.R.color.holo_blue_light);
+                view.setBackgroundResource(android.R.color.holo_blue_light);
                 mLastSelectedView = view;
                 return false;
             }
@@ -262,6 +284,7 @@ public class LazyAdapter extends BaseAdapter {
         TextView text_time;
         TextView text_screenname;
         ImageView image_profile;
+        //ImageView image_media_entity;
     }
 
 }
