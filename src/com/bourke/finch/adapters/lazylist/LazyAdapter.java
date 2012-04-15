@@ -64,7 +64,7 @@ public class LazyAdapter extends BaseAdapter {
 
     private Typeface mTypeface;
 
-    private View mLastSelectedView;
+    private int mSelectedIndex = -1;
 
     /* Statuses recently marked favorite that should be updated on the next
      * call to getView */
@@ -89,6 +89,12 @@ public class LazyAdapter extends BaseAdapter {
             holder = initViewHolder(vi, position);
         } else {
             holder = (ViewHolder)vi.getTag();
+        }
+
+        if (mSelectedIndex == position) {
+            vi.setBackgroundResource(android.R.color.holo_blue_light);
+        } else {
+            vi.setBackgroundResource(android.R.color.background_light);
         }
 
         /* Populate the view based on entity type */
@@ -213,14 +219,6 @@ public class LazyAdapter extends BaseAdapter {
                 mActivity.startActivity(profileActivity);
             }
         });
-        vi.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                view.setBackgroundResource(android.R.color.holo_blue_light);
-                mLastSelectedView = view;
-                return false;
-            }
-        });
 
         return holder;
     }
@@ -268,13 +266,8 @@ public class LazyAdapter extends BaseAdapter {
         mFavQueue.add(statusToUpdate.getId());
     }
 
-    public void unselectLastView() {
-        if (mLastSelectedView != null) {
-            mLastSelectedView.setBackgroundResource(
-                    android.R.color.background_light);
-        } else {
-            Log.e(TAG, "mLastSelectedView == null");
-        }
+    public void setSelectedIndex(int position) {
+        mSelectedIndex = position;
     }
 
     static class ViewHolder {
