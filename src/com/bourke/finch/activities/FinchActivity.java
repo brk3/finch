@@ -8,11 +8,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
+import android.util.Log;
+
 import com.actionbarsherlock.app.SherlockFragment;
+
+import com.bourke.finch.common.Constants;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
-import android.util.Log;
+import android.widget.TextView;
+import android.graphics.Color;
 
 public class FinchActivity extends BaseFinchActivity
         implements ViewPager.OnPageChangeListener {
@@ -27,7 +32,7 @@ public class FinchActivity extends BaseFinchActivity
     private ConnectionsFragment mConnectionsFragment =
         new ConnectionsFragment();
 
-    private int mCurrentlyShowingFragment;
+    private int mCurrentPage = HOME_PAGE;
 
     private Context mContext;
 
@@ -38,11 +43,8 @@ public class FinchActivity extends BaseFinchActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Log.d(TAG, "onCreate()");
-
         mContext = getApplicationContext();
-
         setContentView(R.layout.main);
         initViewPager();
     }
@@ -58,7 +60,8 @@ public class FinchActivity extends BaseFinchActivity
 
     @Override
     public void onPageSelected(int position) {
-        Log.d(TAG, "onPageSelected()");
+        Log.d(TAG, "onPageSelected");
+        mCurrentPage = position;
         switch (position) {
             case HOME_PAGE:
                 mHomePageFragment.refresh();
@@ -69,23 +72,27 @@ public class FinchActivity extends BaseFinchActivity
         }
     }
 
-    public void updateUnreadDisplay(int fragmentId, int count) {
-        /*
-        Log.d(TAG, "Adding " + count + " to total unread");
-        if (fragmentId != mCurrentlyShowingFragment) {
-            Log.d(TAG, "fragmentId != mCurrentlyShowingFragment, skipping");
-            return;
+    public void updateUnreadDisplay() {
+        Log.d(TAG, "updateUnreadDisplay");
+        int unreadCount = 0;
+        switch (mCurrentPage) {
+            case HOME_PAGE:
+                unreadCount = mHomePageFragment.getUnreadCount();
+                break;
+            case CONNECTIONS_PAGE:
+                unreadCount = mConnectionsFragment.getUnreadCount();
+                break;
         }
-        mUnreadCount += count;
-        mUnreadCountView.setText(mUnreadCount+"");
+        mUnreadCountView.setText(unreadCount+"");
         getSupportActionBar().setCustomView(mActionCustomView);
-        if (mUnreadCount > 0) {
-            TextView tabIndicatorTextView = (TextView)findViewById(
-                    android.R.id.text1);
+        TextView tabIndicatorTextView = (TextView)findViewById(
+                android.R.id.text1);
+        if (unreadCount > 0) {
             tabIndicatorTextView.setShadowLayer(15, 0, 0,
                     Constants.COLOR_FINCH_YELLOW);
+        } else {
+            tabIndicatorTextView.setShadowLayer(0, 0, 0, Color.BLACK);
         }
-        */
     }
 
     private void initViewPager() {

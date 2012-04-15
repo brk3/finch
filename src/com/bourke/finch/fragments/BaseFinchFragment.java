@@ -63,12 +63,14 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected boolean mLoadingPage = false;
 
-    private BaseFinchActivity mActivity;
+    private FinchActivity mActivity;
 
     /* Update the unread display on scrolling every X items */
     private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
 
     protected long mSinceId = -1;
+
+    protected int mUnreadCount = 0;
 
     private int mTwitterTaskType;
 
@@ -84,7 +86,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
         setHasOptionsMenu(true);
 
-        mActivity = (BaseFinchActivity)getSherlockActivity();
+        mActivity = (FinchActivity)getSherlockActivity();
         mContext = mActivity.getApplicationContext();
         mPrefs = mActivity.getSharedPreferences("twitterPrefs",
                 Context.MODE_PRIVATE);
@@ -153,11 +155,11 @@ public abstract class BaseFinchFragment extends SherlockFragment
             public void onSuccess(TwitterTaskParams payload) {
                 ResponseList<TwitterResponse> res =
                     (ResponseList<TwitterResponse>)payload.result;
-                //updateUnreadDisplay(FinchActivity.HOME_PAGE,
-                //        res.size());
                 mMainListAdapter.prependResponses((ResponseList)res);
                 mMainListAdapter.notifyDataSetChanged();
                 mSinceId = ((Status)res.get(0)).getId();
+                mUnreadCount = mMainList.getFirstVisiblePosition();
+                mActivity.updateUnreadDisplay();
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();
@@ -194,6 +196,10 @@ public abstract class BaseFinchFragment extends SherlockFragment
         mMainList.setAdapter(mMainListAdapter);
         mMainList.setOnScrollListener(this);
         setupActionMode();
+    }
+
+    public int getUnreadCount() {
+        return mUnreadCount;
     }
 
     public abstract void setupActionMode();
