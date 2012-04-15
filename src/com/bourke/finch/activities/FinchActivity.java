@@ -62,8 +62,10 @@ public class FinchActivity extends BaseFinchActivity
         switch (position) {
             case HOME_PAGE:
                 mHomePageFragment.refresh();
+                break;
             case CONNECTIONS_PAGE:
                 mConnectionsFragment.refresh();
+                break;
         }
     }
 

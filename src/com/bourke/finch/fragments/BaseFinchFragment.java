@@ -32,6 +32,8 @@ import twitter4j.Paging;
 
 import twitter4j.ResponseList;
 
+import twitter4j.Status;
+
 import twitter4j.Twitter;
 
 import twitter4j.TwitterException;
@@ -155,6 +157,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 //        res.size());
                 mMainListAdapter.prependResponses((ResponseList)res);
                 mMainListAdapter.notifyDataSetChanged();
+                mSinceId = ((Status)res.get(0)).getId();
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();
