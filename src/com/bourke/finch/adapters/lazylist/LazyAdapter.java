@@ -71,10 +71,9 @@ public class LazyAdapter extends BaseAdapter {
         imageLoader = new ImageLoader(activity);
     }
 
-    // TODO: may be able to speed this up slightly by having a seperate
-    // LazyAdapter for User/Status types.
     public View getView(final int position, View convertView,
             ViewGroup parent) {
+        /* Init view holder */
         View vi = convertView;
         ViewHolder holder;
         if (convertView == null) {
@@ -84,74 +83,84 @@ public class LazyAdapter extends BaseAdapter {
             holder = (ViewHolder)vi.getTag();
         }
 
+        /* Populate the view based on entity type */
         if (mResponses != null) {
             TwitterResponse currentEntity = mResponses.get(position);
-
-            /* Get the entity text */
-            String text = "";
             if (currentEntity instanceof User) {
-                /* If the user is protected, the status may be null, so account
-                 * for that. */
-                if (((User)currentEntity).getStatus() == null) {
-                    // TODO: add to strings.xml
-                    text = "You need to follow this user to see their status.";
-                } else {
-                    text = ((User)currentEntity).getStatus().getText();
-                }
+                showUserView(holder, (User)currentEntity);
             } else if (currentEntity instanceof Status) {
-                text = ((Status)currentEntity).getText();
-                /* Show star if status is favorited */
-                long entityId = ((Status)currentEntity).getId();
-                if (mFavQueue.contains(entityId) ||
-                        ((Status)currentEntity).isFavorited()) {
-                    holder.imageFavStar.setVisibility(View.VISIBLE);
-                } else {
-                    holder.imageFavStar.setVisibility(View.GONE);
-                }
+                showStatusView(holder, (Status)currentEntity);
             } else {
-                Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
-                        + currentEntity.getClass().getName());
+                Log.e(TAG, "Unknown TwitterResponse type in getView");
             }
-            holder.text_tweet.setText(text);
-            holder.text_tweet.setTypeface(mTypeface);
-            Linkify.addLinks(holder.text_tweet, Linkify.ALL);
-            Linkify.addLinks(holder.text_tweet, screenNameMatcher,
-                     Constants.SCREEN_NAME_URI.toString() + "/");
-
-            /* Set the tweet time Textview */
-            Date createdAt = new Date();
-            if (currentEntity instanceof User) {
-                if (((User)currentEntity).getStatus() != null) {
-                    createdAt = ((User)currentEntity).getStatus()
-                        .getCreatedAt();
-                }
-            } else if (currentEntity instanceof Status) {
-                createdAt = ((Status)currentEntity).getCreatedAt();
-            } else {
-                Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
-                        + currentEntity.getClass().getName());
-            }
-            holder.text_time.setText(new PrettyDate(createdAt).toString());
-            holder.text_time.setTypeface(mTypeface);
-
-            /* Set the screen name TextView */
-            String screenName = "";
-            if (currentEntity instanceof User) {
-                screenName = ((User)currentEntity).getScreenName();
-            } else if (currentEntity instanceof Status) {
-                screenName = ((Status)currentEntity).getUser().getScreenName();
-            } else {
-                Log.e(TAG, "Trying to use LazyAdapter with unsupported class: "
-                        + currentEntity.getClass().getName());
-            }
-            holder.text_screenname.setText("@"+screenName);
-            holder.text_screenname.setTypeface(mTypeface);
-
-            /* Set the profile image ImageView */
-            imageLoader.displayImage(screenName, holder.image_profile);
         }
 
         return vi;
+    }
+
+    private void showStatusView(ViewHolder holder, Status currentEntity) {
+        /* Get the entity text */
+        String text = ((Status)currentEntity).getText();
+        holder.text_tweet.setText(text);
+        holder.text_tweet.setTypeface(mTypeface);
+        Linkify.addLinks(holder.text_tweet, Linkify.ALL);
+        Linkify.addLinks(holder.text_tweet, screenNameMatcher,
+                 Constants.SCREEN_NAME_URI.toString() + "/");
+
+        /* Show star if status is favorited */
+        long entityId = currentEntity.getId();
+        if (mFavQueue.contains(entityId) || currentEntity.isFavorited()) {
+            holder.imageFavStar.setVisibility(View.VISIBLE);
+        } else {
+            holder.imageFavStar.setVisibility(View.GONE);
+        }
+
+        /* Set the tweet time Textview */
+        Date createdAt = ((Status)currentEntity).getCreatedAt();
+        holder.text_time.setText(new PrettyDate(createdAt).toString());
+        holder.text_time.setTypeface(mTypeface);
+
+        /* Set the screen name TextView */
+        String screenName = currentEntity.getUser().getScreenName();
+        holder.text_screenname.setText("@"+screenName);
+        holder.text_screenname.setTypeface(mTypeface);
+
+        /* Set the profile image ImageView */
+        imageLoader.displayImage(screenName, holder.image_profile);
+    }
+
+    private void showUserView(ViewHolder holder, User currentEntity) {
+        /* Get the entity text. (If the user is protected, the status may be
+         * null, so account for that) */
+        String text = "";
+        if (currentEntity.getStatus() == null) {
+            // TODO: add to strings.xml
+            text = "You need to follow this user to see their status.";
+        } else {
+            text = ((User)currentEntity).getStatus().getText();
+        }
+        holder.text_tweet.setText(text);
+        holder.text_tweet.setTypeface(mTypeface);
+        Linkify.addLinks(holder.text_tweet, Linkify.ALL);
+        Linkify.addLinks(holder.text_tweet, screenNameMatcher,
+                 Constants.SCREEN_NAME_URI.toString() + "/");
+
+        /* Set the tweet time Textview */
+        Date createdAt = new Date();
+        if (currentEntity.getStatus() != null) {
+            createdAt = ((User)currentEntity).getStatus()
+                .getCreatedAt();
+        }
+        holder.text_time.setText(new PrettyDate(createdAt).toString());
+        holder.text_time.setTypeface(mTypeface);
+
+        /* Set the screen name TextView */
+        String screenName = currentEntity.getScreenName();
+        holder.text_screenname.setText("@"+screenName);
+        holder.text_screenname.setTypeface(mTypeface);
+
+        /* Set the profile image ImageView */
+        imageLoader.displayImage(screenName, holder.image_profile);
     }
 
     private ViewHolder initViewHolder(View vi, final int position) {
