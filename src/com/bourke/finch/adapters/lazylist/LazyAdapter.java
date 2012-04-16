@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Typeface;
 
 import android.net.Uri;
@@ -24,10 +23,7 @@ import android.widget.TextView;
 
 import com.bourke.finch.common.Constants;
 import com.bourke.finch.common.Constants;
-import com.bourke.finch.common.MediaEntityTask;
 import com.bourke.finch.common.PrettyDate;
-import com.bourke.finch.common.TwitterTaskCallback;
-import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.ProfileActivity;
 import com.bourke.finch.provider.FinchProvider;
 import com.bourke.finch.R;
@@ -39,8 +35,6 @@ import java.util.regex.Pattern;
 import twitter4j.ResponseList;
 
 import twitter4j.Status;
-
-import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
 
