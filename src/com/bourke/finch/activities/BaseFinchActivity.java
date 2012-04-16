@@ -130,6 +130,7 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity {
             getSupportActionBar().setBackgroundDrawable(bg);
         }
 
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         mActionCustomView = getLayoutInflater().inflate(
                 R.layout.actionbar_layout, null);
