@@ -234,18 +234,24 @@ public class LazyAdapter extends BaseAdapter {
     }
 
     public void prependResponses(ResponseList<TwitterResponse> data) {
+        Log.d(TAG, "prependResponses: " + data.size());
         if (mResponses != null) {
+            Log.d(TAG, "mResponses: " + mResponses.size());
             data.addAll(mResponses);
         }
         mResponses = data;
+        Log.d(TAG, "new mResponses: " + mResponses.size());
     }
 
     public void appendResponses(ResponseList<TwitterResponse> data) {
+        Log.d(TAG, "appendResponses: " + data.size());
         if (mResponses != null) {
+            Log.d(TAG, "mResponses: " + mResponses.size());
             mResponses.addAll(data);
         } else {
             mResponses = data;
         }
+        Log.d(TAG, "new mResponses: " + mResponses.size());
     }
 
     public void clearResponses() {

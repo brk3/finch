@@ -59,20 +59,22 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected Context mContext;
 
-    protected int mPage = 1;
+    protected long mSinceId = -1;
+
+    protected long mMaxId = -1;
 
     protected boolean mLoadingPage = false;
+
+    protected int mUnreadCount = 0;
+
+    private int mTwitterTaskType;
 
     private FinchActivity mActivity;
 
     /* Update the unread display on scrolling every X items */
     private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
 
-    protected long mSinceId = -1;
-
-    protected int mUnreadCount = 0;
-
-    private int mTwitterTaskType;
+    private static int FETCH_LIMIT = 20;
 
     public BaseFinchFragment(int twitterTaskType) {
         mTwitterTaskType = twitterTaskType;
@@ -136,28 +138,36 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected void refresh() {
         Log.d(TAG, "refresh()");
-        Paging page = new Paging(1);
 
+        Paging page = new Paging();
+        page.setCount(FETCH_LIMIT);
         if (mSinceId > -1) {
             page.setSinceId(mSinceId);
             Log.d(TAG, "sinceId=" + mSinceId + ", only fetching tweets after "
                     + "then");
         } else {
-            Log.d(TAG, "No sinceId found, fetching first page of tweets");
+            Log.d(TAG, "No sinceId found, fetching first " + FETCH_LIMIT +
+                    " tweets");
         }
-
-        TwitterTaskParams taskParams = new TwitterTaskParams(
-                mTwitterTaskType, new Object[] {mActivity, mMainListAdapter,
-                    mMainList, page});
 
         TwitterTaskCallback taskCallback = new TwitterTaskCallback
                 <TwitterTaskParams, TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
                 ResponseList<TwitterResponse> res =
                     (ResponseList<TwitterResponse>)payload.result;
+                if (res.size() == 0) {
+                    Log.d(TAG, "res.size() == 0, no action");
+                    return;
+                }
                 mMainListAdapter.prependResponses((ResponseList)res);
                 mMainListAdapter.notifyDataSetChanged();
+
                 mSinceId = ((Status)res.get(0)).getId();
+                ResponseList<TwitterResponse> responseList =
+                    mMainListAdapter.getResponses();
+                mMaxId = ((Status)responseList.get(responseList.size()-1))
+                    .getId();
+
                 mUnreadCount = mMainList.getFirstVisiblePosition();
                 mActivity.updateUnreadDisplay();
             }
@@ -165,17 +175,31 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 e.printStackTrace();
             }
         };
+        TwitterTaskParams taskParams = new TwitterTaskParams(
+                mTwitterTaskType, new Object[] {mActivity, mMainListAdapter,
+                    mMainList, page});
+
         new TwitterTask(taskParams, taskCallback, mTwitter).execute();
     }
 
     protected void loadNextPage() {
+        Log.d(TAG, "loadNextPage");
+        if (mMaxId == -1) {
+            Log.e(TAG, "loadNextPage: mMaxId == -1");
+            return;
+        }
         TwitterTaskCallback taskCallback = new TwitterTaskCallback
                 <TwitterTaskParams, TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                /* Append responses to list adapter */
                 ResponseList<TwitterResponse> res =
                     (ResponseList<TwitterResponse>)payload.result;
-                mMainListAdapter.appendResponses((ResponseList)res);
+                if (res.size()-1 == 0) {  // -1 as maxId is inclusive
+                    Log.d(TAG, "res.size()-1 == 0, no action");
+                    return;
+                }
+                mMaxId = ((Status)res.get(res.size()-1)).getId();
+                res.remove(0); // Avoid overlap with maxId
+                mMainListAdapter.appendResponses(res);
                 mMainListAdapter.notifyDataSetChanged();
                 mLoadingPage = false;
             }
@@ -183,8 +207,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 e.printStackTrace();
             }
         };
-        Paging paging = new Paging(++mPage);
-        Log.d(TAG, "Fetching page " + mPage);
+        Paging paging = new Paging();
+        paging.setCount(FETCH_LIMIT);
+        paging.setMaxId(mMaxId);
         TwitterTaskParams taskParams = new TwitterTaskParams(mTwitterTaskType,
                 new Object[] {mActivity, mMainListAdapter, mMainList, paging});
         new TwitterTask(taskParams, taskCallback, mTwitter).execute();
