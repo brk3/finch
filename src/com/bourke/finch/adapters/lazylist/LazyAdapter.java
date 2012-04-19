@@ -85,6 +85,19 @@ public class LazyAdapter extends BaseAdapter {
             holder = (ViewHolder)vi.getTag();
         }
 
+        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent profileActivity = new Intent(mActivity,
+                    ProfileActivity.class);
+                String screenName = ((Status)mResponses.get(position))
+                    .getUser().getScreenName();
+                profileActivity.setData(Uri.parse(
+                        FinchProvider.CONTENT_URI + "/" + screenName));
+                mActivity.startActivity(profileActivity);
+            }
+        });
+
         if (mSelectedIndex == position) {
             vi.setBackgroundResource(android.R.color.holo_blue_light);
         } else {
@@ -200,19 +213,6 @@ public class LazyAdapter extends BaseAdapter {
         //        R.id.image_media_entity);
 
         vi.setTag(holder);
-
-        holder.imageProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent profileActivity = new Intent(mActivity,
-                    ProfileActivity.class);
-                String screenName = ((Status)mResponses.get(position))
-                    .getUser().getScreenName();
-                profileActivity.setData(Uri.parse(
-                        FinchProvider.CONTENT_URI + "/" + screenName));
-                mActivity.startActivity(profileActivity);
-            }
-        });
 
         return holder;
     }
