@@ -2,22 +2,28 @@ package com.bourke.finch;
 
 import android.content.Context;
 
+import android.graphics.Color;
+
 import android.os.Bundle;
 
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 
 import android.util.Log;
 
+import android.widget.TextView;
+
 import com.actionbarsherlock.app.SherlockFragment;
 
 import com.bourke.finch.common.Constants;
+import com.bourke.finch.fragments.NewTweetDialogFragment;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
-import android.widget.TextView;
-import android.graphics.Color;
 
 public class FinchActivity extends BaseFinchActivity
         implements ViewPager.OnPageChangeListener {
@@ -36,6 +42,8 @@ public class FinchActivity extends BaseFinchActivity
 
     private Context mContext;
 
+    private int mStackLevel = 0;
+
     //TODO: add to R.strings
     public static final String[] CONTENT = new String[] {
         "Home", "Connect" };
@@ -43,10 +51,15 @@ public class FinchActivity extends BaseFinchActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Log.d(TAG, "onCreate()");
         mContext = getApplicationContext();
         setContentView(R.layout.main);
         initViewPager();
+
+        if (savedInstanceState != null) {
+            mStackLevel = savedInstanceState.getInt("level");
+        }
     }
 
     @Override
@@ -70,6 +83,12 @@ public class FinchActivity extends BaseFinchActivity
                 mConnectionsFragment.refresh();
                 break;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("level", mStackLevel);
     }
 
     public void updateUnreadDisplay() {
@@ -106,6 +125,23 @@ public class FinchActivity extends BaseFinchActivity
         indicator.setViewPager(viewPager);
     }
 
+    public void showDialog() {
+        mStackLevel++;
+
+        FragmentTransaction ft = getSupportFragmentManager()
+            .beginTransaction();
+        Fragment prev = getSupportFragmentManager()
+            .findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        DialogFragment newFragment = NewTweetDialogFragment.newInstance(
+                mStackLevel);
+        newFragment.show(ft, "dialog");
+    }
+
     class FinchPagerAdapter extends FragmentPagerAdapter
             implements TitleProvider {
 
@@ -135,4 +171,5 @@ public class FinchActivity extends BaseFinchActivity
             return null;
         }
     }
+
 }

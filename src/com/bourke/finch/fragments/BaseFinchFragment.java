@@ -128,6 +128,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_compose:
+                mActivity.showDialog();
+                return true;
             case R.id.menu_refresh:
                 refresh();
                 return true;
