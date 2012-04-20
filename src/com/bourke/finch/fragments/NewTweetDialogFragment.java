@@ -25,7 +25,7 @@ public class NewTweetDialogFragment extends SherlockDialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, 0);
+        setStyle(DialogFragment.STYLE_NO_TITLE, 0);
     }
 
     @Override
@@ -33,8 +33,6 @@ public class NewTweetDialogFragment extends SherlockDialogFragment {
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_dialog,
                 container, false);
-        View tv = v.findViewById(R.id.text);
-        ((TextView)tv).setText("foobar");
 
         return v;
     }

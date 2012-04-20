@@ -149,18 +149,20 @@ public class LazyAdapter extends BaseAdapter {
         /* Set the profile image ImageView */
         imageLoader.displayImage(screenName, holder.image_profile);
 
+        /*
         URLEntity[] urlEntities = currentEntity.getURLEntities();
         if (urlEntities != null) {
             for (URLEntity u : urlEntities) {
                 String imageURL = u.getExpandedURL().toString();
                 if (imageURL.contains("yfrog.com")) {
-                    //new MediaEntityLoader(mActivity).displayImage(imageURL,
-                    //        holder.image_media_entity);
-                    //holder.image_media_entity.setVisibility(View.VISIBLE);
-                    break;  /* Just show first one */
+                    new MediaEntityLoader(mActivity).displayImage(imageURL,
+                            holder.image_media_entity);
+                    holder.image_media_entity.setVisibility(View.VISIBLE);
+                    break;
                 }
             }
         }
+        */
     }
 
     private void showUserView(ViewHolder holder, User currentEntity) {

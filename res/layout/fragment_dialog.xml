@@ -1,40 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2010 The Android Open Source Project
 
-     Licensed under the Apache License, Version 2.0 (the "License");
-     you may not use this file except in compliance with the License.
-     You may obtain a copy of the License at
-
-          http://www.apache.org/licenses/LICENSE-2.0
-
-     Unless required by applicable law or agreed to in writing, software
-     distributed under the License is distributed on an "AS IS" BASIS,
-     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     See the License for the specific language governing permissions and
-     limitations under the License.
--->
-
-<!-- Top-level content view for the simple fragment sample. -->
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:padding="4dip"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:gravity="center_horizontal"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:id="@+id/button_tweet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tweet"
+        android:layout_alignParentRight="true" />
+
+    <EditText
+        android:id="@+id/edittext_compose_tweet"
+        android:maxLength="160"
+        android:lines="5"
+        android:gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button_cancel" />
 
     <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:gravity="top|center_horizontal" />
+        android:id="@+id/textview_remaining_chars"
+        android:text="160"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/secondary_text_light"
+        android:layout_below="@id/edittext_compose_tweet"
+        android:layout_alignParentRight="true" />
 
-    <Button android:id="@+id/show"
-        android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="foobar">
-        <requestFocus />
-    </Button>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_add_tweet_entities"
+        android:orientation="horizontal"
+        android:layout_below="@id/textview_remaining_chars"
+        android:gravity="center_horizontal"
+        android:padding="4dip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <ImageButton
+        android:id="@+id/button_take_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true" />
+    <ImageButton
+        android:id="@+id/button_add_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true" />
+    <ImageButton
+        android:id="@+id/button_add_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true" />
+    <ImageButton
+        android:id="@+id/button_add_mention"
+        android:text="\@"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true" />
+    </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>
