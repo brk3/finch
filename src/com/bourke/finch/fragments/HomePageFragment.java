@@ -71,11 +71,14 @@ public class HomePageFragment extends BaseFinchFragment {
         ResponseList<TwitterResponse> content = mMainListAdapter
                 .getResponses();
         if (content != null && content.size() > 0) {
-            long sinceId = ((Status)content.get(0)).getId();
-            editor.putLong(Constants.PREF_HOMETIMELINE_SINCEID, sinceId);
+            editor.putLong(Constants.PREF_HOMETIMELINE_SINCEID, mSinceId);
+            Log.d(TAG, "Wrote mSinceId: " + mSinceId);
         }
         editor.putInt(Constants.PREF_HOMETIMELINE_POS,
                 mMainList.getFirstVisiblePosition());
+        Log.d(TAG, "Wrote hometimeline pos: " +
+                mMainList.getFirstVisiblePosition());
+
         editor.commit();
     }
 
@@ -99,6 +102,7 @@ public class HomePageFragment extends BaseFinchFragment {
                     mMainListAdapter.notifyDataSetChanged();
                     mMaxId = ((Status)listContents.get(listContents.size()-1))
                         .getId();
+                    Log.d(TAG, "Restored mMaxId to " + mMaxId);
                     Log.d(TAG, "Restored hometimeline");
                 }
                 ois.close();
@@ -121,6 +125,7 @@ public class HomePageFragment extends BaseFinchFragment {
         }
 
         mSinceId = mPrefs.getLong(Constants.PREF_HOMETIMELINE_SINCEID, -1);
+        Log.d(TAG, "Restored mSinceId to " + mSinceId);
 
         refresh();
     }

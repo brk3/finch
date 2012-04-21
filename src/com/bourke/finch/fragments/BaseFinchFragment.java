@@ -43,7 +43,7 @@ import twitter4j.TwitterResponse;
 public abstract class BaseFinchFragment extends SherlockFragment
         implements OnScrollListener {
 
-    protected static final String TAG = "Finch/BaseFinchFragment";
+    protected String TAG = "Finch/BaseFinchFragment";
 
     protected ListView mMainList;
 
@@ -78,6 +78,15 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     public BaseFinchFragment(int twitterTaskType) {
         mTwitterTaskType = twitterTaskType;
+
+        switch (mTwitterTaskType) {
+            case TwitterTask.GET_HOME_TIMELINE:
+                TAG = "Finch/HomePageFragment";
+                break;
+            case TwitterTask.GET_MENTIONS:
+                TAG = "Finch/ConnectionsFragment";
+                break;
+        }
     }
 
     @Override
@@ -162,7 +171,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
                     Log.d(TAG, "res.size() == 0, no action");
                     return;
                 }
+                int currentListPosition = mMainList.getFirstVisiblePosition();
                 mMainListAdapter.prependResponses((ResponseList)res);
+                mMainList.setSelection(currentListPosition);
                 mMainListAdapter.notifyDataSetChanged();
 
                 mSinceId = ((Status)res.get(0)).getId();
@@ -170,6 +181,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
                     mMainListAdapter.getResponses();
                 mMaxId = ((Status)responseList.get(responseList.size()-1))
                     .getId();
+                Log.d(TAG, "set mMaxId to " + mMaxId);
 
                 mUnreadCount = mMainList.getFirstVisiblePosition();
                 mActivity.updateUnreadDisplay();
@@ -201,6 +213,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
                     return;
                 }
                 mMaxId = ((Status)res.get(res.size()-1)).getId();
+                Log.d(TAG, "set mMaxId to " + mMaxId);
                 res.remove(0); // Avoid overlap with maxId
                 mMainListAdapter.appendResponses(res);
                 mMainListAdapter.notifyDataSetChanged();

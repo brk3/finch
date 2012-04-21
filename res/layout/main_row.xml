@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/profile_layout"
         android:layout_centerVertical="true"
-        android:textSize="12dp"
+        android:textSize="13dp"
         android:paddingLeft="12dp"
         android:paddingRight="12dp" />
 

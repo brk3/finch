@@ -1,69 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:gravity="center_horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/button_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cancel"
-        android:layout_alignParentLeft="true" />
-
-    <Button
-        android:id="@+id/button_tweet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tweet"
-        android:layout_alignParentRight="true" />
-
-    <EditText
-        android:id="@+id/edittext_compose_tweet"
-        android:maxLength="160"
-        android:lines="5"
-        android:gravity="top"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_main"
+        android:layout_margin="4dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_cancel" />
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/button_cancel"
+            android:background="@drawable/sel_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:layout_alignParentLeft="true" />
+        <Button
+            android:id="@+id/button_tweet"
+            android:background="@drawable/sel_button_bright"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tweet"
+            android:layout_alignParentRight="true" />
 
-    <TextView
-        android:id="@+id/textview_remaining_chars"
-        android:text="160"
-        android:textSize="16sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/secondary_text_light"
-        android:layout_below="@id/edittext_compose_tweet"
-        android:layout_alignParentRight="true" />
+        <EditText
+            android:id="@+id/edittext_compose_tweet"
+            android:maxLength="160"
+            android:lines="5"
+            android:gravity="top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/button_cancel" />
+
+        <TextView
+            android:id="@+id/textview_remaining_chars"
+            android:text="160"
+            android:textSize="16sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/secondary_text_light"
+            android:layout_below="@id/edittext_compose_tweet"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/layout_add_tweet_entities"
         android:orientation="horizontal"
-        android:layout_below="@id/textview_remaining_chars"
+        android:layout_below="@id/layout_main"
         android:gravity="center_horizontal"
         android:padding="4dip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     <ImageButton
         android:id="@+id/button_take_photo"
+        android:src="@drawable/ic_device_access_camera_light"
+        android:layout_weight="1"
+        android:background="@drawable/custom_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true" />
     <ImageButton
         android:id="@+id/button_add_photo"
+        android:src="@drawable/ic_content_picture_light"
+        android:background="@drawable/custom_button"
+        android:layout_weight="1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true" />
     <ImageButton
         android:id="@+id/button_add_location"
+        android:background="@drawable/custom_button"
+        android:layout_weight="1"
+        android:src="@drawable/ic_location_light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true" />
     <ImageButton
         android:id="@+id/button_add_mention"
-        android:text="\@"
+        android:background="@drawable/custom_button"
+        android:layout_weight="1"
+        android:src="@drawable/ic_social_add_person_light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true" />
