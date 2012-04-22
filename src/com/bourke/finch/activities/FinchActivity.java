@@ -24,6 +24,7 @@ import com.bourke.finch.fragments.NewTweetDialogFragment;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
+import android.view.View;
 
 public class FinchActivity extends BaseFinchActivity
         implements ViewPager.OnPageChangeListener {
@@ -130,8 +131,8 @@ public class FinchActivity extends BaseFinchActivity
 
         FragmentTransaction ft = getSupportFragmentManager()
             .beginTransaction();
-        Fragment prev = getSupportFragmentManager()
-            .findFragmentByTag("dialog");
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(
+                "dialog");
         if (prev != null) {
             ft.remove(prev);
         }

@@ -37,4 +37,6 @@ public class Constants {
     public static final String ROBOTO_REGULAR = "fonts/Roboto-Regular.ttf";
     public static final String SHADOWS_INTO_LIGHT_REG =
         "fonts/ShadowsIntoLightTwo-Regular.ttf";
+
+    public static final int MAX_TWEET_LENGTH = 140;
 }
