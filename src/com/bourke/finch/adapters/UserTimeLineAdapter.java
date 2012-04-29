@@ -31,7 +31,7 @@ public class UserTimeLineAdapter extends BaseAdapter {
 
     private Activity activity;
 
-    private ResponseList<Status> mStatuses;
+    private ResponseList mStatuses;
 
     private static LayoutInflater inflater = null;
 
@@ -54,7 +54,7 @@ public class UserTimeLineAdapter extends BaseAdapter {
 
         if (mStatuses != null) {
             TextView text_tweet = (TextView)vi.findViewById(R.id.text_tweet);
-            text_tweet.setText(mStatuses.get(position).getText());
+            text_tweet.setText(((Status)mStatuses.get(position)).getText());
             text_tweet.setTypeface(mTypeface);
         }
 
@@ -77,7 +77,7 @@ public class UserTimeLineAdapter extends BaseAdapter {
         return position;
     }
 
-    public void setStatuses(ResponseList<Status> data) {
+    public void setStatuses(ResponseList data) {
         mStatuses = data;
     }
 

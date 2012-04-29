@@ -165,8 +165,8 @@ public abstract class BaseFinchFragment extends SherlockFragment
         TwitterTaskCallback taskCallback = new TwitterTaskCallback
                 <TwitterTaskParams, TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                ResponseList<TwitterResponse> res =
-                    (ResponseList<TwitterResponse>)payload.result;
+                ResponseList res =
+                    (ResponseList)payload.result;
                 if (res.size() == 0) {
                     Log.d(TAG, "res.size() == 0, no action");
                     return;
@@ -177,7 +177,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
                 mMainListAdapter.notifyDataSetChanged();
 
                 mSinceId = ((Status)res.get(0)).getId();
-                ResponseList<TwitterResponse> responseList =
+                ResponseList responseList =
                     mMainListAdapter.getResponses();
                 mMaxId = ((Status)responseList.get(responseList.size()-1))
                     .getId();
@@ -206,8 +206,8 @@ public abstract class BaseFinchFragment extends SherlockFragment
         TwitterTaskCallback taskCallback = new TwitterTaskCallback
                 <TwitterTaskParams, TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                ResponseList<TwitterResponse> res =
-                    (ResponseList<TwitterResponse>)payload.result;
+                ResponseList res =
+                    (ResponseList)payload.result;
                 if (res.size()-1 == 0) {  // -1 as maxId is inclusive
                     Log.d(TAG, "res.size()-1 == 0, no action");
                     return;

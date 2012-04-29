@@ -48,7 +48,7 @@ public class LazyAdapter extends BaseAdapter {
 
     private Activity mActivity;
 
-    private ResponseList<TwitterResponse> mResponses;
+    private ResponseList mResponses;
 
     private static LayoutInflater inflater = null;
 
@@ -106,7 +106,7 @@ public class LazyAdapter extends BaseAdapter {
 
         /* Populate the view based on entity type */
         if (mResponses != null) {
-            TwitterResponse currentEntity = mResponses.get(position);
+            Object currentEntity = mResponses.get(position);
             if (currentEntity instanceof User) {
                 showUserView(holder, (User)currentEntity);
             } else if (currentEntity instanceof Status) {
@@ -235,7 +235,7 @@ public class LazyAdapter extends BaseAdapter {
         return position;
     }
 
-    public void prependResponses(ResponseList<TwitterResponse> data) {
+    public void prependResponses(ResponseList data) {
         Log.d(TAG, "prependResponses: " + data.size());
         if (mResponses != null) {
             Log.d(TAG, "mResponses: " + mResponses.size());
@@ -245,7 +245,7 @@ public class LazyAdapter extends BaseAdapter {
         Log.d(TAG, "new mResponses: " + mResponses.size());
     }
 
-    public void appendResponses(ResponseList<TwitterResponse> data) {
+    public void appendResponses(ResponseList data) {
         Log.d(TAG, "appendResponses: " + data.size());
         if (mResponses != null) {
             Log.d(TAG, "mResponses: " + mResponses.size());
@@ -260,7 +260,7 @@ public class LazyAdapter extends BaseAdapter {
         mResponses.clear();
     }
 
-    public ResponseList<TwitterResponse> getResponses() {
+    public ResponseList getResponses() {
         return mResponses;
     }
 

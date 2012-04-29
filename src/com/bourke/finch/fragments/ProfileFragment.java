@@ -53,7 +53,7 @@ public class ProfileFragment extends SherlockFragment {
 
     private BaseAdapter mMainListAdapter;
 
-    private ResponseList<Status> mTimeline;
+    private ResponseList mTimeline;
 
     private Context mContext;
 
@@ -136,7 +136,7 @@ public class ProfileFragment extends SherlockFragment {
             userTimelineCallback =  new TwitterTaskCallback<TwitterTaskParams,
                                  TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                mTimeline = (ResponseList<Status>)payload.result;
+                mTimeline = (ResponseList)payload.result;
                 ((UserTimeLineAdapter)mMainListAdapter).setStatuses(mTimeline);
                 mMainListAdapter.notifyDataSetChanged();
             }
@@ -190,8 +190,8 @@ public class ProfileFragment extends SherlockFragment {
             followingUsersCallback = new TwitterTaskCallback<TwitterTaskParams,
                                  TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                ResponseList<TwitterResponse> users =
-                    (ResponseList<TwitterResponse>)payload.result;
+                ResponseList users =
+                    (ResponseList)payload.result;
                 ((LazyAdapter)mMainListAdapter).prependResponses(users);
                 mMainListAdapter.notifyDataSetChanged();
             }

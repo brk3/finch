@@ -177,7 +177,7 @@ public class TwitterTask extends
 
             case LOOKUP_USERS:
                 Log.d(TAG, "Running taskType LOOKUP_USERS");
-                ResponseList<User> users = null;
+                ResponseList users = null;
                 long[] l_ids = (long[])payload.data[1];
                 try {
                     users = mTwitter.lookupUsers(l_ids);

@@ -68,7 +68,7 @@ public class HomePageFragment extends BaseFinchFragment {
         }
 
         SharedPreferences.Editor editor = mPrefs.edit();
-        ResponseList<TwitterResponse> content = mMainListAdapter
+        ResponseList content = mMainListAdapter
                 .getResponses();
         if (content != null && content.size() > 0) {
             editor.putLong(Constants.PREF_HOMETIMELINE_SINCEID, mSinceId);
@@ -95,8 +95,8 @@ public class HomePageFragment extends BaseFinchFragment {
                 FileInputStream fis = mContext.openFileInput(
                         Constants.PREF_HOMETIMELINE_PAGE);
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                ResponseList<TwitterResponse> listContents =
-                    (ResponseList<TwitterResponse>) ois.readObject();
+                ResponseList listContents =
+                    (ResponseList) ois.readObject();
                 if (listContents != null && listContents.size() > 0) {
                     mMainListAdapter.appendResponses(listContents);
                     mMainListAdapter.notifyDataSetChanged();
