@@ -39,6 +39,8 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
+import java.util.List;
+import java.util.ArrayList;
 
 public abstract class BaseFinchFragment extends SherlockFragment
         implements OnScrollListener {
@@ -59,10 +61,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     protected Context mContext;
 
-    protected long mSinceId = -1;
-
-    protected long mMaxId = -1;
-
     protected boolean mLoadingPage = false;
 
     protected int mUnreadCount = 0;
@@ -75,6 +73,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
     private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
 
     private static int FETCH_LIMIT = 20;
+
+    private List<TwitterResponse> mTimelineGap =
+        new ResponseList();
 
     public BaseFinchFragment(int twitterTaskType) {
         mTwitterTaskType = twitterTaskType;
@@ -151,56 +152,74 @@ public abstract class BaseFinchFragment extends SherlockFragment
     protected void refresh() {
         Log.d(TAG, "refresh()");
 
-        Paging page = new Paging();
+        final Paging page = new Paging();
         page.setCount(FETCH_LIMIT);
-        if (mSinceId > -1) {
-            page.setSinceId(mSinceId);
-            Log.d(TAG, "sinceId=" + mSinceId + ", only fetching tweets after "
-                    + "then");
-        } else {
-            Log.d(TAG, "No sinceId found, fetching first " + FETCH_LIMIT +
-                    " tweets");
-        }
 
-        TwitterTaskCallback taskCallback = new TwitterTaskCallback
-                <TwitterTaskParams, TwitterException>() {
-            public void onSuccess(TwitterTaskParams payload) {
-                ResponseList res =
-                    (ResponseList)payload.result;
-                if (res.size() == 0) {
-                    Log.d(TAG, "res.size() == 0, no action");
-                    return;
+        ResponseList currentList = mMainListAdapter.getResponses();
+        mTimelineGap.clear();
+
+        if (currentList == null || currentList.isEmpty()) {
+            /* Fetch first N tweets and add to list */
+            TwitterTaskCallback taskCallback = new TwitterTaskCallback
+                    <TwitterTaskParams, TwitterException>() {
+                public void onSuccess(TwitterTaskParams payload) {
+                    ResponseList res = (ResponseList)payload.result;
+                    if (res.size() == 0) {
+                        Log.d(TAG, "res.size() == 0, no action");
+                        return;
+                    }
+                    /* Update list */
+                    mMainListAdapter.appendResponses((ResponseList)res);
+                    mMainListAdapter.notifyDataSetChanged();
+                    /* Update unread count display */
+                    mUnreadCount = mMainList.getFirstVisiblePosition();
+                    mActivity.updateUnreadDisplay();
                 }
-                int currentListPosition = mMainList.getFirstVisiblePosition();
-                mMainListAdapter.prependResponses((ResponseList)res);
-                mMainList.setSelection(currentListPosition);
-                mMainListAdapter.notifyDataSetChanged();
-
-                mSinceId = ((Status)res.get(0)).getId();
-                ResponseList responseList =
-                    mMainListAdapter.getResponses();
-                mMaxId = ((Status)responseList.get(responseList.size()-1))
-                    .getId();
-                Log.d(TAG, "set mMaxId to " + mMaxId);
-
-                mUnreadCount = mMainList.getFirstVisiblePosition();
-                mActivity.updateUnreadDisplay();
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
-        TwitterTaskParams taskParams = new TwitterTaskParams(
-                mTwitterTaskType, new Object[] {mActivity, mMainListAdapter,
-                    mMainList, page});
-
-        new TwitterTask(taskParams, taskCallback, mTwitter).execute();
+                public void onFailure(TwitterException e) {
+                    e.printStackTrace();
+                }
+            };
+            TwitterTaskParams taskParams = new TwitterTaskParams(
+                    mTwitterTaskType, new Object[] {mActivity,
+                        mMainListAdapter, mMainList, page});
+            new TwitterTask(taskParams, taskCallback, mTwitter).execute();
+        } else {
+            page.setSinceId(((Status)currentList.get(0)).getId());
+            final TwitterTaskCallback taskCallback = new TwitterTaskCallback
+                    <TwitterTaskParams, TwitterException>() {
+                public void onSuccess(TwitterTaskParams payload) {
+                    ResponseList res = (ResponseList)payload.result;
+                    if (res.size() > 0) {
+                        mTimelineGap.addAll(res);
+                        page.setMaxId(((Status)mTimelineGap.get(
+                                        mTimelineGap.size()-1)).getId());
+                        TwitterTaskParams taskParams = new TwitterTaskParams(
+                                mTwitterTaskType, new Object[] {mActivity,
+                                    mMainListAdapter, mMainList, page});
+                        new TwitterTask(taskParams, this, mTwitter)
+                            .execute();
+                    } else {
+                        mMainListAdapter.prependResponses(mTimelineGap);
+                        mMainListAdapter.notifyDataSetChanged();
+                    }
+                }
+                public void onFailure(TwitterException e) {
+                    e.printStackTrace();
+                }
+            };
+            TwitterTaskParams taskParams = new TwitterTaskParams(
+                    mTwitterTaskType, new Object[] {mActivity,
+                        mMainListAdapter, mMainList, page});
+            new TwitterTask(taskParams, taskCallback, mTwitter).execute();
+        }
     }
 
     protected void loadNextPage() {
         Log.d(TAG, "loadNextPage");
-        if (mMaxId == -1) {
-            Log.e(TAG, "loadNextPage: mMaxId == -1");
+
+        ResponseList currentList = mMainListAdapter.getResponses();
+        if (currentList.isEmpty()) {
+            Log.e(TAG, "mMainListAdapter.getResponses() is empty");
             return;
         }
         TwitterTaskCallback taskCallback = new TwitterTaskCallback
@@ -212,8 +231,6 @@ public abstract class BaseFinchFragment extends SherlockFragment
                     Log.d(TAG, "res.size()-1 == 0, no action");
                     return;
                 }
-                mMaxId = ((Status)res.get(res.size()-1)).getId();
-                Log.d(TAG, "set mMaxId to " + mMaxId);
                 res.remove(0); // Avoid overlap with maxId
                 mMainListAdapter.appendResponses(res);
                 mMainListAdapter.notifyDataSetChanged();
@@ -225,7 +242,8 @@ public abstract class BaseFinchFragment extends SherlockFragment
         };
         Paging paging = new Paging();
         paging.setCount(FETCH_LIMIT);
-        paging.setMaxId(mMaxId);
+        long maxId = ((Status)currentList.get(currentList.size()-1)).getId();
+        paging.setMaxId(maxId);
         TwitterTaskParams taskParams = new TwitterTaskParams(mTwitterTaskType,
                 new Object[] {mActivity, mMainListAdapter, mMainList, paging});
         new TwitterTask(taskParams, taskCallback, mTwitter).execute();

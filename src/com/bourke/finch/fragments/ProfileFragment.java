@@ -190,8 +190,7 @@ public class ProfileFragment extends SherlockFragment {
             followingUsersCallback = new TwitterTaskCallback<TwitterTaskParams,
                                  TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                ResponseList users =
-                    (ResponseList)payload.result;
+                ResponseList users = (ResponseList)payload.result;
                 ((LazyAdapter)mMainListAdapter).prependResponses(users);
                 mMainListAdapter.notifyDataSetChanged();
             }

@@ -41,6 +41,7 @@ import twitter4j.TwitterResponse;
 import twitter4j.URLEntity;
 
 import twitter4j.User;
+import java.util.List;
 
 public class LazyAdapter extends BaseAdapter {
 
@@ -235,7 +236,7 @@ public class LazyAdapter extends BaseAdapter {
         return position;
     }
 
-    public void prependResponses(ResponseList data) {
+    public void prependResponses(List<TwitterResponse> data) {
         Log.d(TAG, "prependResponses: " + data.size());
         if (mResponses != null) {
             Log.d(TAG, "mResponses: " + mResponses.size());
