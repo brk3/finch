@@ -75,7 +75,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
     private static int FETCH_LIMIT = 20;
 
     private List<TwitterResponse> mTimelineGap =
-        new ResponseList();
+        new ArrayList<TwitterResponse>();
 
     public BaseFinchFragment(int twitterTaskType) {
         mTwitterTaskType = twitterTaskType;
@@ -155,10 +155,11 @@ public abstract class BaseFinchFragment extends SherlockFragment
         final Paging page = new Paging();
         page.setCount(FETCH_LIMIT);
 
-        ResponseList currentList = mMainListAdapter.getResponses();
+        List<TwitterResponse> currentList = mMainListAdapter.getResponses();
         mTimelineGap.clear();
 
         if (currentList == null || currentList.isEmpty()) {
+            Log.d(TAG, "currentList null or empty");
             /* Fetch first N tweets and add to list */
             TwitterTaskCallback taskCallback = new TwitterTaskCallback
                     <TwitterTaskParams, TwitterException>() {
@@ -169,36 +170,57 @@ public abstract class BaseFinchFragment extends SherlockFragment
                         return;
                     }
                     /* Update list */
+                    Log.d(TAG, "fetched " + res.size() + " responses, " +
+                            "appending to adapter");
                     mMainListAdapter.appendResponses((ResponseList)res);
                     mMainListAdapter.notifyDataSetChanged();
                     /* Update unread count display */
-                    mUnreadCount = mMainList.getFirstVisiblePosition();
-                    mActivity.updateUnreadDisplay();
+                    //mUnreadCount = mMainList.getFirstVisiblePosition();
+                    //mActivity.updateUnreadDisplay();
                 }
                 public void onFailure(TwitterException e) {
                     e.printStackTrace();
                 }
             };
+            Log.d(TAG, "Issuing GET with sinceId=" +
+                    page.getSinceId() + ", maxId=" +
+                    page.getMaxId());
             TwitterTaskParams taskParams = new TwitterTaskParams(
                     mTwitterTaskType, new Object[] {mActivity,
                         mMainListAdapter, mMainList, page});
             new TwitterTask(taskParams, taskCallback, mTwitter).execute();
         } else {
+            Log.d(TAG, "current response list size = " + currentList.size());
             page.setSinceId(((Status)currentList.get(0)).getId());
             final TwitterTaskCallback taskCallback = new TwitterTaskCallback
                     <TwitterTaskParams, TwitterException>() {
                 public void onSuccess(TwitterTaskParams payload) {
                     ResponseList res = (ResponseList)payload.result;
+                    /* If we have made a request with maxId set, we need to
+                     * drop the first response as maxId is inclusive */
+                    if (page.getMaxId() > -1) {
+                        Log.d(TAG, "maxId set, dropping first response");
+                        res.remove(0);
+                    }
                     if (res.size() > 0) {
+                        Log.d(TAG, "fetched " + res.size() + " responses, " +
+                                "appending to timeline gap list");
                         mTimelineGap.addAll(res);
                         page.setMaxId(((Status)mTimelineGap.get(
                                         mTimelineGap.size()-1)).getId());
+                        Log.d(TAG, "Issuing GET with sinceId=" +
+                                page.getSinceId() + ", maxId=" +
+                                page.getMaxId());
+                        // TODO: Add some sort of limit here to prevent getting
+                        // rate limited if there's a *lot* to fetch. Also test
+                        // what happens when we are rate limited
                         TwitterTaskParams taskParams = new TwitterTaskParams(
                                 mTwitterTaskType, new Object[] {mActivity,
                                     mMainListAdapter, mMainList, page});
-                        new TwitterTask(taskParams, this, mTwitter)
-                            .execute();
+                        new TwitterTask(taskParams, this, mTwitter).execute();
                     } else {
+                        Log.d(TAG, "fetched " + res.size() + " responses, " +
+                                "prepending timeline gap list to adapter");
                         mMainListAdapter.prependResponses(mTimelineGap);
                         mMainListAdapter.notifyDataSetChanged();
                     }
@@ -207,6 +229,9 @@ public abstract class BaseFinchFragment extends SherlockFragment
                     e.printStackTrace();
                 }
             };
+            Log.d(TAG, "Issuing GET with sinceId=" +
+                    page.getSinceId() + ", maxId=" +
+                    page.getMaxId());
             TwitterTaskParams taskParams = new TwitterTaskParams(
                     mTwitterTaskType, new Object[] {mActivity,
                         mMainListAdapter, mMainList, page});
@@ -217,7 +242,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
     protected void loadNextPage() {
         Log.d(TAG, "loadNextPage");
 
-        ResponseList currentList = mMainListAdapter.getResponses();
+        List<TwitterResponse> currentList = mMainListAdapter.getResponses();
         if (currentList.isEmpty()) {
             Log.e(TAG, "mMainListAdapter.getResponses() is empty");
             return;

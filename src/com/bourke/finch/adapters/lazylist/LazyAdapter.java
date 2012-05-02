@@ -49,7 +49,7 @@ public class LazyAdapter extends BaseAdapter {
 
     private Activity mActivity;
 
-    private ResponseList mResponses;
+    private List<TwitterResponse> mResponses;
 
     private static LayoutInflater inflater = null;
 
@@ -237,17 +237,25 @@ public class LazyAdapter extends BaseAdapter {
     }
 
     public void prependResponses(List<TwitterResponse> data) {
-        Log.d(TAG, "prependResponses: " + data.size());
+        Log.d(TAG, "prependResponses: prepend " + data.size());
+        if (data.isEmpty()) {
+            Log.d(TAG, "Nothing to prepend, returning");
+            return;
+        }
         if (mResponses != null) {
-            Log.d(TAG, "mResponses: " + mResponses.size());
+            Log.d(TAG, "current mResponses size: " + mResponses.size());
             data.addAll(mResponses);
         }
-        mResponses = data;
+        mResponses = new ArrayList<TwitterResponse>(data);
         Log.d(TAG, "new mResponses: " + mResponses.size());
     }
 
-    public void appendResponses(ResponseList data) {
+    public void appendResponses(List<TwitterResponse> data) {
         Log.d(TAG, "appendResponses: " + data.size());
+        if (data.isEmpty()) {
+            Log.d(TAG, "Nothing to append, returning");
+            return;
+        }
         if (mResponses != null) {
             Log.d(TAG, "mResponses: " + mResponses.size());
             mResponses.addAll(data);
@@ -261,7 +269,7 @@ public class LazyAdapter extends BaseAdapter {
         mResponses.clear();
     }
 
-    public ResponseList getResponses() {
+    public List<TwitterResponse> getResponses() {
         return mResponses;
     }
 

@@ -28,7 +28,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 
-import twitter4j.ResponseList;
+import java.util.List;
 
 import twitter4j.Status;
 
@@ -68,8 +68,7 @@ public class HomePageFragment extends BaseFinchFragment {
         }
 
         SharedPreferences.Editor editor = mPrefs.edit();
-        ResponseList content = mMainListAdapter
-                .getResponses();
+        List<TwitterResponse> content = mMainListAdapter.getResponses();
         editor.putInt(Constants.PREF_HOMETIMELINE_POS,
                 mMainList.getFirstVisiblePosition());
         Log.d(TAG, "Wrote hometimeline pos: " +
@@ -91,8 +90,8 @@ public class HomePageFragment extends BaseFinchFragment {
                 FileInputStream fis = mContext.openFileInput(
                         Constants.PREF_HOMETIMELINE_PAGE);
                 ObjectInputStream ois = new ObjectInputStream(fis);
-                ResponseList listContents =
-                    (ResponseList) ois.readObject();
+                List<TwitterResponse> listContents = (List<TwitterResponse>)
+                    ois.readObject();
                 if (listContents != null && listContents.size() > 0) {
                     mMainListAdapter.appendResponses(listContents);
                     mMainListAdapter.notifyDataSetChanged();
