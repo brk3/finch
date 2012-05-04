@@ -66,6 +66,8 @@ public abstract class BaseTimelineFragment extends SherlockFragment
 
     protected int mUnreadCount = 0;
 
+    private int mNewestUnreadIndex = 0;
+
     private int mTwitterTaskType;
 
     private MainActivity mActivity;
@@ -73,7 +75,7 @@ public abstract class BaseTimelineFragment extends SherlockFragment
     /* Update the unread display on scrolling every X items */
     private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
 
-    private static int FETCH_LIMIT = 20;
+    private static final int FETCH_LIMIT = 20;
 
     private List<TwitterResponse> mTimelineGap =
         new ArrayList<TwitterResponse>();
@@ -122,8 +124,18 @@ public abstract class BaseTimelineFragment extends SherlockFragment
     public void onScroll(AbsListView view, int firstVisible, int visibleCount,
             int totalCount) {
 
-        if (totalCount <= 0 || mLoadingPage)
+        if (totalCount <= 0 || mLoadingPage) {
             return;
+        }
+
+        if (firstVisible <= mNewestUnreadIndex) {
+           mNewestUnreadIndex = firstVisible;
+           if (mNewestUnreadIndex % UPDATE_UNREAD_COUNT_INTERVAL == 0 ||
+                   mNewestUnreadIndex == 0) {
+               mUnreadCount = mNewestUnreadIndex;
+               mActivity.updateUnreadDisplay();
+           }
+        }
 
         boolean loadMore = firstVisible + visibleCount >= totalCount;
         if (loadMore) {
@@ -134,6 +146,9 @@ public abstract class BaseTimelineFragment extends SherlockFragment
 
     @Override
     public void onScrollStateChanged(AbsListView v, int scrollState) {
+        if (scrollState == OnScrollListener.SCROLL_STATE_IDLE) {
+            //Log.i("a", "scrolling stopped...");
+        }
     }
 
     @Override
@@ -159,42 +174,9 @@ public abstract class BaseTimelineFragment extends SherlockFragment
         final List<TwitterResponse> currentList = mMainListAdapter
             .getResponses();
         final int currentPosition = mMainList.getFirstVisiblePosition();
-
         mTimelineGap.clear();
 
-        if (currentList == null || currentList.isEmpty()) {
-            Log.d(TAG, "currentList null or empty");
-            /* Fetch first N tweets and add to list */
-            TwitterTaskCallback taskCallback = new TwitterTaskCallback
-                    <TwitterTaskParams, TwitterException>() {
-                public void onSuccess(TwitterTaskParams payload) {
-                    ResponseList res = (ResponseList)payload.result;
-                    if (res.size() == 0) {
-                        Log.d(TAG, "res.size() == 0, no action");
-                        return;
-                    }
-                    /* Update list */
-                    Log.d(TAG, "fetched " + res.size() + " responses, " +
-                            "appending to adapter");
-                    mMainListAdapter.appendResponses((ResponseList)res);
-                    mMainListAdapter.notifyDataSetChanged();
-                    /* Update unread count display */
-                    // TODO: fix this logic
-                    //mUnreadCount = mMainList.getFirstVisiblePosition();
-                    //mActivity.updateUnreadDisplay();
-                }
-                public void onFailure(TwitterException e) {
-                    e.printStackTrace();
-                }
-            };
-            Log.d(TAG, "Issuing GET with sinceId=" +
-                    page.getSinceId() + ", maxId=" +
-                    page.getMaxId());
-            TwitterTaskParams taskParams = new TwitterTaskParams(
-                    mTwitterTaskType, new Object[] {mActivity,
-                        mMainListAdapter, mMainList, page});
-            new TwitterTask(taskParams, taskCallback, mTwitter).execute();
-        } else {
+        if (currentList != null && !currentList.isEmpty()) {
             Log.d(TAG, "current response list size = " + currentList.size());
             page.setSinceId(((Status)currentList.get(0)).getId());
             final TwitterTaskCallback taskCallback = new TwitterTaskCallback
@@ -216,6 +198,10 @@ public abstract class BaseTimelineFragment extends SherlockFragment
                         Log.d(TAG, "Issuing GET with sinceId=" +
                                 page.getSinceId() + ", maxId=" +
                                 page.getMaxId());
+                        /* Update unread count display */
+                        mNewestUnreadIndex = res.size()-1;
+                        mUnreadCount += res.size();
+                        mActivity.updateUnreadDisplay();
                         // TODO: Add some sort of limit here to prevent getting
                         // rate limited if there's a *lot* to fetch. Also test
                         // what happens when we are rate limited
@@ -234,6 +220,37 @@ public abstract class BaseTimelineFragment extends SherlockFragment
                                 currentList.size()) + currentPosition;
                         mMainList.setSelection(newScrollPosition);
                     }
+                }
+                public void onFailure(TwitterException e) {
+                    e.printStackTrace();
+                }
+            };
+            Log.d(TAG, "Issuing GET with sinceId=" +
+                    page.getSinceId() + ", maxId=" +
+                    page.getMaxId());
+            TwitterTaskParams taskParams = new TwitterTaskParams(
+                    mTwitterTaskType, new Object[] {mActivity,
+                        mMainListAdapter, mMainList, page});
+            new TwitterTask(taskParams, taskCallback, mTwitter).execute();
+        } else {
+            Log.d(TAG, "currentList null or empty");
+            /* Fetch first N tweets and add to list */
+            TwitterTaskCallback taskCallback = new TwitterTaskCallback
+                    <TwitterTaskParams, TwitterException>() {
+                public void onSuccess(TwitterTaskParams payload) {
+                    ResponseList res = (ResponseList)payload.result;
+                    if (res.size() == 0) {
+                        Log.d(TAG, "res.size() == 0, no action");
+                        return;
+                    }
+                    /* Update list */
+                    Log.d(TAG, "fetched " + res.size() + " responses, " +
+                            "appending to adapter");
+                    mMainListAdapter.appendResponses((ResponseList)res);
+                    mMainListAdapter.notifyDataSetChanged();
+                    /* Update unread count display */
+                    mUnreadCount += res.size();
+                    mActivity.updateUnreadDisplay();
                 }
                 public void onFailure(TwitterException e) {
                     e.printStackTrace();

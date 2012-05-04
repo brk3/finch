@@ -34,7 +34,8 @@ public class MainActivity extends BaseFinchActivity
     public static final int HOME_PAGE = 0;
     public static final int CONNECTIONS_PAGE = 1;
 
-    private HomeTimelineFragment mHomeTimelineFragment = new HomeTimelineFragment();
+    private HomeTimelineFragment mHomeTimelineFragment =
+        new HomeTimelineFragment();
 
     private ConnectionsTimelineFragment mConnectionsTimelineFragment =
         new ConnectionsTimelineFragment();
@@ -46,8 +47,8 @@ public class MainActivity extends BaseFinchActivity
     private int mStackLevel = 0;
 
     //TODO: add to R.strings
-    public static final String[] CONTENT = new String[] {
-        "Home", "Connect" };
+    public static final String[] CONTENT =
+        new String[] { "Home", "Connect" };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
