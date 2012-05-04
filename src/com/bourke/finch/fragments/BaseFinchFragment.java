@@ -26,6 +26,9 @@ import com.bourke.finch.common.TwitterTaskCallback;
 import com.bourke.finch.common.TwitterTaskParams;
 import com.bourke.finch.lazylist.LazyAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import twitter4j.auth.AccessToken;
 
 import twitter4j.Paging;
@@ -39,8 +42,6 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
-import java.util.List;
-import java.util.ArrayList;
 
 public abstract class BaseFinchFragment extends SherlockFragment
         implements OnScrollListener {
@@ -155,7 +156,10 @@ public abstract class BaseFinchFragment extends SherlockFragment
         final Paging page = new Paging();
         page.setCount(FETCH_LIMIT);
 
-        List<TwitterResponse> currentList = mMainListAdapter.getResponses();
+        final List<TwitterResponse> currentList = mMainListAdapter
+            .getResponses();
+        final int currentPosition = mMainList.getFirstVisiblePosition();
+
         mTimelineGap.clear();
 
         if (currentList == null || currentList.isEmpty()) {
@@ -175,6 +179,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
                     mMainListAdapter.appendResponses((ResponseList)res);
                     mMainListAdapter.notifyDataSetChanged();
                     /* Update unread count display */
+                    // TODO: fix this logic
                     //mUnreadCount = mMainList.getFirstVisiblePosition();
                     //mActivity.updateUnreadDisplay();
                 }
@@ -223,6 +228,11 @@ public abstract class BaseFinchFragment extends SherlockFragment
                                 "prepending timeline gap list to adapter");
                         mMainListAdapter.prependResponses(mTimelineGap);
                         mMainListAdapter.notifyDataSetChanged();
+                        int newListSize = mMainListAdapter.getResponses()
+                            .size();
+                        int newScrollPosition = (newListSize -
+                                currentList.size()) + currentPosition;
+                        mMainList.setSelection(newScrollPosition);
                     }
                 }
                 public void onFailure(TwitterException e) {
