@@ -43,10 +43,10 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
 
-public abstract class BaseFinchFragment extends SherlockFragment
+public abstract class BaseTimelineFragment extends SherlockFragment
         implements OnScrollListener {
 
-    protected String TAG = "Finch/BaseFinchFragment";
+    protected String TAG = "Finch/BaseTimelineFragment";
 
     protected ListView mMainList;
 
@@ -68,7 +68,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
     private int mTwitterTaskType;
 
-    private FinchActivity mActivity;
+    private MainActivity mActivity;
 
     /* Update the unread display on scrolling every X items */
     private static final int UPDATE_UNREAD_COUNT_INTERVAL = 3;
@@ -78,15 +78,15 @@ public abstract class BaseFinchFragment extends SherlockFragment
     private List<TwitterResponse> mTimelineGap =
         new ArrayList<TwitterResponse>();
 
-    public BaseFinchFragment(int twitterTaskType) {
+    public BaseTimelineFragment(int twitterTaskType) {
         mTwitterTaskType = twitterTaskType;
 
         switch (mTwitterTaskType) {
             case TwitterTask.GET_HOME_TIMELINE:
-                TAG = "Finch/HomePageFragment";
+                TAG = "Finch/HomeTimelineFragment";
                 break;
             case TwitterTask.GET_MENTIONS:
-                TAG = "Finch/ConnectionsFragment";
+                TAG = "Finch/ConnectionsTimelineFragment";
                 break;
         }
     }
@@ -99,7 +99,7 @@ public abstract class BaseFinchFragment extends SherlockFragment
 
         setHasOptionsMenu(true);
 
-        mActivity = (FinchActivity)getSherlockActivity();
+        mActivity = (MainActivity)getSherlockActivity();
         mContext = mActivity.getApplicationContext();
         mPrefs = mActivity.getSharedPreferences("twitterPrefs",
                 Context.MODE_PRIVATE);

@@ -149,7 +149,7 @@ public class LoginActivity extends SherlockFragmentActivity {
 
             Toast.makeText(mContext, "Logged In", Toast.LENGTH_SHORT).show();
 
-            startActivity(new Intent(mContext, FinchActivity.class));
+            startActivity(new Intent(mContext, MainActivity.class));
         }
     }
 }

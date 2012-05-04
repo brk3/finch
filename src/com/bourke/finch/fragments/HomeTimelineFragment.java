@@ -36,13 +36,13 @@ import twitter4j.TwitterException;
 
 import twitter4j.TwitterResponse;
 
-public class HomePageFragment extends BaseFinchFragment {
+public class HomeTimelineFragment extends BaseTimelineFragment {
 
-    private static final String TAG = "Finch/HomePageFragment";
+    private static final String TAG = "Finch/HomeTimelineFragment";
 
     private int mLastSelectedIndex;
 
-    public HomePageFragment() {
+    public HomeTimelineFragment() {
         super(TwitterTask.GET_HOME_TIMELINE);
     }
 

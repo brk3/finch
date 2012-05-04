@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.bourke.finch.lazylist.Utils;
 import com.bourke.finch.BaseFinchActivity;
-import com.bourke.finch.FinchActivity;
+import com.bourke.finch.MainActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;

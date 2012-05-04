@@ -2,11 +2,11 @@ package com.bourke.finch;
 
 import com.bourke.finch.common.TwitterTask;
 
-public class ConnectionsFragment extends BaseFinchFragment {
+public class ConnectionsTimelineFragment extends BaseTimelineFragment {
 
-    private static final String TAG = "Finch/ConnectionsFragment";
+    private static final String TAG = "Finch/ConnectionsTimelineFragment";
 
-    public ConnectionsFragment() {
+    public ConnectionsTimelineFragment() {
         super(TwitterTask.GET_MENTIONS);
     }
 

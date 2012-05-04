@@ -26,18 +26,18 @@ import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
 import android.view.View;
 
-public class FinchActivity extends BaseFinchActivity
+public class MainActivity extends BaseFinchActivity
         implements ViewPager.OnPageChangeListener {
 
-    private static final String TAG = "Finch/FinchActivity";
+    private static final String TAG = "Finch/MainActivity";
 
     public static final int HOME_PAGE = 0;
     public static final int CONNECTIONS_PAGE = 1;
 
-    private HomePageFragment mHomePageFragment = new HomePageFragment();
+    private HomeTimelineFragment mHomeTimelineFragment = new HomeTimelineFragment();
 
-    private ConnectionsFragment mConnectionsFragment =
-        new ConnectionsFragment();
+    private ConnectionsTimelineFragment mConnectionsTimelineFragment =
+        new ConnectionsTimelineFragment();
 
     private int mCurrentPage = HOME_PAGE;
 
@@ -78,10 +78,10 @@ public class FinchActivity extends BaseFinchActivity
         mCurrentPage = position;
         switch (position) {
             case HOME_PAGE:
-                mHomePageFragment.refresh();
+                mHomeTimelineFragment.refresh();
                 break;
             case CONNECTIONS_PAGE:
-                mConnectionsFragment.refresh();
+                mConnectionsTimelineFragment.refresh();
                 break;
         }
     }
@@ -97,10 +97,10 @@ public class FinchActivity extends BaseFinchActivity
         int unreadCount = 0;
         switch (mCurrentPage) {
             case HOME_PAGE:
-                unreadCount = mHomePageFragment.getUnreadCount();
+                unreadCount = mHomeTimelineFragment.getUnreadCount();
                 break;
             case CONNECTIONS_PAGE:
-                unreadCount = mConnectionsFragment.getUnreadCount();
+                unreadCount = mConnectionsTimelineFragment.getUnreadCount();
                 break;
         }
         mUnreadCountView.setText(unreadCount+"");
@@ -165,9 +165,9 @@ public class FinchActivity extends BaseFinchActivity
         public SherlockFragment getItem(int position) {
             switch (position) {
                 case HOME_PAGE:
-                    return mHomePageFragment;
+                    return mHomeTimelineFragment;
                 case CONNECTIONS_PAGE:
-                    return mConnectionsFragment;
+                    return mConnectionsTimelineFragment;
             }
             return null;
         }
