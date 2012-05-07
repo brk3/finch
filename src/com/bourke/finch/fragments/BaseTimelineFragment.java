@@ -198,10 +198,6 @@ public abstract class BaseTimelineFragment extends SherlockFragment
                         Log.d(TAG, "Issuing GET with sinceId=" +
                                 page.getSinceId() + ", maxId=" +
                                 page.getMaxId());
-                        /* Update unread count display */
-                        mNewestUnreadIndex = res.size()-1;
-                        mUnreadCount += res.size();
-                        mActivity.updateUnreadDisplay();
                         // TODO: Add some sort of limit here to prevent getting
                         // rate limited if there's a *lot* to fetch. Also test
                         // what happens when we are rate limited
@@ -219,6 +215,11 @@ public abstract class BaseTimelineFragment extends SherlockFragment
                         int newScrollPosition = (newListSize -
                                 currentList.size()) + currentPosition;
                         mMainList.setSelection(newScrollPosition);
+
+                        /* Update unread count display */
+                        mNewestUnreadIndex = mTimelineGap.size()-1;
+                        mUnreadCount += mTimelineGap.size();
+                        mActivity.updateUnreadDisplay();
                     }
                 }
                 public void onFailure(TwitterException e) {

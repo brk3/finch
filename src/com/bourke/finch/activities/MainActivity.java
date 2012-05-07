@@ -15,6 +15,8 @@ import android.support.v4.view.ViewPager;
 
 import android.util.Log;
 
+import android.view.View;
+
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -24,7 +26,6 @@ import com.bourke.finch.fragments.NewTweetDialogFragment;
 
 import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
-import android.view.View;
 
 public class MainActivity extends BaseFinchActivity
         implements ViewPager.OnPageChangeListener {
@@ -65,13 +66,10 @@ public class MainActivity extends BaseFinchActivity
     }
 
     @Override
-    public void onPageScrollStateChanged(int state) {
-    }
+    public void onPageScrollStateChanged(int state) {}
 
     @Override
-    public void onPageScrolled(int position, float positionOffset,
-            int positionOffsetPixels) {
-    }
+    public void onPageScrolled(int pos, float posOffset, int posOffsetPx) {}
 
     @Override
     public void onPageSelected(int position) {

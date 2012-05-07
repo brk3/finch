@@ -99,6 +99,8 @@ public class LazyAdapter extends BaseAdapter {
             }
         });
 
+
+
         if (mSelectedIndex == position) {
             vi.setBackgroundResource(android.R.color.holo_blue_light);
         } else {
@@ -212,8 +214,8 @@ public class LazyAdapter extends BaseAdapter {
                 R.id.text_screenname);
         holder.image_profile = (ImageView)vi.findViewById(
                 R.id.image_profile);
-        //holder.image_media_entity = (ImageView)vi.findViewById(
-        //        R.id.image_media_entity);
+        holder.image_media_entity = (ImageView)vi.findViewById(
+                R.id.image_media_entity);
 
         vi.setTag(holder);
 
@@ -288,7 +290,7 @@ public class LazyAdapter extends BaseAdapter {
         TextView text_time;
         TextView text_screenname;
         ImageView image_profile;
-        //ImageView image_media_entity;
+        ImageView image_media_entity;
     }
 
 }
