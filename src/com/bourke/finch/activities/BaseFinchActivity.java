@@ -12,8 +12,12 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.util.Log;
+
 import android.view.View;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -28,6 +32,14 @@ import com.bourke.finch.common.FinchTwitterFactory;
 import com.bourke.finch.common.TwitterTask;
 import com.bourke.finch.common.TwitterTaskCallback;
 import com.bourke.finch.common.TwitterTaskParams;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 
 import twitter4j.auth.AccessToken;
 
@@ -47,8 +59,6 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity {
 
     private MenuItem mMenuItemRefresh;
 
-    private SharedPreferences mPrefs;
-
     private AccessToken mAccessToken;
 
     private Twitter mTwitter;
@@ -66,16 +76,14 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
 
         mContext = getApplicationContext();
-        mPrefs = getSharedPreferences("twitterPrefs", Context.MODE_PRIVATE);
-
-        initActionBar();
 
         if (!initTwitter()) {
             Intent intent = new Intent();
-            intent.setClass(this, LoginActivity.class);
+            intent.setClass(BaseFinchActivity.this,
+                LoginActivity.class);
             startActivity(intent);
         } else {
-            showUserInActionbar();
+            initActionBar();
         }
     }
 
@@ -103,9 +111,11 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity {
     }
 
     private boolean initTwitter() {
-        mPrefs = getSharedPreferences("twitterPrefs", Context.MODE_PRIVATE);
-        String token = mPrefs.getString(Constants.PREF_ACCESS_TOKEN, null);
-        String secret = mPrefs.getString(
+        SharedPreferences twitterPrefs = getSharedPreferences(
+                Constants.PREF_TOKEN_DATA, Context.MODE_PRIVATE);
+        String token = twitterPrefs.getString(Constants.PREF_ACCESS_TOKEN,
+                null);
+        String secret = twitterPrefs.getString(
                 Constants.PREF_ACCESS_TOKEN_SECRET, null);
         if (token == null || secret == null) {
             return false;
@@ -119,8 +129,7 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity {
     }
 
     private void initActionBar() {
-        /*
-         * Set up actionbar and split backgrounds / color
+        /* Set up actionbar and split backgrounds / color
          * Workaround for http://b.android.com/15340
          */
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
@@ -144,44 +153,99 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity {
         titleTextView.setTypeface(typeface);
         titleTextView.setText("Finch");
         getSupportActionBar().setCustomView(mActionCustomView);
+
+        /* Only show user info once actionbar is drawn to screen */
+        ViewTreeObserver vto = mActionCustomView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mActionCustomView.getViewTreeObserver()
+                    .removeGlobalOnLayoutListener(this);
+                showUserInActionbar(false);
+            }
+        });
     }
 
-    //TODO: this entire function badly needs to be cached
-    private void showUserInActionbar() {
-        /* Set up callback to set user's profile image to actionbar */
-        final TwitterTaskCallback<TwitterTaskParams, TwitterException>
-            profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,
-                                                    TwitterException>() {
-            public void onSuccess(TwitterTaskParams payload) {
-                Drawable profileImage = (Drawable)payload.result;
-                ImageView homeIcon = (ImageView)mActionCustomView
-                    .findViewById(R.id.ab_home_icon);
-                int abHeight = getSupportActionBar().getHeight();
-                RelativeLayout.LayoutParams layoutParams =
-                    new RelativeLayout.LayoutParams(abHeight, abHeight);
-                layoutParams.setMargins(5, 5, 5, 5);
-                homeIcon.setLayoutParams(layoutParams);
-                homeIcon.setImageDrawable(profileImage);
-            }
-            public void onFailure(TwitterException e) {
-                e.printStackTrace();
-            }
-        };
+    private void setActionBarHomeIcon(Drawable image) {
+        ImageView homeIcon = (ImageView)mActionCustomView
+            .findViewById(R.id.ab_home_icon);
+        int abHeight = getSupportActionBar().getHeight();
+        RelativeLayout.LayoutParams layoutParams =
+            new RelativeLayout.LayoutParams(abHeight, abHeight);
+        layoutParams.setMargins(5, 5, 5, 5);
+        homeIcon.setLayoutParams(layoutParams);
+        homeIcon.setImageDrawable(image);
+    }
 
+    private void setActionBarSubTitle(String text) {
+        TextView textScreenName = (TextView)mActionCustomView
+            .findViewById(R.id.ab_text_screenname);
+        textScreenName.setText(text);
+    }
+
+    private void writeProfileCache(String profileImage, String screenName) {
+        SharedPreferences profileData = getSharedPreferences(
+                Constants.PREF_PROFILE_DATA, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = profileData.edit();
+        editor.putString(Constants.PREF_PROFILE_IMAGE, profileImage);
+        editor.putString(Constants.PREF_SCREEN_NAME, screenName);
+        editor.commit();
+        Log.d(TAG, "Sucessfully wrote profile cache data");
+    }
+
+    /* Check if both screenname and profileImage are in the cache */
+    private boolean readProfileCache() {
+        SharedPreferences profileData = getSharedPreferences(
+                Constants.PREF_PROFILE_DATA, Context.MODE_PRIVATE);
+        String screenName = profileData.getString(Constants.PREF_SCREEN_NAME,
+                null);
+        String profileImagePath = profileData.getString(
+                Constants.PREF_PROFILE_IMAGE, null);
+        if (profileImagePath != null && screenName != null) {
+            Log.d(TAG, "Found profile data in cache, using it for ab home " +
+                    "icon and subtitle");
+            setActionBarSubTitle("@"+screenName);
+            setActionBarHomeIcon(Drawable.createFromPath(profileImagePath));
+            return true;
+        }
+        return false;
+    }
+
+    private void showUserInActionbar(boolean forceCacheRefresh) {
+        if (!forceCacheRefresh) {
+            boolean success = readProfileCache();
+            if (success) {
+                return;
+            }
+        }
+        Log.d(TAG, "No profile data in cache, fetching it");
+        /* If here we need to fetch them from Twitter */
         TwitterTaskCallback<TwitterTaskParams, TwitterException>
             showUserCallback =  new TwitterTaskCallback<TwitterTaskParams,
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                String screenName = ((User)payload.result).getScreenName();
-                TextView textScreenName = (TextView)mActionCustomView
-                    .findViewById(R.id.ab_text_screenname);
-                textScreenName.setText("@"+screenName);
+                final String screenName = ((User)payload.result)
+                    .getScreenName();
+                setActionBarSubTitle("@"+screenName);
 
                 /* Now we have screenName, start another thread to get the
                  * profile image */
+                final TwitterTaskCallback<TwitterTaskParams, TwitterException>
+                    profileImageCallback = new TwitterTaskCallback
+                        <TwitterTaskParams, TwitterException>() {
+                    public void onSuccess(TwitterTaskParams payload) {
+                        String imagePath = (String)payload.result;
+                        Drawable profileImage = Drawable.createFromPath(
+                                imagePath);
+                        setActionBarHomeIcon(profileImage);
+                        writeProfileCache(imagePath, screenName);
+                    }
+                    public void onFailure(TwitterException e) {
+                        e.printStackTrace();
+                    }
+                };
                 TwitterTaskParams showProfileImageParams =
                     new TwitterTaskParams(TwitterTask.GET_PROFILE_IMAGE,
-                        //new Object[] {getCacheDir(), screenName,
                         new Object[] {BaseFinchActivity.this, screenName,
                             ProfileImage.NORMAL});
                 new TwitterTask(showProfileImageParams, profileImageCallback,
@@ -191,13 +255,9 @@ public abstract class BaseFinchActivity extends SherlockFragmentActivity {
                 e.printStackTrace();
             }
         };
-
-        /* Set actionbar subtitle to user's username, and home icon to user's
-         * profile image */
         TwitterTaskParams showUserParams = new TwitterTaskParams(
                 TwitterTask.SHOW_USER,
                 new Object[] {this, mAccessToken.getUserId()});
-        new TwitterTask(showUserParams, showUserCallback,
-                mTwitter).execute();
+        new TwitterTask(showUserParams, showUserCallback, mTwitter).execute();
     }
 }

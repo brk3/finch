@@ -34,6 +34,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import twitter4j.User;
+import android.graphics.drawable.Drawable;
 
 public class ProfileActivity extends BaseFinchActivity {
 
@@ -98,7 +99,9 @@ public class ProfileActivity extends BaseFinchActivity {
             profileImageCallback =  new TwitterTaskCallback<TwitterTaskParams,
                                                     TwitterException>() {
             public void onSuccess(TwitterTaskParams payload) {
-                mProfileImage.setImageDrawable((BitmapDrawable)payload.result);
+                String imagePath = (String)payload.result;
+                mProfileImage.setImageDrawable(Drawable.createFromPath(
+                            imagePath));
             }
             public void onFailure(TwitterException e) {
                 e.printStackTrace();

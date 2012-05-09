@@ -119,6 +119,7 @@ public class TwitterTask extends
             case GET_PROFILE_IMAGE:
                 Log.d(TAG, "Running taskType GET_PROFILE_IMAGE");
                 Drawable bitmap = null;
+                File tempFile = null;
                 try {
                     BaseFinchActivity a = (BaseFinchActivity)payload.data[0];
                     File cacheDir = a.getCacheDir();
@@ -130,7 +131,7 @@ public class TwitterTask extends
                             p_screenName, imageSize);
                     String profileImageUrl = p.getURL();
 
-                    File tempFile = new File(cacheDir, "profile_image");
+                    tempFile = new File(cacheDir, "profile_" + p_screenName);
                     URL imageUrl = new URL(p.getURL());
                     HttpURLConnection conn =
                         (HttpURLConnection)imageUrl.openConnection();
@@ -147,7 +148,7 @@ public class TwitterTask extends
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                payload.result = bitmap;
+                payload.result = tempFile.toString();
                 break;
 
             case GET_USER_TIMELINE:

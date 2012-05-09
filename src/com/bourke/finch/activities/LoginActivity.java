@@ -33,8 +33,6 @@ public class LoginActivity extends SherlockFragmentActivity {
 
     private Context mContext;
 
-    private SharedPreferences mPrefs;
-
     private Twitter mTwitter;
 
 	private RequestToken mReqToken;
@@ -45,7 +43,6 @@ public class LoginActivity extends SherlockFragmentActivity {
         super.onCreate(savedInstanceState);
 
         mContext = getApplicationContext();
-        mPrefs = getSharedPreferences("twitterPrefs", MODE_PRIVATE);
 
         setContentView(R.layout.login);
         getSupportActionBar().hide();
@@ -131,7 +128,6 @@ public class LoginActivity extends SherlockFragmentActivity {
 
         @Override
         protected void onPostExecute(Void result) {
-
             if (mAccessToken == null) {
                 return;
             }
@@ -141,7 +137,9 @@ public class LoginActivity extends SherlockFragmentActivity {
             /* Save creds to preferences for future use */
             String token = mAccessToken.getToken();
             String secret = mAccessToken.getTokenSecret();
-            SharedPreferences.Editor editor = mPrefs.edit();
+            SharedPreferences twitterPrefs = getSharedPreferences(
+                    Constants.PREF_TOKEN_DATA, MODE_PRIVATE);
+            SharedPreferences.Editor editor = twitterPrefs.edit();
             editor.putString(Constants.PREF_ACCESS_TOKEN, token);
             editor.putString(Constants.PREF_ACCESS_TOKEN_SECRET,
                     secret);

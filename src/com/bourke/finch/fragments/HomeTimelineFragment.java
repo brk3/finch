@@ -67,7 +67,9 @@ public class HomeTimelineFragment extends BaseTimelineFragment {
             e.printStackTrace();
         }
 
-        SharedPreferences.Editor editor = mPrefs.edit();
+        SharedPreferences hometimelineData = mContext.getSharedPreferences(
+                Constants.PREF_HOMETIMELINE_DATA, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = hometimelineData.edit();
         List<TwitterResponse> content = mMainListAdapter.getResponses();
         editor.putInt(Constants.PREF_HOMETIMELINE_POS,
                 mMainList.getFirstVisiblePosition());
@@ -110,7 +112,10 @@ public class HomeTimelineFragment extends BaseTimelineFragment {
         }
 
         /* Restore list position */
-        int timelinePos = mPrefs.getInt(Constants.PREF_HOMETIMELINE_POS, -1);
+        SharedPreferences hometimelineData = mContext.getSharedPreferences(
+                Constants.PREF_HOMETIMELINE_DATA, Context.MODE_PRIVATE);
+        int timelinePos = hometimelineData.getInt(
+                Constants.PREF_HOMETIMELINE_POS, -1);
         if (timelinePos != -1) {
             mMainList.setSelection(timelinePos);
             mMainListAdapter.notifyDataSetChanged();

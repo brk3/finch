@@ -81,7 +81,8 @@ public class ProfileFragment extends SherlockFragment {
         /* Set up adapter depending on TYPE */
         switch (mType) {
             case TYPE_TWEETS:
-                mMainListAdapter = new UserTimeLineAdapter(getSherlockActivity());
+                mMainListAdapter = new UserTimeLineAdapter(
+                        getSherlockActivity());
                 mMainList.setAdapter(mMainListAdapter);
                 mMainList.setOnItemClickListener(
                         new AdapterView.OnItemClickListener() {

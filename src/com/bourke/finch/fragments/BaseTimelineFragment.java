@@ -1,7 +1,6 @@
 package com.bourke.finch;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import android.os.Bundle;
 
@@ -56,8 +55,6 @@ public abstract class BaseTimelineFragment extends SherlockFragment
 
     protected AccessToken mAccessToken;
 
-    protected SharedPreferences mPrefs;
-
     protected ActionMode mMode;
 
     protected Context mContext;
@@ -103,8 +100,6 @@ public abstract class BaseTimelineFragment extends SherlockFragment
 
         mActivity = (MainActivity)getSherlockActivity();
         mContext = mActivity.getApplicationContext();
-        mPrefs = mActivity.getSharedPreferences("twitterPrefs",
-                Context.MODE_PRIVATE);
         mTwitter = FinchTwitterFactory.getInstance(mContext).getTwitter();
     }
 
