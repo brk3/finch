@@ -19,7 +19,7 @@ Needs work:
 * Lots more
 
 Will happily accept pull requests as long as they match the existing code
-style.
+style (< 80 char line lengths are a must!).
 
 Setup
 -----
@@ -37,7 +37,15 @@ equivalent instructions on building with Eclipse please send a pull request.
 ```
 
 You will also need Twitter consumer keys (see https://dev.twitter.com/), and
-add them to [src/com/bourke/finch/common/Constants.java](https://github.com/brk3/finch/blob/master/src/com/bourke/finch/common/Constants.java).
+add them to [src/com/bourke/finch/common/ConsumerKey.java](https://github.com/brk3/finch/blob/master/src/com/bourke/finch/common/ConsumerKey.java).
+
+You should take care not to commit your keys to git as they could be stolen and
+abused.  Run the following to make git ignore this file:
+
+```bash
+    git update-index --assume-unchanged \
+    src/com/bourke/finch/common/ConsumerKey.java
+```
 
 Building
 --------

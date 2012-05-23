@@ -4,7 +4,7 @@ import android.content.Context;
 
 import android.util.Log;
 
-import com.bourke.finch.common.Constants;
+import com.bourke.finch.common.ConsumerKey;
 
 import java.io.File;
 
@@ -31,8 +31,9 @@ public class FinchTwitterFactory {
         installHttpResponseCache();
 
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-        configurationBuilder.setOAuthConsumerKey(Constants.CONSUMER_KEY);
-        configurationBuilder.setOAuthConsumerSecret(Constants.CONSUMER_SECRET);
+        configurationBuilder.setOAuthConsumerKey(ConsumerKey.CONSUMER_KEY);
+        configurationBuilder.setOAuthConsumerSecret(
+                ConsumerKey.CONSUMER_SECRET);
         configurationBuilder.setUseSSL(true);
         Configuration configuration = configurationBuilder.build();
         mTwitter = new TwitterFactory(configuration).getInstance();

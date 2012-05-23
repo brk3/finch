@@ -14,10 +14,6 @@ public class Constants {
 
     public static final String CALLBACK_URL = "finch-callback:///";
 
-    public static final String CONSUMER_KEY = "<consumer-key>";
-    public static final String CONSUMER_SECRET =
-        "<consumer-secret>";
-
 	public static final String PREF_ACCESS_TOKEN = "accessToken";
 	public static final String PREF_ACCESS_TOKEN_SECRET = "accessTokenSecret";
 	public static final String PREF_SCREEN_NAME = "screenName";
